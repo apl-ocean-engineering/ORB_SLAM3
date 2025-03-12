@@ -549,8 +549,8 @@ namespace ORB_SLAM3 {
             }
             output << " ]" << endl;
         }
-        
-        if((settings.sensor_ == System::STEREO || settings.sensor_ == System::IMU_STEREO) && settings.cameraType_ !=  Settings::Rectified){
+
+        if((settings.sensor_ == System::STEREO || settings.sensor_ == System::IMU_STEREO) && (settings.cameraType_ !=  Settings::Rectified)){
             output << "\t-Camera 2 parameters (";
             if(settings.cameraType_ == Settings::PinHole || settings.cameraType_ ==  Settings::Rectified){
                 output << "Pinhole";
