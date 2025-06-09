@@ -1,3 +1,14 @@
+> [!NOTE]
+> My personal fork of ORBSLAM3.   This version contains changes to integrate with the [orbslam3_ros2](https://gitlab.com/apl-ocean-engineering/orbslam3_ros2) wrapper:
+
+* Removed the "ThirdParty" copies of Sophus and g2o in lieu of the versions available as ROS packages.  Due to API changes, thise necessitated some more invasive changes to the ORB-SLAM code.
+
+> I _am not_ testing if this repo buids outside of ROS2.   I am _only_ checking that [orbslam3_ros2](https://gitlab.com/apl-ocean-engineering/orbslam3_ros2) builds.  
+
+
+
+
+
 # ORB-SLAM3
 
 ### V1.0, December 22th, 2021
