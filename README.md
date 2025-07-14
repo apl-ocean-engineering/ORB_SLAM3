@@ -1,3 +1,16 @@
+> [!NOTE]
+> This is my personal "working" fork of ORBSLAM3, which focuses on integrating ORBSLAM3 into ROS2.   The actual ROS2 integration takes place in [orbslam3_ros2](https://gitlab.com/apl-ocean-engineering/orbslam3_ros2), but this repo contains multiple updates:
+
+* I removed the "ThirdParty" copies of "Sophus" and "g2o" in lieu of packages which can be installed "rosdep".  Due to API changes, this necessitated some syntactically invasive (but functionally equivalent) changes.
+
+> I _am not_ testing this repo outside of ROS2.   I am _only_ checking that [orbslam3_ros2](https://gitlab.com/apl-ocean-engineering/orbslam3_ros2) will build.  
+
+
+-----
+
+Author's original README follows below.
+
+
 # ORB-SLAM3
 
 ### V1.0, December 22th, 2021

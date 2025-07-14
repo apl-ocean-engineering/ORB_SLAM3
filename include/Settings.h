@@ -16,12 +16,11 @@
 * If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef ORB_SLAM3_SETTINGS_H
-#define ORB_SLAM3_SETTINGS_H
+#pragma once
 
 
 // Flag to activate the measurement of time in each process (track,localmap, place recognition).
-//#define REGISTER_TIMES
+#define REGISTER_TIMES
 
 #include "CameraModels/GeometricCamera.h"
 
@@ -231,5 +230,3 @@ namespace ORB_SLAM3 {
     };
 };
 
-
-#endif //ORB_SLAM3_SETTINGS_H

@@ -1951,8 +1951,10 @@ void Tracking::Track()
                 {
                     Verbose::PrintMess("TRACK: Track with motion model", Verbose::VERBOSITY_DEBUG);
                     bOK = TrackWithMotionModel();
-                    if(!bOK)
+                    if(!bOK){
+                        Verbose::PrintMess("TRACK:  ... motion model failed, falling back to reference key frame", Verbose::VERBOSITY_DEBUG);
                         bOK = TrackReferenceKeyFrame();
+                    }
                 }
 
 
@@ -1965,7 +1967,6 @@ void Tracking::Track()
                     }
                     else if(pCurrentMap->KeyFramesInMap()>10)
                     {
-                        // cout << "KF in map: " << pCurrentMap->KeyFramesInMap() << endl;
                         mState = RECENTLY_LOST;
                         mTimeStampLost = mCurrentFrame.mTimeStamp;
                     }
@@ -2340,13 +2341,13 @@ void Tracking::StereoInitialization()
         {
             if (!mCurrentFrame.mpImuPreintegrated || !mLastFrame.mpImuPreintegrated)
             {
-                cout << "not IMU meas" << endl;
+                cout << "no IMU meas to initialize this map" << endl;
                 return;
             }
 
             if (!mFastInit && (mCurrentFrame.mpImuPreintegratedFrame->avgA-mLastFrame.mpImuPreintegratedFrame->avgA).norm()<0.5)
             {
-                cout << "not enough acceleration" << endl;
+                cout << "not enough acceleration to initialize" << endl;
                 return;
             }
 
@@ -2729,9 +2730,11 @@ bool Tracking::TrackReferenceKeyFrame()
 
     int nmatches = matcher.SearchByBoW(mpReferenceKF,mCurrentFrame,vpMapPointMatches);
 
+    cout << "Tracking::TrackReferenceKeyFrame:  Got " << nmatches << " matches" << std::endl;
+
     if(nmatches<15)
     {
-        cout << "TRACK_REF_KF: Less than 15 matches!!\n";
+        cout << "TRACK_REF_KF: Less than 15 matches!!" << std::endl;
         return false;
     }
 
@@ -2878,12 +2881,15 @@ bool Tracking::TrackWithMotionModel()
     // Project points seen in previous frame
     int th;
 
-    if(mSensor==System::STEREO)
-        th=7;
-    else
+    // if(mSensor==System::STEREO)
+    //     th=7;
+    // else
         th=15;
 
     int nmatches = matcher.SearchByProjection(mCurrentFrame,mLastFrame,th,mSensor==System::MONOCULAR || mSensor==System::IMU_MONOCULAR);
+
+    cout << "Tracking::TrackWithMotionModel found " << nmatches << " matches in first pass" << std::endl;
+
 
     // If few matches, uses a wider window search
     if(nmatches<20)
@@ -2934,6 +2940,9 @@ bool Tracking::TrackWithMotionModel()
         }
     }
 
+    cout << "Tracking::TrackWithMotionModel this led to " << nmatchesMap << " matches against the map" << std::endl;
+
+
     if(mbOnlyTracking)
     {
         mbVO = nmatchesMap<10;
@@ -2942,8 +2951,11 @@ bool Tracking::TrackWithMotionModel()
 
     if (mSensor == System::IMU_MONOCULAR || mSensor == System::IMU_STEREO || mSensor == System::IMU_RGBD)
         return true;
-    else
-        return nmatchesMap>=10;
+    else {
+        const bool goodTracking = (nmatchesMap>=10);
+            cout << "Tracking::TrackWithMotionModel tracking is " << (goodTracking ? "GOOD" : "BAD") << std::endl;
+        return goodTracking;
+    }
 }
 
 bool Tracking::TrackLocalMap()
@@ -3023,6 +3035,8 @@ bool Tracking::TrackLocalMap()
                 mCurrentFrame.mvpMapPoints[i] = static_cast<MapPoint*>(NULL);
         }
     }
+
+cout << "mnMatchesInliers: " << mnMatchesInliers << std::endl; 
 
     // Decide if the tracking was succesful
     // More restrictive if there was a relocalization recently
