@@ -1635,7 +1635,7 @@ void Tracking::PreintegrateIMU()
     mvImuFromLastFrame.reserve(mlQueueImuData.size());
     if(mlQueueImuData.size() == 0)
     {
-        Verbose::PrintMess("Not IMU data in mlQueueImuData!!", Verbose::VERBOSITY_NORMAL);
+        Verbose::PrintMess("No IMU data in mlQueueImuData!!", Verbose::VERBOSITY_NORMAL);
         mCurrentFrame.setIntegrated();
         return;
     }
@@ -2341,13 +2341,13 @@ void Tracking::StereoInitialization()
         {
             if (!mCurrentFrame.mpImuPreintegrated || !mLastFrame.mpImuPreintegrated)
             {
-                cout << "no IMU meas to initialize this map" << endl;
+                PLOGI << "No IMU measurements to initialize this map";
                 return;
             }
 
             if (!mFastInit && (mCurrentFrame.mpImuPreintegratedFrame->avgA-mLastFrame.mpImuPreintegratedFrame->avgA).norm()<0.5)
             {
-                cout << "not enough acceleration to initialize" << endl;
+                PLOGI << "not enough acceleration to initialize";
                 return;
             }
 
@@ -2904,7 +2904,7 @@ bool Tracking::TrackWithMotionModel()
 
     if(nmatches<20)
     {
-        Verbose::PrintMess("Not enough matches!!", Verbose::VERBOSITY_NORMAL);
+        Verbose::PrintMess("Not enough matches after wider search!!", Verbose::VERBOSITY_NORMAL);
         if (mSensor == System::IMU_MONOCULAR || mSensor == System::IMU_STEREO || mSensor == System::IMU_RGBD)
             return true;
         else
@@ -3068,7 +3068,7 @@ cout << "mnMatchesInliers: " << mnMatchesInliers << std::endl;
     }
     else
     {
-        if(mnMatchesInliers<30)
+        if(mnMatchesInliers<15)
             return false;
         else
             return true;
@@ -3093,9 +3093,9 @@ bool Tracking::NeedNewKeyFrame()
     // If Local Mapping is freezed by a Loop Closure do not insert keyframes
     if(mpLocalMapper->isStopped() || mpLocalMapper->stopRequested()) {
         /*if(mSensor == System::MONOCULAR)
-        {
-            std::cout << "NeedNewKeyFrame: localmap stopped" << std::endl;
-        }*/
+        {*/
+            std::cout << "NeedNewKeyFrame: Not adding KF because localmap is stopped" << std::endl;
+        
         return false;
     }
 
@@ -3109,7 +3109,7 @@ bool Tracking::NeedNewKeyFrame()
 
     // Tracked MapPoints in the reference keyframe
     int nMinObs = 3;
-    if(nKFs<=2)
+    //if(nKFs<=2)
         nMinObs=2;
     int nRefMatches = mpReferenceKF->TrackedMapPoints(nMinObs);
 
@@ -3134,7 +3134,7 @@ bool Tracking::NeedNewKeyFrame()
 
             }
         }
-        //Verbose::PrintMess("[NEEDNEWKF]-> closed points: " + to_string(nTrackedClose) + "; non tracked closed points: " + to_string(nNonTrackedClose), Verbose::VERBOSITY_NORMAL);// Verbose::VERBOSITY_DEBUG);
+        Verbose::PrintMess("[NEEDNEWKF]-> tracked close points: " + to_string(nTrackedClose) + "; non tracked close points: " + to_string(nNonTrackedClose), Verbose::VERBOSITY_NORMAL);// Verbose::VERBOSITY_DEBUG);
     }
 
     bool bNeedToInsertClose;
@@ -3166,16 +3166,18 @@ bool Tracking::NeedNewKeyFrame()
             thRefRatio = 0.90f;
     }
 
+    std::cout << "mnMatchesInliers: " << mnMatchesInliers << " ; nRefMatches: " << nRefMatches << std::endl;
+    std::cout << "thRefRatio: " << thRefRatio << std::endl;
+
     // Condition 1a: More than "MaxFrames" have passed from last keyframe insertion
     const bool c1a = mCurrentFrame.mnId>=mnLastKeyFrameId+mMaxFrames;
     // Condition 1b: More than "MinFrames" have passed and Local Mapping is idle
     const bool c1b = ((mCurrentFrame.mnId>=mnLastKeyFrameId+mMinFrames) && bLocalMappingIdle); //mpLocalMapper->KeyframesInQueue() < 2);
     //Condition 1c: tracking is weak
-    const bool c1c = mSensor!=System::MONOCULAR && mSensor!=System::IMU_MONOCULAR && mSensor!=System::IMU_STEREO && mSensor!=System::IMU_RGBD && (mnMatchesInliers<nRefMatches*0.25 || bNeedToInsertClose) ;
+    const bool c1c = mSensor!=System::MONOCULAR && mSensor!=System::IMU_MONOCULAR && mSensor!=System::IMU_STEREO && mSensor!=System::IMU_RGBD && (mnMatchesInliers<nRefMatches*0.50 || bNeedToInsertClose) ;
     // Condition 2: Few tracked points compared to reference keyframe. Lots of visual odometry compared to map matches.
     const bool c2 = (((mnMatchesInliers<nRefMatches*thRefRatio || bNeedToInsertClose)) && mnMatchesInliers>15);
 
-    //std::cout << "NeedNewKF: c1a=" << c1a << "; c1b=" << c1b << "; c1c=" << c1c << "; c2=" << c2 << std::endl;
     // Temporal condition for Inertial cases
     bool c3 = false;
     if(mpLastKeyFrame)
@@ -3198,16 +3200,20 @@ bool Tracking::NeedNewKeyFrame()
     else
         c4=false;
 
+std::cout << "NeedNewKF: c1a=" << c1a << "; c1b=" << c1b << "; c1c=" << c1c << "; c2=" << c2 << "; c3=" << c3 << "; c4=" << c4 << std::endl;
+
     if(((c1a||c1b||c1c) && c2)||c3 ||c4)
     {
         // If the mapping accepts keyframes, insert keyframe.
         // Otherwise send a signal to interrupt BA
         if(bLocalMappingIdle || mpLocalMapper->IsInitializing())
         {
+            std::cout << "!!! Create a new keyframe!" << std::endl;
             return true;
         }
         else
         {
+            std::cout << "!!! Want to create a new keyframe, interrupting BA" << std::endl;
             mpLocalMapper->InterruptBA();
             if(mSensor!=System::MONOCULAR  && mSensor!=System::IMU_MONOCULAR)
             {
@@ -3218,7 +3224,7 @@ bool Tracking::NeedNewKeyFrame()
             }
             else
             {
-                //std::cout << "NeedNewKeyFrame: localmap is busy" << std::endl;
+                std::cout << "NeedNewKeyFrame: localmap is busy" << std::endl;
                 return false;
             }
         }
@@ -3341,7 +3347,7 @@ void Tracking::CreateNewKeyFrame()
                     break;
                 }
             }
-            //Verbose::PrintMess("new mps for stereo KF: " + to_string(nPoints), Verbose::VERBOSITY_NORMAL);
+            Verbose::PrintMess("new mps for stereo KF: " + to_string(nPoints), Verbose::VERBOSITY_NORMAL);
         }
     }
 
@@ -3402,7 +3408,7 @@ void Tracking::SearchLocalPoints()
     if(nToMatch>0)
     {
         ORBmatcher matcher(0.8);
-        int th = 1;
+        int th = 10;
         if(mSensor==System::RGBD || mSensor==System::IMU_RGBD)
             th=3;
         if(mpAtlas->isImuInitialized())

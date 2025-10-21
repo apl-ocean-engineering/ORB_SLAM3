@@ -96,10 +96,13 @@ void LoopClosing::Run()
 
         //NEW LOOP AND MERGE DETECTION ALGORITHM
         //----------------------------
-
+        PLOG_INFO << "LoopClosing loop running...";
 
         if(CheckNewKeyFrames())
         {
+        PLOG_INFO << "Checking new frames";
+
+
             if(mpLastCurrentKF)
             {
                 mpLastCurrentKF->mvpLoopCandKFs.clear();

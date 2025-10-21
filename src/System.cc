@@ -247,6 +247,8 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
 
 Sophus::SE3f System::TrackStereo(const cv::Mat &imLeft, const cv::Mat &imRight, const double &timestamp, const vector<IMU::Point>& vImuMeas, string filename)
 {
+
+Verbose::PrintMess("TrackStereo",Verbose::VERBOSITY_NORMAL);
     if(mSensor!=STEREO && mSensor!=IMU_STEREO)
     {
         cerr << "ERROR: you called TrackStereo but input sensor was not set to Stereo nor Stereo-Inertial." << endl;
@@ -316,9 +318,9 @@ Sophus::SE3f System::TrackStereo(const cv::Mat &imLeft, const cv::Mat &imRight, 
         for(size_t i_imu = 0; i_imu < vImuMeas.size(); i_imu++)
             mpTracker->GrabImuData(vImuMeas[i_imu]);
 
-    //  std::cout << "start GrabImageStereo" << std::endl;
-    //  std::cout << " Left: " << imLeftToFeed.rows << " x " << imLeftToFeed.cols << std::endl;
-    //       std::cout << " Right: " << imRightToFeed.rows << " x " << imRightToFeed.cols << std::endl;
+    PLOGI << "start GrabImageStereo";
+    PLOGI << " Left: " << imLeftToFeed.rows << " x " << imLeftToFeed.cols;
+    PLOGI << " Right: " << imRightToFeed.rows << " x " << imRightToFeed.cols;
     Sophus::SE3f Tcw = mpTracker->GrabImageStereo(imLeftToFeed,imRightToFeed,timestamp,filename);
 
     // std::cout << "out grabber" << std::endl;

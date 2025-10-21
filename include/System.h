@@ -28,6 +28,8 @@
 #include<thread>
 #include<opencv2/core/core.hpp>
 
+#include <plog/Log.h>
+
 #include "Tracking.h"
 #include "FrameDrawer.h"
 #include "MapDrawer.h"
@@ -39,7 +41,6 @@
 #include "Viewer.h"
 #include "ImuTypes.h"
 #include "Settings.h"
-
 
 namespace ORB_SLAM3
 {
@@ -61,13 +62,34 @@ public:
 public:
     static void PrintMess(std::string str, eLevel lev)
     {
-        if(lev <= th)
-            cout << str << endl;
+
+        // There might be a priority mismatch here.
+        // For the original Verbose, is VERBOSITY_DEBUG > VERBOSITY_VERY_VERBOSE
+        //
+        // For plog, I think PLOG_VERBOSE > PLOG_DEBUG
+        //
+        std::cerr << "PrintMess: " << str;
+        switch(lev) {
+            case VERBOSITY_DEBUG:
+                        PLOG_DEBUG << str;
+                        break;
+            case VERBOSITY_VERY_VERBOSE:
+                        PLOG_VERBOSE << str;
+                        break;
+            case VERBOSITY_VERBOSE:
+                        PLOG_INFO << str;
+                        break;
+            case VERBOSITY_NORMAL:
+                        PLOG_WARNING << str;
+                        break;
+            case VERBOSITY_QUIET:
+                        PLOG_ERROR << str;
+                        break;
+        }
     }
 
     static void SetTh(eLevel _th)
     {
-        th = _th;
     }
 };
 
