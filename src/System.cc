@@ -205,11 +205,13 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
         mpLocalMapper->mThFarPoints = fsSettings["thFarPoints"];
     if(mpLocalMapper->mThFarPoints!=0)
     {
-        cout << "Discard points further than " << mpLocalMapper->mThFarPoints << " m from current camera" << endl;
+        spdlog::info("LocalMapping will discard points further than {} m from current camera",  mpLocalMapper->mThFarPoints);
         mpLocalMapper->mbFarPoints = true;
     }
-    else
+    else{
+        spdlog::info("LocalMapping will _not_ discard far points");
         mpLocalMapper->mbFarPoints = false;
+    }
 
     //Initialize the Loop Closing thread and launch
     // mSensor!=MONOCULAR && mSensor!=IMU_MONOCULAR
@@ -248,7 +250,6 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
 Sophus::SE3f System::TrackStereo(const cv::Mat &imLeft, const cv::Mat &imRight, const double &timestamp, const vector<IMU::Point>& vImuMeas, string filename)
 {
 
-Verbose::PrintMess("TrackStereo",Verbose::VERBOSITY_NORMAL);
     if(mSensor!=STEREO && mSensor!=IMU_STEREO)
     {
         cerr << "ERROR: you called TrackStereo but input sensor was not set to Stereo nor Stereo-Inertial." << endl;
@@ -318,9 +319,9 @@ Verbose::PrintMess("TrackStereo",Verbose::VERBOSITY_NORMAL);
         for(size_t i_imu = 0; i_imu < vImuMeas.size(); i_imu++)
             mpTracker->GrabImuData(vImuMeas[i_imu]);
 
-    PLOGI << "start GrabImageStereo";
-    PLOGI << " Left: " << imLeftToFeed.rows << " x " << imLeftToFeed.cols;
-    PLOGI << " Right: " << imRightToFeed.rows << " x " << imRightToFeed.cols;
+    //spdlog::warn("start GrabImageStereo");
+    //PLOGI << " Left: " << imLeftToFeed.rows << " x " << imLeftToFeed.cols;
+    //PLOGI << " Right: " << imRightToFeed.rows << " x " << imRightToFeed.cols;
     Sophus::SE3f Tcw = mpTracker->GrabImageStereo(imLeftToFeed,imRightToFeed,timestamp,filename);
 
     // std::cout << "out grabber" << std::endl;

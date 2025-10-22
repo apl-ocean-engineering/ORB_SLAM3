@@ -21,14 +21,14 @@
 #define SYSTEM_H
 
 
-#include <unistd.h>
+#include<unistd.h>
 #include<stdio.h>
 #include<stdlib.h>
 #include<string>
 #include<thread>
 #include<opencv2/core/core.hpp>
 
-#include <plog/Log.h>
+#include <spdlog/spdlog.h>
 
 #include "Tracking.h"
 #include "FrameDrawer.h"
@@ -62,34 +62,32 @@ public:
 public:
     static void PrintMess(std::string str, eLevel lev)
     {
-
-        // There might be a priority mismatch here.
-        // For the original Verbose, is VERBOSITY_DEBUG > VERBOSITY_VERY_VERBOSE
-        //
-        // For plog, I think PLOG_VERBOSE > PLOG_DEBUG
-        //
-        std::cerr << "PrintMess: " << str;
         switch(lev) {
             case VERBOSITY_DEBUG:
-                        PLOG_DEBUG << str;
+                        spdlog::debug("{}",str);
                         break;
             case VERBOSITY_VERY_VERBOSE:
-                        PLOG_VERBOSE << str;
+                        spdlog::debug("{}",str);
                         break;
             case VERBOSITY_VERBOSE:
-                        PLOG_INFO << str;
+                        spdlog::info("{}",str);
                         break;
             case VERBOSITY_NORMAL:
-                        PLOG_WARNING << str;
+                        spdlog::error("{}",str);
                         break;
             case VERBOSITY_QUIET:
-                        PLOG_ERROR << str;
+                        spdlog::critical("{}",str);
                         break;
         }
     }
 
     static void SetTh(eLevel _th)
     {
+    }
+
+    static void set_default_logger(const std::shared_ptr<spdlog::logger>& logger)
+    {
+        spdlog::set_default_logger(logger);
     }
 };
 

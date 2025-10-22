@@ -96,11 +96,11 @@ void LoopClosing::Run()
 
         //NEW LOOP AND MERGE DETECTION ALGORITHM
         //----------------------------
-        PLOG_INFO << "LoopClosing loop running...";
+        spdlog::debug("@@ LoopClosing: loop running...");
 
         if(CheckNewKeyFrames())
         {
-        PLOG_INFO << "Checking new frames";
+            spdlog::info( "LoopClosing: Have new frames to check");
 
 
             if(mpLastCurrentKF)
@@ -314,8 +314,10 @@ void LoopClosing::Run()
 void LoopClosing::InsertKeyFrame(KeyFrame *pKF)
 {
     unique_lock<mutex> lock(mMutexLoopQueue);
-    if(pKF->mnId!=0)
+    if(pKF->mnId!=0) {
         mlpLoopKeyFrameQueue.push_back(pKF);
+        spdlog::info("LoopClosing: Pushing KF {} into queue, which is length {}", pKF->mnId, mlpLoopKeyFrameQueue.size());
+    }
 }
 
 bool LoopClosing::CheckNewKeyFrames()
@@ -327,8 +329,9 @@ bool LoopClosing::CheckNewKeyFrames()
 bool LoopClosing::NewDetectCommonRegions()
 {
     // To deactivate placerecognition. No loopclosing nor merging will be performed
-    if(!mbActiveLC)
+    if(!mbActiveLC) {
         return false;
+    }
 
     {
         unique_lock<mutex> lock(mMutexLoopQueue);
@@ -350,7 +353,7 @@ bool LoopClosing::NewDetectCommonRegions()
 
     if(mpTracker->mSensor == System::STEREO && mpLastMap->GetAllKeyFrames().size() < 5) //12
     {
-        // cout << "LoopClousure: Stereo KF inserted without check: " << mpCurrentKF->mnId << endl;
+        spdlog::info("[LoopClosing::NewDetectCommonRegions] Stereo KF inserted without check: {}", mpCurrentKF->mnId);
         mpKeyFrameDB->add(mpCurrentKF);
         mpCurrentKF->SetErase();
         return false;
@@ -358,13 +361,13 @@ bool LoopClosing::NewDetectCommonRegions()
 
     if(mpLastMap->GetAllKeyFrames().size() < 12)
     {
-        // cout << "LoopClousure: Stereo KF inserted without check, map is small: " << mpCurrentKF->mnId << endl;
+        spdlog::info("[LoopClosing::NewDetectCommonRegions] Stereo KF inserted without check, map is small: {}", mpCurrentKF->mnId);
         mpKeyFrameDB->add(mpCurrentKF);
         mpCurrentKF->SetErase();
         return false;
     }
 
-    //cout << "LoopClousure: Checking KF: " << mpCurrentKF->mnId << endl;
+    spdlog::info("[LoopClosing::NewDetectCommonRegions] Checking KF: {}", mpCurrentKF->mnId);
 
     //Check the last candidates with geometric validation
     // Loop candidates
@@ -401,7 +404,7 @@ bool LoopClosing::NewDetectCommonRegions()
 
             if(!mbLoopDetected)
             {
-                cout << "PR: Loop detected with Reffine Sim3" << endl;
+                spdlog::info("PR: Loop detected with Reffine Sim3");
             }
         }
         else

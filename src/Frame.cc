@@ -16,6 +16,8 @@
 * If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <spdlog/spdlog.h>
+
 #include "Frame.h"
 
 #include "G2oTypes.h"
@@ -739,8 +741,13 @@ void Frame::ComputeBoW()
 {
     if(mBowVec.empty())
     {
+        spdlog::info("[Frame::ComputeBoW] Computing BoW for {} x {} descriptors", mDescriptors.size().height, mDescriptors.size().width);
+
         vector<cv::Mat> vCurrentDesc = Converter::toDescriptorVector(mDescriptors);
         mpORBvocabulary->transform(vCurrentDesc,mBowVec,mFeatVec,4);
+
+        spdlog::info("[Frame::ComputeBoW]  ... BoW vector size {}, feature vector size {}", mBowVec.size(), mFeatVec.size());
+
     }
 }
 

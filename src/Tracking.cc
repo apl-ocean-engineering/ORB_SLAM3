@@ -30,7 +30,7 @@
 #include "GeometricTools.h"
 
 #include <iostream>
-
+#include <spdlog/spdlog.h>
 #include <mutex>
 #include <chrono>
 
@@ -1280,6 +1280,7 @@ bool Tracking::ParseORBParamFile(cv::FileStorage &fSettings)
         return false;
     }
 
+    spdlog::info("[Tracking::ParseORBParamFile] Creating ORB extractor: {} features, {} scale factor, {} levels", nFeatures, fScaleFactor, nLevels);
     mpORBextractorLeft = new ORBextractor(nFeatures,fScaleFactor,nLevels,fIniThFAST,fMinThFAST);
 
     if(mSensor==System::STEREO || mSensor==System::IMU_STEREO)
@@ -1834,7 +1835,7 @@ void Tracking::Track()
 
                 if(mpAtlas->isImuInitialized())
                 {
-                    cout << "Timestamp jump detected. State set to LOST. Reseting IMU integration..." << endl;
+                    cout << "Timestamp jump detected. State set to LOST. resetting IMU integration..." << endl;
                     if(!pCurrentMap->GetIniertialBA2())
                     {
                         mpSystem->ResetActiveMap();
@@ -1846,7 +1847,7 @@ void Tracking::Track()
                 }
                 else
                 {
-                    cout << "Timestamp jump detected, before IMU initialization. Reseting..." << endl;
+                    cout << "Timestamp jump detected, before IMU initialization. resetting..." << endl;
                     mpSystem->ResetActiveMap();
                 }
                 return;
@@ -2020,7 +2021,7 @@ void Tracking::Track()
                     if (pCurrentMap->KeyFramesInMap()<10)
                     {
                         mpSystem->ResetActiveMap();
-                        Verbose::PrintMess("Reseting current map...", Verbose::VERBOSITY_NORMAL);
+                        Verbose::PrintMess("resetting current map...", Verbose::VERBOSITY_NORMAL);
                     }else
                         CreateMapInAtlas();
 
@@ -2149,7 +2150,7 @@ void Tracking::Track()
                 Verbose::PrintMess("Track lost for less than one second...", Verbose::VERBOSITY_NORMAL);
                 if(!pCurrentMap->isImuInitialized() || !pCurrentMap->GetIniertialBA2())
                 {
-                    cout << "IMU is not or recently initialized. Reseting active map..." << endl;
+                    cout << "IMU is not or recently initialized. resetting active map..." << endl;
                     mpSystem->ResetActiveMap();
                 }
 
@@ -2183,7 +2184,7 @@ void Tracking::Track()
             {
                 if(mCurrentFrame.mnId==(mnLastRelocFrameId+mnFramesToResetIMU))
                 {
-                    cout << "RESETING FRAME!!!" << endl;
+                    cout << "resetting FRAME!!!" << endl;
                     ResetFrameIMU();
                 }
                 else if(mCurrentFrame.mnId>(mnLastRelocFrameId+30))
@@ -2279,7 +2280,7 @@ void Tracking::Track()
             if (mSensor == System::IMU_MONOCULAR || mSensor == System::IMU_STEREO || mSensor == System::IMU_RGBD)
                 if (!pCurrentMap->isImuInitialized())
                 {
-                    Verbose::PrintMess("Track lost before IMU initialisation, reseting...", Verbose::VERBOSITY_QUIET);
+                    Verbose::PrintMess("Track lost before IMU initialisation, resetting...", Verbose::VERBOSITY_QUIET);
                     mpSystem->ResetActiveMap();
                     return;
                 }
@@ -2341,13 +2342,13 @@ void Tracking::StereoInitialization()
         {
             if (!mCurrentFrame.mpImuPreintegrated || !mLastFrame.mpImuPreintegrated)
             {
-                PLOGI << "No IMU measurements to initialize this map";
+                spdlog::warn("No IMU measurements to initialize this map");
                 return;
             }
 
             if (!mFastInit && (mCurrentFrame.mpImuPreintegratedFrame->avgA-mLastFrame.mpImuPreintegratedFrame->avgA).norm()<0.5)
             {
-                PLOGI << "not enough acceleration to initialize";
+               spdlog::warn("not enough acceleration to initialize");
                 return;
             }
 
@@ -2589,7 +2590,7 @@ void Tracking::CreateInitialMapMonocular()
 
     if(medianDepth<0 || pKFcur->TrackedMapPoints(1)<50) // TODO Check, originally 100 tracks
     {
-        Verbose::PrintMess("Wrong initialization, reseting...", Verbose::VERBOSITY_QUIET);
+        Verbose::PrintMess("Wrong initialization, resetting...", Verbose::VERBOSITY_QUIET);
         mpSystem->ResetActiveMap();
         return;
     }
@@ -3347,7 +3348,7 @@ void Tracking::CreateNewKeyFrame()
                     break;
                 }
             }
-            Verbose::PrintMess("new mps for stereo KF: " + to_string(nPoints), Verbose::VERBOSITY_NORMAL);
+            spdlog::info("New stereo KF with {} points", nPoints);
         }
     }
 
@@ -3628,7 +3629,7 @@ void Tracking::UpdateLocalKeyFrames()
 
 bool Tracking::Relocalization()
 {
-    Verbose::PrintMess("Starting relocalization", Verbose::VERBOSITY_NORMAL);
+    Verbose::PrintMess("[Tracking::Relocalization] Starting relocalization", Verbose::VERBOSITY_NORMAL);
     // Compute Bag of Words Vector
     mCurrentFrame.ComputeBoW();
 
@@ -3637,9 +3638,11 @@ bool Tracking::Relocalization()
     vector<KeyFrame*> vpCandidateKFs = mpKeyFrameDB->DetectRelocalizationCandidates(&mCurrentFrame, mpAtlas->GetCurrentMap());
 
     if(vpCandidateKFs.empty()) {
-        Verbose::PrintMess("There are not candidates", Verbose::VERBOSITY_NORMAL);
+        spdlog::warn("[Tracking::Relocalization] There are no candidates keyframes");
         return false;
     }
+
+    spdlog::info("[Tracking::Relocalization] Found {} candidate KFs", vpCandidateKFs.size());
 
     const int nKFs = vpCandidateKFs.size();
 
@@ -3666,6 +3669,7 @@ bool Tracking::Relocalization()
         else
         {
             int nmatches = matcher.SearchByBoW(pKF,mCurrentFrame,vvpMapPointMatches[i]);
+            spdlog::info("[Tracking::Relocalization]   kf {};  {} matches", i, nmatches);     
             if(nmatches<15)
             {
                 vbDiscarded[i] = true;
@@ -3680,6 +3684,8 @@ bool Tracking::Relocalization()
             }
         }
     }
+
+    spdlog::info("[Tracking::Relocalization] ... {} candidates are plausible", nCandidates);
 
     // Alternatively perform some iterations of P4P RANSAC
     // Until we found a camera pose supported by enough inliers
@@ -3790,7 +3796,7 @@ bool Tracking::Relocalization()
     else
     {
         mnLastRelocFrameId = mCurrentFrame.mnId;
-        cout << "Relocalized!!" << endl;
+        spdlog::warn("[Tracking::Relocalization] ... Successful relocalization!!");
         return true;
     }
 
@@ -3798,7 +3804,7 @@ bool Tracking::Relocalization()
 
 void Tracking::Reset(bool bLocMap)
 {
-    Verbose::PrintMess("System Reseting", Verbose::VERBOSITY_NORMAL);
+    Verbose::PrintMess("System resetting", Verbose::VERBOSITY_NORMAL);
 
     if(mpViewer)
     {
@@ -3810,21 +3816,21 @@ void Tracking::Reset(bool bLocMap)
     // Reset Local Mapping
     if (!bLocMap)
     {
-        Verbose::PrintMess("Reseting Local Mapper...", Verbose::VERBOSITY_NORMAL);
+        Verbose::PrintMess("!! resetting Local Mapper...", Verbose::VERBOSITY_NORMAL);
         mpLocalMapper->RequestReset();
-        Verbose::PrintMess("done", Verbose::VERBOSITY_NORMAL);
+        Verbose::PrintMess("!!    done", Verbose::VERBOSITY_NORMAL);
     }
 
 
     // Reset Loop Closing
-    Verbose::PrintMess("Reseting Loop Closing...", Verbose::VERBOSITY_NORMAL);
+    Verbose::PrintMess("!! resetting Loop Closing...", Verbose::VERBOSITY_NORMAL);
     mpLoopClosing->RequestReset();
-    Verbose::PrintMess("done", Verbose::VERBOSITY_NORMAL);
+    Verbose::PrintMess("!!   done", Verbose::VERBOSITY_NORMAL);
 
     // Clear BoW Database
-    Verbose::PrintMess("Reseting Database...", Verbose::VERBOSITY_NORMAL);
+    Verbose::PrintMess("!! resetting Database...", Verbose::VERBOSITY_NORMAL);
     mpKeyFrameDB->clear();
-    Verbose::PrintMess("done", Verbose::VERBOSITY_NORMAL);
+    Verbose::PrintMess("!!    done", Verbose::VERBOSITY_NORMAL);
 
     // Clear Map (this erase MapPoints and KeyFrames)
     mpAtlas->clearAtlas();
@@ -3854,12 +3860,12 @@ void Tracking::Reset(bool bLocMap)
     if(mpViewer)
         mpViewer->Release();
 
-    Verbose::PrintMess("   End reseting! ", Verbose::VERBOSITY_NORMAL);
+    Verbose::PrintMess("!! End resetting! ", Verbose::VERBOSITY_NORMAL);
 }
 
 void Tracking::ResetActiveMap(bool bLocMap)
 {
-    Verbose::PrintMess("Active map Reseting", Verbose::VERBOSITY_NORMAL);
+    Verbose::PrintMess("!! Active map resetting", Verbose::VERBOSITY_NORMAL);
     if(mpViewer)
     {
         mpViewer->RequestStop();
@@ -3871,20 +3877,20 @@ void Tracking::ResetActiveMap(bool bLocMap)
 
     if (!bLocMap)
     {
-        Verbose::PrintMess("Reseting Local Mapper...", Verbose::VERBOSITY_VERY_VERBOSE);
+        Verbose::PrintMess("!! resetting Local Mapper...", Verbose::VERBOSITY_VERY_VERBOSE);
         mpLocalMapper->RequestResetActiveMap(pMap);
-        Verbose::PrintMess("done", Verbose::VERBOSITY_VERY_VERBOSE);
+        Verbose::PrintMess("!!   done", Verbose::VERBOSITY_VERY_VERBOSE);
     }
 
     // Reset Loop Closing
-    Verbose::PrintMess("Reseting Loop Closing...", Verbose::VERBOSITY_NORMAL);
+    Verbose::PrintMess("!! resetting Loop Closing...", Verbose::VERBOSITY_NORMAL);
     mpLoopClosing->RequestResetActiveMap(pMap);
-    Verbose::PrintMess("done", Verbose::VERBOSITY_NORMAL);
+    Verbose::PrintMess("!!   done", Verbose::VERBOSITY_NORMAL);
 
     // Clear BoW Database
-    Verbose::PrintMess("Reseting Database", Verbose::VERBOSITY_NORMAL);
+    Verbose::PrintMess("!! resetting Database", Verbose::VERBOSITY_NORMAL);
     mpKeyFrameDB->clearMap(pMap); // Only clear the active map references
-    Verbose::PrintMess("done", Verbose::VERBOSITY_NORMAL);
+    Verbose::PrintMess("!!    done", Verbose::VERBOSITY_NORMAL);
 
     // Clear Map (this erase MapPoints and KeyFrames)
     mpAtlas->clearMap();
@@ -3927,7 +3933,7 @@ void Tracking::ResetActiveMap(bool bLocMap)
 
         index++;
     }
-    cout << num_lost << " Frames set to lost" << endl;
+    spdlog::warn("{} frames set to lost", num_lost );
 
     mlbLost = lbLost;
 
@@ -3945,7 +3951,7 @@ void Tracking::ResetActiveMap(bool bLocMap)
     if(mpViewer)
         mpViewer->Release();
 
-    Verbose::PrintMess("   End reseting! ", Verbose::VERBOSITY_NORMAL);
+    spdlog::warn("!! End resetting!");
 }
 
 vector<MapPoint*> Tracking::GetLocalMapMPS()

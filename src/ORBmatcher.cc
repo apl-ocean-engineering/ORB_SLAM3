@@ -16,10 +16,10 @@
 * If not, see <http://www.gnu.org/licenses/>.
 */
 
-
 #include "ORBmatcher.h"
 
 #include<limits.h>
+#include <spdlog/spdlog.h>
 
 #include<opencv2/core/core.hpp>
 
@@ -241,6 +241,8 @@ namespace ORB_SLAM3
         DBoW2::FeatureVector::const_iterator KFend = vFeatVecKF.end();
         DBoW2::FeatureVector::const_iterator Fend = F.mFeatVec.end();
 
+        spdlog::info("[ORBmatcher::SearchByBoW] {} feature vector in Keyframe, {} in Frame",vFeatVecKF.size(), F.mFeatVec.size() );
+
         while(KFit != KFend && Fit != Fend)
         {
             if(KFit->first == Fit->first)
@@ -254,11 +256,15 @@ namespace ORB_SLAM3
 
                     MapPoint* pMP = vpMapPointsKF[realIdxKF];
 
-                    if(!pMP)
+                    if(!pMP) {
+                        //spdlog::warn("[ORBmatcher::SearchByBoW] Null map point, skipping");
                         continue;
+                    }
 
-                    if(pMP->isBad())
+                    if(pMP->isBad()) {
+                        //spdlog::warn("[ORBmatcher::SearchByBoW] Bad map point, skipping");
                         continue;
+                    }
 
                     const cv::Mat &dKF= pKF->mDescriptors.row(realIdxKF);
 
@@ -399,7 +405,9 @@ namespace ORB_SLAM3
             {
                 Fit = F.mFeatVec.lower_bound(KFit->first);
             }
-        }
+        }    
+
+        const int nmatches_before_orientation_check = nmatches;
 
         if(mbCheckOrientation)
         {
@@ -420,6 +428,9 @@ namespace ORB_SLAM3
                 }
             }
         }
+
+               spdlog::info("  Due to orientation check, {} matches -> {}", nmatches_before_orientation_check, nmatches);
+
 
         return nmatches;
     }
