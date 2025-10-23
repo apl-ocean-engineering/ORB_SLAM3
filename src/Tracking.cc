@@ -2889,8 +2889,7 @@ bool Tracking::TrackWithMotionModel()
 
     int nmatches = matcher.SearchByProjection(mCurrentFrame,mLastFrame,th,mSensor==System::MONOCULAR || mSensor==System::IMU_MONOCULAR);
 
-    cout << "Tracking::TrackWithMotionModel found " << nmatches << " matches in first pass" << std::endl;
-
+    spdlog::info( "Tracking::TrackWithMotionModel found {}  matches in first pass", nmatches);
 
     // If few matches, uses a wider window search
     if(nmatches<20)
@@ -2941,7 +2940,7 @@ bool Tracking::TrackWithMotionModel()
         }
     }
 
-    cout << "Tracking::TrackWithMotionModel this led to " << nmatchesMap << " matches against the map" << std::endl;
+   spdlog::info( "Tracking::TrackWithMotionModel this led to {} matches against the map", nmatchesMap );
 
 
     if(mbOnlyTracking)
@@ -2954,7 +2953,7 @@ bool Tracking::TrackWithMotionModel()
         return true;
     else {
         const bool goodTracking = (nmatchesMap>=10);
-            cout << "Tracking::TrackWithMotionModel tracking is " << (goodTracking ? "GOOD" : "BAD") << std::endl;
+            spdlog::info( "Tracking::TrackWithMotionModel tracking is {}", (goodTracking ? "GOOD" : "BAD"));
         return goodTracking;
     }
 }
@@ -3037,7 +3036,7 @@ bool Tracking::TrackLocalMap()
         }
     }
 
-cout << "mnMatchesInliers: " << mnMatchesInliers << std::endl; 
+spdlog::info("mnMatchesInliers: {}", mnMatchesInliers ); 
 
     // Decide if the tracking was succesful
     // More restrictive if there was a relocalization recently
@@ -3095,7 +3094,7 @@ bool Tracking::NeedNewKeyFrame()
     if(mpLocalMapper->isStopped() || mpLocalMapper->stopRequested()) {
         /*if(mSensor == System::MONOCULAR)
         {*/
-            std::cout << "NeedNewKeyFrame: Not adding KF because localmap is stopped" << std::endl;
+            spdlog::info( "NeedNewKeyFrame: Not adding KF because localmap is stopped");
         
         return false;
     }
@@ -3167,8 +3166,8 @@ bool Tracking::NeedNewKeyFrame()
             thRefRatio = 0.90f;
     }
 
-    std::cout << "mnMatchesInliers: " << mnMatchesInliers << " ; nRefMatches: " << nRefMatches << std::endl;
-    std::cout << "thRefRatio: " << thRefRatio << std::endl;
+    spdlog::info( "mnMatchesInliers: {}; nRefMatches: {}", mnMatchesInliers, nRefMatches);
+    spdlog::info( "thRefRatio: {}", thRefRatio );
 
     // Condition 1a: More than "MaxFrames" have passed from last keyframe insertion
     const bool c1a = mCurrentFrame.mnId>=mnLastKeyFrameId+mMaxFrames;
