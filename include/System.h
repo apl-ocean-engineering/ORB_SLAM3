@@ -28,8 +28,6 @@
 #include<thread>
 #include<opencv2/core/core.hpp>
 
-#include <spdlog/spdlog.h>
-
 #include "Tracking.h"
 #include "FrameDrawer.h"
 #include "MapDrawer.h"
@@ -41,55 +39,11 @@
 #include "Viewer.h"
 #include "ImuTypes.h"
 #include "Settings.h"
+#include "Logging.h"
 
 namespace ORB_SLAM3
 {
 
-class Verbose
-{
-public:
-    enum eLevel
-    {
-        VERBOSITY_QUIET=0,
-        VERBOSITY_NORMAL=1,
-        VERBOSITY_VERBOSE=2,
-        VERBOSITY_VERY_VERBOSE=3,
-        VERBOSITY_DEBUG=4
-    };
-
-    static eLevel th;
-
-public:
-    static void PrintMess(std::string str, eLevel lev)
-    {
-        switch(lev) {
-            case VERBOSITY_DEBUG:
-                        spdlog::debug("{}",str);
-                        break;
-            case VERBOSITY_VERY_VERBOSE:
-                        spdlog::debug("{}",str);
-                        break;
-            case VERBOSITY_VERBOSE:
-                        spdlog::info("{}",str);
-                        break;
-            case VERBOSITY_NORMAL:
-                        spdlog::error("{}",str);
-                        break;
-            case VERBOSITY_QUIET:
-                        spdlog::critical("{}",str);
-                        break;
-        }
-    }
-
-    static void SetTh(eLevel _th)
-    {
-    }
-
-    static void set_default_logger(const std::shared_ptr<spdlog::logger>& logger)
-    {
-        spdlog::set_default_logger(logger);
-    }
-};
 
 class Viewer;
 class FrameDrawer;
@@ -122,7 +76,10 @@ public:
 public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     // Initialize the SLAM system. It launches the Local Mapping, Loop Closing and Viewer threads.
-    System(const string &strVocFile, const string &strSettingsFile, const eSensor sensor, const bool bUseViewer = true, const int initFr = 0, const string &strSequence = std::string());
+    System(const string &strVocFile, const string &strSettingsFile, const eSensor sensor, const int initFr = 0, const string &strSequence = std::string());
+
+    // Initialize the SLAM system. It launches the Local Mapping, Loop Closing and Viewer threads.
+    System(const Settings &settings, const int initFr = 0, const string &strSequence = std::string());
 
     // Proccess the given stereo frame. Images must be synchronized and rectified.
     // Input images: RGB (CV_8UC3) or grayscale (CV_8U). RGB is converted to grayscale.
@@ -218,6 +175,10 @@ public:
 
 private:
 
+    void printBanner( eSensor mSensor );
+
+    void initialize( void );
+
     void SaveAtlas(int type);
     bool LoadAtlas(int type);
 
@@ -285,7 +246,7 @@ private:
 
     string mStrVocabularyFilePath;
 
-    Settings* settings_;
+    std::shared_ptr<Settings> settings_;
 };
 
 }// namespace ORB_SLAM

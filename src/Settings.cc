@@ -125,7 +125,8 @@ namespace ORB_SLAM3 {
     }
 
     Settings::Settings(const std::string &configFile, const int& sensor) :
-    bNeedToUndistort_(false), bNeedToRectify_(false), bNeedToResize1_(false), bNeedToResize2_(false) {
+    bNeedToUndistort_(false), bNeedToRectify_(false), bNeedToResize1_(false), bNeedToResize2_(false),
+    loopClosing_(true) {
         sensor_ = sensor;
 
         //Open settings file
@@ -480,6 +481,8 @@ namespace ORB_SLAM3 {
         bool found;
 
         thFarPoints_ = readParameter<float>(fSettings,"System.thFarPoints",found,false);
+
+        loopClosing_ = readParameter<bool>(fSettings,"System.loopClosing", found, true);
     }
 
     void Settings::precomputeRectificationMaps() {
@@ -632,6 +635,9 @@ namespace ORB_SLAM3 {
         output << "\t-ORB number of scales: " << settings.nLevels_ << endl;
         output << "\t-Initial FAST threshold: " << settings.initThFAST_ << endl;
         output << "\t-Min FAST threshold: " << settings.minThFAST_ << endl;
+
+        output << "\tLoop closing: " << (settings.loopClosing_ ? "YES" : "NO") << endl;
+
 
         return output;
     }

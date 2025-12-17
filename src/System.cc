@@ -39,9 +39,47 @@ namespace ORB_SLAM3
 Verbose::eLevel Verbose::th = Verbose::VERBOSITY_NORMAL;
 
 System::System(const string &strVocFile, const string &strSettingsFile, const eSensor sensor,
-               const bool bUseViewer, const int initFr, const string &strSequence):
+               const int initFr, const string &strSequence)
+               :
     mSensor(sensor), mpViewer(static_cast<Viewer*>(NULL)), mbReset(false), mbResetActiveMap(false),
     mbActivateLocalizationMode(false), mbDeactivateLocalizationMode(false), mbShutDown(false)
+{
+    printBanner( mSensor );
+
+    //Check settings file
+    cv::FileStorage fsSettings(strSettingsFile.c_str(), cv::FileStorage::READ);
+    if(!fsSettings.isOpened())
+    {
+       cerr << "Failed to open settings file at: " << strSettingsFile << endl;
+       exit(-1);
+    }
+
+    cv::FileNode node = fsSettings["File.version"];
+    if(node.empty() || (node.isString() && node.string() != "1.0")){
+
+        std::cerr << "UNABLE TO LOAD CONFIG FILE THAT IS NOT VERSION 1.0" << std::endl;
+    }
+
+    settings_ = std::make_shared<Settings>(strSettingsFile,mSensor);
+
+    setting_->setFileVoc = strFileVoc;
+
+    initialize();
+}
+
+
+System::System(const Settings &settings,  const int initFr, const string &strSequence):
+    mSensor(sensor), mpViewer(static_cast<Viewer*>(NULL)), mbReset(false), mbResetActiveMap(false),
+    mbActivateLocalizationMode(false), mbDeactivateLocalizationMode(false), mbShutDown(false),
+    settings_(std::make_shared<Settings>(settings))
+{
+    printBanner( settings->sensor_ );
+
+    initialize();
+}
+
+
+void System::printBanner( eSensor mSensor ) 
 {
     // Output welcome message
     cout << endl <<
@@ -65,47 +103,19 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
         cout << "Stereo-Inertial" << endl;
     else if(mSensor==IMU_RGBD)
         cout << "RGB-D-Inertial" << endl;
+}
 
-    //Check settings file
-    cv::FileStorage fsSettings(strSettingsFile.c_str(), cv::FileStorage::READ);
-    if(!fsSettings.isOpened())
-    {
-       cerr << "Failed to open settings file at: " << strSettingsFile << endl;
-       exit(-1);
-    }
 
-    cv::FileNode node = fsSettings["File.version"];
-    if(!node.empty() && node.isString() && node.string() == "1.0"){
-        settings_ = new Settings(strSettingsFile,mSensor);
+void System::initialize() {
 
-        mStrLoadAtlasFromFile = settings_->atlasLoadFile();
-        mStrSaveAtlasToFile = settings_->atlasSaveFile();
+    mStrLoadAtlasFromFile = settings_->atlasLoadFile();
+    mStrSaveAtlasToFile = settings_->atlasSaveFile();
 
-        cout << (*settings_) << endl;
-    }
-    else{
-        settings_ = nullptr;
-        cv::FileNode node = fsSettings["System.LoadAtlasFromFile"];
-        if(!node.empty() && node.isString())
-        {
-            mStrLoadAtlasFromFile = (string)node;
-        }
+    cout << (*settings_) << endl;
 
-        node = fsSettings["System.SaveAtlasToFile"];
-        if(!node.empty() && node.isString())
-        {
-            mStrSaveAtlasToFile = (string)node;
-        }
-    }
+    bool activeLC = settings_->loopClosing_;
 
-    node = fsSettings["loopClosing"];
-    bool activeLC = true;
-    if(!node.empty())
-    {
-        activeLC = static_cast<int>(fsSettings["loopClosing"]) != 0;
-    }
-
-    mStrVocabularyFilePath = strVocFile;
+    mStrVocabularyFilePath = settings_->strFileVoc;
 
     bool loadedAtlas = false;
 
@@ -115,11 +125,11 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
         cout << endl << "Loading ORB Vocabulary. This could take a while..." << endl;
 
         mpVocabulary = new ORBVocabulary();
-        bool bVocLoad = mpVocabulary->loadFromTextFile(strVocFile);
+        bool bVocLoad = mpVocabulary->loadFromTextFile(mStrVocabularyFilePath);
         if(!bVocLoad)
         {
             cerr << "Wrong path to vocabulary. " << endl;
-            cerr << "Falied to open at: " << strVocFile << endl;
+            cerr << "Falied to open at: " << mStrVocabularyFilePath << endl;
             exit(-1);
         }
         cout << "Vocabulary loaded!" << endl << endl;
@@ -137,11 +147,11 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
         cout << endl << "Loading ORB Vocabulary. This could take a while..." << endl;
 
         mpVocabulary = new ORBVocabulary();
-        bool bVocLoad = mpVocabulary->loadFromTextFile(strVocFile);
+        bool bVocLoad = mpVocabulary->loadFromTextFile(mStrVocabularyFilePath);
         if(!bVocLoad)
         {
             cerr << "Wrong path to vocabulary. " << endl;
-            cerr << "Falied to open at: " << strVocFile << endl;
+            cerr << "Falied to open at: " << mStrVocabularyFilePath << endl;
             exit(-1);
         }
         cout << "Vocabulary loaded!" << endl << endl;
@@ -199,10 +209,8 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
                                      mSensor==IMU_MONOCULAR || mSensor==IMU_STEREO || mSensor==IMU_RGBD, strSequence);
     mptLocalMapping = new thread(&ORB_SLAM3::LocalMapping::Run,mpLocalMapper);
     mpLocalMapper->mInitFr = initFr;
-    if(settings_)
-        mpLocalMapper->mThFarPoints = settings_->thFarPoints();
-    else
-        mpLocalMapper->mThFarPoints = fsSettings["thFarPoints"];
+    mpLocalMapper->mThFarPoints = settings_->thFarPoints();
+
     if(mpLocalMapper->mThFarPoints!=0)
     {
         spdlog::info("LocalMapping will discard points further than {} m from current camera",  mpLocalMapper->mThFarPoints);
@@ -231,9 +239,7 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
     //usleep(10*1000*1000);
 
     //Initialize the Viewer thread and launch
-    if(bUseViewer)
-    //if(false) // TODO
-    {
+    if(settings_->useViewer_) {
         mpViewer = new Viewer(this, mpFrameDrawer,mpMapDrawer,mpTracker,strSettingsFile,settings_);
         mptViewer = new thread(&Viewer::Run, mpViewer);
         mpTracker->SetViewer(mpViewer);
@@ -246,6 +252,11 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
     //Verbose::SetTh(Verbose::VERBOSITY_QUIET);
 
 }
+
+
+
+
+
 
 Sophus::SE3f System::TrackStereo(const cv::Mat &imLeft, const cv::Mat &imRight, const double &timestamp, const vector<IMU::Point>& vImuMeas, string filename)
 {
@@ -322,7 +333,10 @@ Sophus::SE3f System::TrackStereo(const cv::Mat &imLeft, const cv::Mat &imRight, 
     //spdlog::warn("start GrabImageStereo");
     //PLOGI << " Left: " << imLeftToFeed.rows << " x " << imLeftToFeed.cols;
     //PLOGI << " Right: " << imRightToFeed.rows << " x " << imRightToFeed.cols;
+
     Sophus::SE3f Tcw = mpTracker->GrabImageStereo(imLeftToFeed,imRightToFeed,timestamp,filename);
+
+
 
     // std::cout << "out grabber" << std::endl;
 

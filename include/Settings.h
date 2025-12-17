@@ -56,6 +56,9 @@ namespace ORB_SLAM3 {
          */
         Settings(const std::string &configFile, const int& sensor);
 
+        // Copy constructor
+        Settings( const Settings & ) = default;
+
         /*
          * Ostream operator overloading to dump settings to the terminal
          */
@@ -121,27 +124,6 @@ namespace ORB_SLAM3 {
         cv::Mat M1r() {return M1r_;}
         cv::Mat M2r() {return M2r_;}
 
-    private:
-        template<typename T>
-        T readParameter(cv::FileStorage& fSettings, const std::string& name, bool& found,const bool required = true){
-            cv::FileNode node = fSettings[name];
-            if(node.empty()){
-                if(required){
-                    std::cerr << name << " required parameter does not exist, aborting..." << std::endl;
-                    exit(-1);
-                }
-                else{
-                    std::cerr << name << " optional parameter does not exist..." << std::endl;
-                    found = false;
-                    return T();
-                }
-
-            }
-            else{
-                found = true;
-                return (T) node;
-            }
-        }
 
         void readCamera1(cv::FileStorage& fSettings);
         void readCamera2(cv::FileStorage& fSettings);
@@ -208,6 +190,7 @@ namespace ORB_SLAM3 {
         /*
          * Viewer stuff
          */
+         bool useViewer_;
         float keyFrameSize_;
         float keyFrameLineWidth_;
         float graphLineWidth_;
@@ -226,6 +209,31 @@ namespace ORB_SLAM3 {
          * Other stuff
          */
         float thFarPoints_;
+
+        bool loopClosing_;
+        string strVocFile_;
+
+    private:
+        template<typename T>
+        T readParameter(cv::FileStorage& fSettings, const std::string& name, bool& found,const bool required = true){
+            cv::FileNode node = fSettings[name];
+            if(node.empty()){
+                if(required){
+                    std::cerr << name << " required parameter does not exist, aborting..." << std::endl;
+                    exit(-1);
+                }
+                else{
+                    std::cerr << name << " optional parameter does not exist..." << std::endl;
+                    found = false;
+                    return T();
+                }
+
+            }
+            else{
+                found = true;
+                return (T) node;
+            }
+        }
 
     };
 };
