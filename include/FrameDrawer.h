@@ -41,7 +41,7 @@ class FrameDrawer
 {
 public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-    FrameDrawer(Atlas* pAtlas, bool draw_both=false);
+    FrameDrawer(const std::shared_ptr<Atlas> &pAtlas, bool draw_both=false);
 
     // Update info from the last processed frame.
     void Update(Tracking *pTracker);
@@ -69,7 +69,7 @@ protected:
     std::vector<float> mvCurrentDepth;
     float mThDepth;
 
-    Atlas* mpAtlas;
+    std::shared_ptr<Atlas> mpAtlas;
 
     std::mutex mMutex;
     vector<pair<cv::Point2f, cv::Point2f> > mvTracks;

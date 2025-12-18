@@ -26,33 +26,34 @@
 namespace ORB_SLAM3
 {
 
-Atlas::Atlas(){
-    mpCurrentMap = static_cast<Map*>(NULL);
+Atlas::Atlas()
+: mpCurrentMap(nullptr), mpViewer(nullptr)
+{
 }
 
-Atlas::Atlas(int initKFid): mnLastInitKFidMap(initKFid), mHasViewer(false)
+Atlas::Atlas(int initKFid): mnLastInitKFidMap(initKFid),mpCurrentMap(nullptr), mpViewer(nullptr)
 {
-    mpCurrentMap = static_cast<Map*>(NULL);
     CreateNewMap();
 }
 
 Atlas::~Atlas()
 {
-    for(std::set<Map*>::iterator it = mspMaps.begin(), end = mspMaps.end(); it != end;)
-    {
-        Map* pMi = *it;
+    mspMaps.clear();
 
-        if(pMi)
-        {
-            delete pMi;
-            pMi = static_cast<Map*>(NULL);
+    // for( it = mspMaps.begin(), end = mspMaps.end(); it != end;)
+    // {
+    //     std::shared_ptr<Map> pMi( *it );
 
-            it = mspMaps.erase(it);
-        }
-        else
-            ++it;
+    //     if(*it)
+    //     {
+    //         (*it).clear();
+    //         it = mspMaps.erase(it);
+    //     }
+    //     else {
+    //         ++it;
+    //     }
 
-    }
+    // }
 }
 
 void Atlas::CreateNewMap()
@@ -66,17 +67,17 @@ void Atlas::CreateNewMap()
         mpCurrentMap->SetStoredMap();
         cout << "Stored map with ID: " << mpCurrentMap->GetId() << endl;
 
-        //if(mHasViewer)
+        //if(mpViewer)
         //    mpViewer->AddMapToCreateThumbnail(mpCurrentMap);
     }
     cout << "Creation of new map with last KF id: " << mnLastInitKFidMap << endl;
 
-    mpCurrentMap = new Map(mnLastInitKFidMap);
+    mpCurrentMap = std::make_shared<Map>(mnLastInitKFidMap);
     mpCurrentMap->SetCurrentMap();
     mspMaps.insert(mpCurrentMap);
 }
 
-void Atlas::ChangeMap(Map* pMap)
+void Atlas::ChangeMap(const std::shared_ptr<Map> &pMap)
 {
     unique_lock<mutex> lock(mMutexAtlas);
     cout << "Change to map with id: " << pMap->GetId() << endl;
@@ -94,21 +95,20 @@ unsigned long int Atlas::GetLastInitKFid()
     return mnLastInitKFidMap;
 }
 
-void Atlas::SetViewer(Viewer* pViewer)
+void Atlas::SetViewer(const std::shared_ptr<Viewer> &pViewer)
 {
     mpViewer = pViewer;
-    mHasViewer = true;
 }
 
 void Atlas::AddKeyFrame(KeyFrame* pKF)
 {
-    Map* pMapKF = pKF->GetMap();
+    std::shared_ptr<Map> pMapKF = pKF->GetMap();
     pMapKF->AddKeyFrame(pKF);
 }
 
 void Atlas::AddMapPoint(MapPoint* pMP)
 {
-    Map* pMapMP = pMP->GetMap();
+    std::shared_ptr<Map> pMapMP = pMP->GetMap();
     pMapMP->AddMapPoint(pMP);
 }
 
@@ -206,17 +206,17 @@ std::vector<MapPoint*> Atlas::GetReferenceMapPoints()
     return mpCurrentMap->GetReferenceMapPoints();
 }
 
-vector<Map*> Atlas::GetAllMaps()
+vector<std::shared_ptr<Map> > Atlas::GetAllMaps()
 {
     unique_lock<mutex> lock(mMutexAtlas);
     struct compFunctor
     {
-        inline bool operator()(Map* elem1 ,Map* elem2)
+        inline bool operator()(const std::shared_ptr<Map> &elem1 ,const std::shared_ptr<Map> &elem2)
         {
             return elem1->GetId() < elem2->GetId();
         }
     };
-    vector<Map*> vMaps(mspMaps.begin(),mspMaps.end());
+    vector< std::shared_ptr<Map> > vMaps(mspMaps.begin(),mspMaps.end());
     sort(vMaps.begin(), vMaps.end(), compFunctor());
     return vMaps;
 }
@@ -242,11 +242,11 @@ void Atlas::clearAtlas()
         delete *it;
     }*/
     mspMaps.clear();
-    mpCurrentMap = static_cast<Map*>(NULL);
+    mpCurrentMap.reset();
     mnLastInitKFidMap = 0;
 }
 
-Map* Atlas::GetCurrentMap()
+std::shared_ptr<Map> Atlas::GetCurrentMap()
 {
     unique_lock<mutex> lock(mMutexAtlas);
     if(!mpCurrentMap)
@@ -257,7 +257,7 @@ Map* Atlas::GetCurrentMap()
     return mpCurrentMap;
 }
 
-void Atlas::SetMapBad(Map* pMap)
+void Atlas::SetMapBad(const std::shared_ptr<Map> &pMap)
 {
     mspMaps.erase(pMap);
     pMap->SetBad();
@@ -308,7 +308,7 @@ void Atlas::PreSave()
 
     struct compFunctor
     {
-        inline bool operator()(Map* elem1 ,Map* elem2)
+        inline bool operator()(const std::shared_ptr<Map> &elem1 ,const std::shared_ptr<Map> &elem2)
         {
             return elem1->GetId() < elem2->GetId();
         }
@@ -317,7 +317,7 @@ void Atlas::PreSave()
     sort(mvpBackupMaps.begin(), mvpBackupMaps.end(), compFunctor());
 
     std::set<GeometricCamera*> spCams(mvpCameras.begin(), mvpCameras.end());
-    for(Map* pMi : mvpBackupMaps)
+    for(auto pMi : mvpBackupMaps)
     {
         if(!pMi || pMi->IsBad())
             continue;
@@ -342,7 +342,7 @@ void Atlas::PostLoad()
 
     mspMaps.clear();
     unsigned long int numKF = 0, numMP = 0;
-    for(Map* pMi : mvpBackupMaps)
+    for(std::shared_ptr<Map> pMi : mvpBackupMaps)
     {
         mspMaps.insert(pMi);
         pMi->PostLoad(mpKeyFrameDB, mpORBVocabulary, mpCams);
@@ -352,22 +352,22 @@ void Atlas::PostLoad()
     mvpBackupMaps.clear();
 }
 
-void Atlas::SetKeyFrameDababase(KeyFrameDatabase* pKFDB)
+void Atlas::SetKeyFrameDababase(const std::shared_ptr<KeyFrameDatabase> &pKFDB)
 {
     mpKeyFrameDB = pKFDB;
 }
 
-KeyFrameDatabase* Atlas::GetKeyFrameDatabase()
+std::shared_ptr<KeyFrameDatabase> Atlas::GetKeyFrameDatabase()
 {
     return mpKeyFrameDB;
 }
 
-void Atlas::SetORBVocabulary(ORBVocabulary* pORBVoc)
+void Atlas::SetORBVocabulary(const std::shared_ptr<ORBVocabulary> &pORBVoc)
 {
     mpORBVocabulary = pORBVoc;
 }
 
-ORBVocabulary* Atlas::GetORBVocabulary()
+std::shared_ptr<ORBVocabulary> Atlas::GetORBVocabulary()
 {
     return mpORBVocabulary;
 }
@@ -376,7 +376,7 @@ long unsigned int Atlas::GetNumLivedKF()
 {
     unique_lock<mutex> lock(mMutexAtlas);
     long unsigned int num = 0;
-    for(Map* pMap_i : mspMaps)
+    for(auto pMap_i : mspMaps)
     {
         num += pMap_i->GetAllKeyFrames().size();
     }
@@ -387,7 +387,7 @@ long unsigned int Atlas::GetNumLivedKF()
 long unsigned int Atlas::GetNumLivedMP() {
     unique_lock<mutex> lock(mMutexAtlas);
     long unsigned int num = 0;
-    for (Map* pMap_i : mspMaps) {
+    for (auto pMap_i : mspMaps) {
         num += pMap_i->GetAllMapPoints().size();
     }
 
@@ -397,7 +397,7 @@ long unsigned int Atlas::GetNumLivedMP() {
 map<long unsigned int, KeyFrame*> Atlas::GetAtlasKeyframes()
 {
     map<long unsigned int, KeyFrame*> mpIdKFs;
-    for(Map* pMap_i : mvpBackupMaps)
+    for(auto pMap_i : mvpBackupMaps)
     {
         vector<KeyFrame*> vpKFs_Mi = pMap_i->GetAllKeyFrames();
 

@@ -77,11 +77,11 @@ public:
     ~Atlas();
 
     void CreateNewMap();
-    void ChangeMap(Map* pMap);
+    void ChangeMap(const std::shared_ptr<Map> &pMap);
 
     unsigned long int GetLastInitKFid();
 
-    void SetViewer(Viewer* pViewer);
+    void SetViewer(const std::shared_ptr<Viewer> &pViewer);
 
     // Method for change components in the current map
     void AddKeyFrame(KeyFrame* pKF);
@@ -105,7 +105,7 @@ public:
     std::vector<MapPoint*> GetAllMapPoints();
     std::vector<MapPoint*> GetReferenceMapPoints();
 
-    vector<Map*> GetAllMaps();
+    vector< std::shared_ptr<Map> > GetAllMaps();
 
     int CountMaps();
 
@@ -113,9 +113,9 @@ public:
 
     void clearAtlas();
 
-    Map* GetCurrentMap();
+    std::shared_ptr<Map> GetCurrentMap();
 
-    void SetMapBad(Map* pMap);
+    void SetMapBad(const std::shared_ptr<Map> &pMap);
     void RemoveBadMaps();
 
     bool isInertial();
@@ -129,11 +129,11 @@ public:
 
     map<long unsigned int, KeyFrame*> GetAtlasKeyframes();
 
-    void SetKeyFrameDababase(KeyFrameDatabase* pKFDB);
-    KeyFrameDatabase* GetKeyFrameDatabase();
+    void SetKeyFrameDababase(const std::shared_ptr<KeyFrameDatabase> &pKFDB);
+    std::shared_ptr<KeyFrameDatabase> GetKeyFrameDatabase();
 
-    void SetORBVocabulary(ORBVocabulary* pORBVoc);
-    ORBVocabulary* GetORBVocabulary();
+    void SetORBVocabulary(const std::shared_ptr<ORBVocabulary> &pORBVoc);
+    std::shared_ptr<ORBVocabulary> GetORBVocabulary();
 
     long unsigned int GetNumLivedKF();
 
@@ -141,23 +141,22 @@ public:
 
 protected:
 
-    std::set<Map*> mspMaps;
-    std::set<Map*> mspBadMaps;
+    std::set< std::shared_ptr<Map> > mspMaps;
+    std::set< std::shared_ptr<Map> > mspBadMaps;
     // Its necessary change the container from set to vector because libboost 1.58 and Ubuntu 16.04 have an error with this cointainer
-    std::vector<Map*> mvpBackupMaps;
+    std::vector< std::shared_ptr<Map> > mvpBackupMaps;
 
-    Map* mpCurrentMap;
+    std::shared_ptr<Map> mpCurrentMap;
 
     std::vector<GeometricCamera*> mvpCameras;
 
     unsigned long int mnLastInitKFidMap;
 
-    Viewer* mpViewer;
-    bool mHasViewer;
+    std::shared_ptr<Viewer> mpViewer;
 
     // Class references for the map reconstruction from the save file
-    KeyFrameDatabase* mpKeyFrameDB;
-    ORBVocabulary* mpORBVocabulary;
+    std::shared_ptr<KeyFrameDatabase> mpKeyFrameDB;
+    std::shared_ptr<ORBVocabulary> mpORBVocabulary;
 
     // Mutex
     std::mutex mMutexAtlas;

@@ -41,9 +41,12 @@ class Viewer
 {
 public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-    Viewer(System* pSystem, FrameDrawer* pFrameDrawer, MapDrawer* pMapDrawer, Tracking *pTracking, const string &strSettingPath, Settings* settings);
 
-    void newParameterLoader(Settings* settings);
+    Viewer(System* pSystem, 
+            const std::shared_ptr<FrameDrawer> &pFrameDrawer, 
+            const std::shared_ptr<MapDrawer> &pMapDrawer, 
+            const std::shared_ptr<Tracking> &pTracking,  
+            const std::shared_ptr<Settings> &settings);
 
     // Main thread function. Draw points, keyframes, the current camera pose and the last processed
     // frame. Drawing is refreshed according to the camera fps. We use Pangolin.
@@ -66,14 +69,12 @@ public:
     bool both;
 private:
 
-    bool ParseViewerParamFile(cv::FileStorage &fSettings);
-
     bool Stop();
 
     System* mpSystem;
-    FrameDrawer* mpFrameDrawer;
-    MapDrawer* mpMapDrawer;
-    Tracking* mpTracker;
+    std::shared_ptr<FrameDrawer> mpFrameDrawer;
+    std::shared_ptr<MapDrawer> mpMapDrawer;
+    std::shared_ptr<Tracking> mpTracker;
 
     // 1/fps in ms
     double mT;

@@ -38,7 +38,7 @@ class KeyFrame;
 class Atlas;
 class KeyFrameDatabase;
 
-class Map
+class Map : public std::enable_shared_from_this<Map>
 {
     friend class boost::serialization::access;
 
@@ -131,7 +131,8 @@ public:
     unsigned int GetLowerKFID();
 
     void PreSave(std::set<GeometricCamera*> &spCams);
-    void PostLoad(KeyFrameDatabase* pKFDB, ORBVocabulary* pORBVoc/*, map<long unsigned int, KeyFrame*>& mpKeyFrameId*/, map<unsigned int, GeometricCamera*> &mpCams);
+    void PostLoad(const std::shared_ptr<KeyFrameDatabase> &pKFDB, 
+                  const std::shared_ptr<ORBVocabulary> &pORBVoc/*, map<long unsigned int, KeyFrame*>& mpKeyFrameId*/, map<unsigned int, GeometricCamera*> &mpCams);
 
     void printReprojectionError(list<KeyFrame*> &lpLocalWindowKFs, KeyFrame* mpCurrentKF, string &name, string &name_folder);
 

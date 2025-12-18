@@ -18,25 +18,29 @@
 
 #pragma once
 
-
 // Flag to activate the measurement of time in each process (track,localmap, place recognition).
-#define REGISTER_TIMES
-
-#include "CameraModels/GeometricCamera.h"
+//#define REGISTER_TIMES
 
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
 
+#include "CameraModels/GeometricCamera.h"
+#include "Types.h"
+
+
 namespace ORB_SLAM3 {
 
     class System;
+    
+
 
     //TODO: change to double instead of float
 
     class Settings {
     public:
+
         /*
          * Enum for the different camera types implemented
          */
@@ -51,10 +55,12 @@ namespace ORB_SLAM3 {
          */
         Settings() = delete;
 
+        Settings(const SensorType sensor);
+
         /*
          * Constructor from file
          */
-        Settings(const std::string &configFile, const int& sensor);
+        Settings(const std::string &configFile, const SensorType sensor);
 
         // Copy constructor
         Settings( const Settings & ) = default;
@@ -137,7 +143,7 @@ namespace ORB_SLAM3 {
 
         void precomputeRectificationMaps();
 
-        int sensor_;
+        SensorType sensor_;
         CameraType cameraType_;     //Camera type
 
         /*
@@ -211,7 +217,7 @@ namespace ORB_SLAM3 {
         float thFarPoints_;
 
         bool loopClosing_;
-        string strVocFile_;
+        std::string strVocFile_;
 
     private:
         template<typename T>

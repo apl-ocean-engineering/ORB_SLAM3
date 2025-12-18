@@ -29,10 +29,10 @@ using namespace std;
 namespace ORB_SLAM3
 {
 
-KeyFrameDatabase::KeyFrameDatabase (const ORBVocabulary &voc):
-    mpVoc(&voc)
+KeyFrameDatabase::KeyFrameDatabase (const std::shared_ptr<ORBVocabulary> &voc):
+    mpVoc(voc)
 {
-    mvInvertedFile.resize(voc.size());
+    mvInvertedFile.resize(voc->size());
 }
 
 
@@ -71,7 +71,7 @@ void KeyFrameDatabase::clear()
     mvInvertedFile.resize(mpVoc->size());
 }
 
-void KeyFrameDatabase::clearMap(Map* pMap)
+void KeyFrameDatabase::clearMap(const std::shared_ptr<Map> &pMap)
 {
     unique_lock<mutex> lock(mMutex);
 
@@ -730,7 +730,7 @@ void KeyFrameDatabase::DetectNBestCandidates(KeyFrame *pKF, vector<KeyFrame*> &v
 }
 
 
-vector<KeyFrame*> KeyFrameDatabase::DetectRelocalizationCandidates(Frame *F, Map* pMap)
+vector<KeyFrame*> KeyFrameDatabase::DetectRelocalizationCandidates(Frame *F, const std::shared_ptr<Map> &pMap)
 {
     list<KeyFrame*> lKFsSharingWords;
 
@@ -844,11 +844,13 @@ vector<KeyFrame*> KeyFrameDatabase::DetectRelocalizationCandidates(Frame *F, Map
     return vpRelocCandidates;
 }
 
-void KeyFrameDatabase::SetORBVocabulary(ORBVocabulary* pORBVoc)
+void KeyFrameDatabase::SetORBVocabulary(const std::shared_ptr<ORBVocabulary> &pORBVoc)
 {
-    ORBVocabulary** ptr;
-    ptr = (ORBVocabulary**)( &mpVoc );
-    *ptr = pORBVoc;
+    // WTF?
+    // ORBVocabulary** ptr;
+    // ptr = (ORBVocabulary**)( &mpVoc );
+    // *ptr = pORBVoc;
+    mpVoc = pORBVoc;
 
     mvInvertedFile.clear();
     mvInvertedFile.resize(mpVoc->size());

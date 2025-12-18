@@ -37,11 +37,9 @@ class MapDrawer
 {
 public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-    MapDrawer(Atlas* pAtlas, const string &strSettingPath, Settings* settings);
+    MapDrawer(const std::shared_ptr<Atlas> &pAtlas, const std::shared_ptr<Settings> &settings);
 
-    void newParameterLoader(Settings* settings);
-
-    Atlas* mpAtlas;
+    std::shared_ptr<Atlas> mpAtlas;
 
     void DrawMapPoints();
     void DrawKeyFrames(const bool bDrawKF, const bool bDrawGraph, const bool bDrawInertialGraph, const bool bDrawOptLba);
@@ -52,7 +50,7 @@ public:
 
 private:
 
-    bool ParseViewerParamFile(cv::FileStorage &fSettings);
+    void newParameterLoader(const std::shared_ptr<Settings> &ssettings);
 
     float mKeyFrameSize;
     float mKeyFrameLineWidth;

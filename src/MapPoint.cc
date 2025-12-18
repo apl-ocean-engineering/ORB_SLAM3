@@ -36,7 +36,7 @@ MapPoint::MapPoint():
     mpReplaced = static_cast<MapPoint*>(NULL);
 }
 
-MapPoint::MapPoint(const Eigen::Vector3f &Pos, KeyFrame *pRefKF, Map* pMap):
+MapPoint::MapPoint(const Eigen::Vector3f &Pos, KeyFrame *pRefKF, const std::shared_ptr<Map> &pMap):
     mnFirstKFid(pRefKF->mnId), mnFirstFrame(pRefKF->mnFrameId), nObs(0), mnTrackReferenceForFrame(0),
     mnLastFrameSeen(0), mnBALocalForKF(0), mnFuseCandidateForKF(0), mnLoopPointForKF(0), mnCorrectedByKF(0),
     mnCorrectedReference(0), mnBAGlobalForKF(0), mpRefKF(pRefKF), mnVisible(1), mnFound(1), mbBad(false),
@@ -55,7 +55,7 @@ MapPoint::MapPoint(const Eigen::Vector3f &Pos, KeyFrame *pRefKF, Map* pMap):
     mnId=nNextId++;
 }
 
-MapPoint::MapPoint(const double invDepth, cv::Point2f uv_init, KeyFrame* pRefKF, KeyFrame* pHostKF, Map* pMap):
+MapPoint::MapPoint(const double invDepth, cv::Point2f uv_init, KeyFrame* pRefKF, KeyFrame* pHostKF, const std::shared_ptr<Map> &pMap):
     mnFirstKFid(pRefKF->mnId), mnFirstFrame(pRefKF->mnFrameId), nObs(0), mnTrackReferenceForFrame(0),
     mnLastFrameSeen(0), mnBALocalForKF(0), mnFuseCandidateForKF(0), mnLoopPointForKF(0), mnCorrectedByKF(0),
     mnCorrectedReference(0), mnBAGlobalForKF(0), mpRefKF(pRefKF), mnVisible(1), mnFound(1), mbBad(false),
@@ -75,7 +75,7 @@ MapPoint::MapPoint(const double invDepth, cv::Point2f uv_init, KeyFrame* pRefKF,
     mnId=nNextId++;
 }
 
-MapPoint::MapPoint(const Eigen::Vector3f &Pos, Map* pMap, Frame* pFrame, const int &idxF):
+MapPoint::MapPoint(const Eigen::Vector3f &Pos, const std::shared_ptr<Map> &pMap, Frame* pFrame, const int &idxF):
     mnFirstKFid(-1), mnFirstFrame(pFrame->mnId), nObs(0), mnTrackReferenceForFrame(0), mnLastFrameSeen(0),
     mnBALocalForKF(0), mnFuseCandidateForKF(0),mnLoopPointForKF(0), mnCorrectedByKF(0),
     mnCorrectedReference(0), mnBAGlobalForKF(0), mpRefKF(static_cast<KeyFrame*>(NULL)), mnVisible(1),
@@ -557,13 +557,13 @@ void MapPoint::PrintObservations()
     }
 }
 
-Map* MapPoint::GetMap()
+std::shared_ptr<Map> MapPoint::GetMap()
 {
     unique_lock<mutex> lock(mMutexMap);
     return mpMap;
 }
 
-void MapPoint::UpdateMap(Map* pMap)
+void MapPoint::UpdateMap(const std::shared_ptr<Map> &pMap)
 {
     unique_lock<mutex> lock(mMutexMap);
     mpMap = pMap;

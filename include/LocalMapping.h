@@ -42,11 +42,11 @@ class LocalMapping
 {
 public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-    LocalMapping(System* pSys, Atlas* pAtlas, const float bMonocular, bool bInertial, const string &_strSeqName=std::string());
+    LocalMapping(System* pSys, const std::shared_ptr<Atlas> &pAtlas, const float bMonocular, bool bInertial, const string &_strSeqName=std::string());
 
-    void SetLoopCloser(LoopClosing* pLoopCloser);
+    void SetLoopCloser(const std::shared_ptr<LoopClosing> &pLoopCloser);
 
-    void SetTracker(Tracking* pTracker);
+    void SetTracker(const std::shared_ptr<Tracking> &pTracker);
 
     // Main function
     void Run();
@@ -57,7 +57,7 @@ public:
     // Thread Synch
     void RequestStop();
     void RequestReset();
-    void RequestResetActiveMap(Map* pMap);
+    void RequestResetActiveMap(const std::shared_ptr<Map> &pMap);
     bool Stop();
     void Release();
     bool isStopped();
@@ -147,7 +147,7 @@ protected:
     void ResetIfRequested();
     bool mbResetRequested;
     bool mbResetRequestedActiveMap;
-    Map* mpMapToReset;
+    std::shared_ptr<Map> mpMapToReset;
     std::mutex mMutexReset;
 
     bool CheckFinish();
@@ -156,10 +156,10 @@ protected:
     bool mbFinished;
     std::mutex mMutexFinish;
 
-    Atlas* mpAtlas;
+    std::shared_ptr<Atlas> mpAtlas;
 
-    LoopClosing* mpLoopCloser;
-    Tracking* mpTracker;
+    std::shared_ptr<LoopClosing> mpLoopCloser;
+    std::shared_ptr<Tracking> mpTracker;
 
     std::list<KeyFrame*> mlNewKeyFrames;
 

@@ -25,37 +25,14 @@
 namespace ORB_SLAM3
 {
 
-Viewer::Viewer(System* pSystem, FrameDrawer *pFrameDrawer, MapDrawer *pMapDrawer, Tracking *pTracking, const string &strSettingPath, Settings* settings):
-    both(false), mpSystem(pSystem), mpFrameDrawer(pFrameDrawer),mpMapDrawer(pMapDrawer), mpTracker(pTracking),
-    mbFinishRequested(false), mbFinished(true), mbStopped(true), mbStopRequested(false)
+Viewer::Viewer(System* pSystem,
+            const std::shared_ptr<FrameDrawer>  &pFrameDrawer, 
+            const std::shared_ptr<MapDrawer> &pMapDrawer, 
+            const std::shared_ptr<Tracking> &pTracking,  
+            const std::shared_ptr<Settings> &settings)
+            : both(false), mpSystem(pSystem), mpFrameDrawer(pFrameDrawer),mpMapDrawer(pMapDrawer), mpTracker(pTracking),
+    mbFinishRequested(false), mbFinished(true), mbStopped(true), mbStopRequested(false), mbStopTrack(false)
 {
-    if(settings){
-        newParameterLoader(settings);
-    }
-    else{
-
-        cv::FileStorage fSettings(strSettingPath, cv::FileStorage::READ);
-
-        bool is_correct = ParseViewerParamFile(fSettings);
-
-        if(!is_correct)
-        {
-            std::cerr << "**ERROR in the config file, the format is not correct**" << std::endl;
-            try
-            {
-                throw -1;
-            }
-            catch(exception &e)
-            {
-
-            }
-        }
-    }
-
-    mbStopTrack = false;
-}
-
-void Viewer::newParameterLoader(Settings *settings) {
     mImageViewerScale = 1.f;
 
     float fps = settings->fps();
@@ -72,91 +49,6 @@ void Viewer::newParameterLoader(Settings *settings) {
     mViewpointY = settings->viewPointY();
     mViewpointZ = settings->viewPointZ();
     mViewpointF = settings->viewPointF();
-}
-
-bool Viewer::ParseViewerParamFile(cv::FileStorage &fSettings)
-{
-    bool b_miss_params = false;
-    mImageViewerScale = 1.f;
-
-    float fps = fSettings["Camera.fps"];
-    if(fps<1)
-        fps=30;
-    mT = 1e3/fps;
-
-    cv::FileNode node = fSettings["Camera.width"];
-    if(!node.empty())
-    {
-        mImageWidth = node.real();
-    }
-    else
-    {
-        std::cerr << "*Camera.width parameter doesn't exist or is not a real number*" << std::endl;
-        b_miss_params = true;
-    }
-
-    node = fSettings["Camera.height"];
-    if(!node.empty())
-    {
-        mImageHeight = node.real();
-    }
-    else
-    {
-        std::cerr << "*Camera.height parameter doesn't exist or is not a real number*" << std::endl;
-        b_miss_params = true;
-    }
-
-    node = fSettings["Viewer.imageViewScale"];
-    if(!node.empty())
-    {
-        mImageViewerScale = node.real();
-    }
-
-    node = fSettings["Viewer.ViewpointX"];
-    if(!node.empty())
-    {
-        mViewpointX = node.real();
-    }
-    else
-    {
-        std::cerr << "*Viewer.ViewpointX parameter doesn't exist or is not a real number*" << std::endl;
-        b_miss_params = true;
-    }
-
-    node = fSettings["Viewer.ViewpointY"];
-    if(!node.empty())
-    {
-        mViewpointY = node.real();
-    }
-    else
-    {
-        std::cerr << "*Viewer.ViewpointY parameter doesn't exist or is not a real number*" << std::endl;
-        b_miss_params = true;
-    }
-
-    node = fSettings["Viewer.ViewpointZ"];
-    if(!node.empty())
-    {
-        mViewpointZ = node.real();
-    }
-    else
-    {
-        std::cerr << "*Viewer.ViewpointZ parameter doesn't exist or is not a real number*" << std::endl;
-        b_miss_params = true;
-    }
-
-    node = fSettings["Viewer.ViewpointF"];
-    if(!node.empty())
-    {
-        mViewpointF = node.real();
-    }
-    else
-    {
-        std::cerr << "*Viewer.ViewpointF parameter doesn't exist or is not a real number*" << std::endl;
-        b_miss_params = true;
-    }
-
-    return !b_miss_params;
 }
 
 void Viewer::Run()
@@ -211,7 +103,7 @@ void Viewer::Run()
     bool bStepByStep = false;
     bool bCameraView = true;
 
-    if(mpTracker->mSensor == mpSystem->MONOCULAR || mpTracker->mSensor == mpSystem->STEREO || mpTracker->mSensor == mpSystem->RGBD)
+    if(mpTracker->mSensor == SensorType::MONOCULAR || mpTracker->mSensor == SensorType::STEREO || mpTracker->mSensor == SensorType::RGBD)
     {
         menuShowGraph = true;
     }

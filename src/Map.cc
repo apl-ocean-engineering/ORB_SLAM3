@@ -26,19 +26,19 @@ namespace ORB_SLAM3
 
 long unsigned int Map::nNextId=0;
 
-Map::Map():mnMaxKFid(0),mnBigChangeIdx(0), mbImuInitialized(false), mnMapChange(0), mpFirstRegionKF(static_cast<KeyFrame*>(NULL)),
+Map::Map()
+: mnMaxKFid(0),mnBigChangeIdx(0), mbImuInitialized(false), mnMapChange(0), mpFirstRegionKF(nullptr), mThumbnail(nullptr),
 mbFail(false), mIsInUse(false), mHasTumbnail(false), mbBad(false), mnMapChangeNotified(0), mbIsInertial(false), mbIMU_BA1(false), mbIMU_BA2(false)
 {
     mnId=nNextId++;
-    mThumbnail = static_cast<GLubyte*>(NULL);
 }
 
-Map::Map(int initKFid):mnInitKFid(initKFid), mnMaxKFid(initKFid),/*mnLastLoopKFid(initKFid),*/ mnBigChangeIdx(0), mIsInUse(false),
-                       mHasTumbnail(false), mbBad(false), mbImuInitialized(false), mpFirstRegionKF(static_cast<KeyFrame*>(NULL)),
+Map::Map(int initKFid)
+: mnInitKFid(initKFid), mnMaxKFid(initKFid),/*mnLastLoopKFid(initKFid),*/ mnBigChangeIdx(0), mIsInUse(false),
+                       mHasTumbnail(false), mbBad(false), mbImuInitialized(false), mpFirstRegionKF(nullptr),mThumbnail(nullptr),
                        mnMapChange(0), mbFail(false), mnMapChangeNotified(0), mbIsInertial(false), mbIMU_BA1(false), mbIMU_BA2(false)
 {
     mnId=nNextId++;
-    mThumbnail = static_cast<GLubyte*>(NULL);
 }
 
 Map::~Map()
@@ -219,7 +219,7 @@ void Map::clear()
     for(set<KeyFrame*>::iterator sit=mspKeyFrames.begin(), send=mspKeyFrames.end(); sit!=send; sit++)
     {
         KeyFrame* pKF = *sit;
-        pKF->UpdateMap(static_cast<Map*>(NULL));
+        pKF->UpdateMap(nullptr);
 //        delete *sit;
     }
 
@@ -371,7 +371,7 @@ void Map::PreSave(std::set<GeometricCamera*> &spCams)
         map<KeyFrame*, std::tuple<int,int>> mpObs = pMPi->GetObservations();
         for(map<KeyFrame*, std::tuple<int,int>>::iterator it= mpObs.begin(), end=mpObs.end(); it!=end; ++it)
         {
-            if(it->first->GetMap() != this || it->first->isBad())
+            if(it->first->GetMap().get() != this || it->first->isBad())
             {
                 pMPi->EraseObservation(it->first);
             }
@@ -424,7 +424,7 @@ void Map::PreSave(std::set<GeometricCamera*> &spCams)
 
 }
 
-void Map::PostLoad(KeyFrameDatabase* pKFDB, ORBVocabulary* pORBVoc/*, map<long unsigned int, KeyFrame*>& mpKeyFrameId*/, map<unsigned int, GeometricCamera*> &mpCams)
+void Map::PostLoad(const std::shared_ptr<KeyFrameDatabase> &pKFDB, const std::shared_ptr<ORBVocabulary> &pORBVoc/*, map<long unsigned int, KeyFrame*>& mpKeyFrameId*/, map<unsigned int, GeometricCamera*> &mpCams)
 {
     std::copy(mvpBackupMapPoints.begin(), mvpBackupMapPoints.end(), std::inserter(mspMapPoints, mspMapPoints.begin()));
     std::copy(mvpBackupKeyFrames.begin(), mvpBackupKeyFrames.end(), std::inserter(mspKeyFrames, mspKeyFrames.begin()));
@@ -435,7 +435,7 @@ void Map::PostLoad(KeyFrameDatabase* pKFDB, ORBVocabulary* pORBVoc/*, map<long u
         if(!pMPi || pMPi->isBad())
             continue;
 
-        pMPi->UpdateMap(this);
+        pMPi->UpdateMap(shared_from_this());
         mpMapPointId[pMPi->mnId] = pMPi;
     }
 
@@ -445,7 +445,7 @@ void Map::PostLoad(KeyFrameDatabase* pKFDB, ORBVocabulary* pORBVoc/*, map<long u
         if(!pKFi || pKFi->isBad())
             continue;
 
-        pKFi->UpdateMap(this);
+        pKFi->UpdateMap(shared_from_this());
         pKFi->SetORBVocabulary(pORBVoc);
         pKFi->SetKeyFrameDatabase(pKFDB);
         mpKeyFrameId[pKFi->mnId] = pKFi;

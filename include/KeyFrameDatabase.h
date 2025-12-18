@@ -58,14 +58,14 @@ public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     KeyFrameDatabase(){}
-    KeyFrameDatabase(const ORBVocabulary &voc);
+    KeyFrameDatabase(const std::shared_ptr<ORBVocabulary> &voc);
 
     void add(KeyFrame* pKF);
 
     void erase(KeyFrame* pKF);
 
     void clear();
-    void clearMap(Map* pMap);
+    void clearMap(const std::shared_ptr<Map> &pMap);
 
     // Loop Detection(DEPRECATED)
     std::vector<KeyFrame *> DetectLoopCandidates(KeyFrame* pKF, float minScore);
@@ -76,16 +76,16 @@ public:
     void DetectNBestCandidates(KeyFrame *pKF, vector<KeyFrame*> &vpLoopCand, vector<KeyFrame*> &vpMergeCand, int nNumCandidates);
 
     // Relocalization
-    std::vector<KeyFrame*> DetectRelocalizationCandidates(Frame* F, Map* pMap);
+    std::vector<KeyFrame*> DetectRelocalizationCandidates(Frame* F, const std::shared_ptr<Map> &pMap);
 
     void PreSave();
     void PostLoad(map<long unsigned int, KeyFrame*> mpKFid);
-    void SetORBVocabulary(ORBVocabulary* pORBVoc);
+    void SetORBVocabulary(const std::shared_ptr<ORBVocabulary> &pORBVoc);
 
 protected:
 
    // Associated vocabulary
-   const ORBVocabulary* mpVoc;
+   std::shared_ptr<ORBVocabulary> mpVoc;
 
    // Inverted file
    std::vector<list<KeyFrame*> > mvInvertedFile;

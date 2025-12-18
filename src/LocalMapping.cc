@@ -30,7 +30,7 @@
 namespace ORB_SLAM3
 {
 
-LocalMapping::LocalMapping(System* pSys, Atlas *pAtlas, const float bMonocular, bool bInertial, const string &_strSeqName):
+LocalMapping::LocalMapping(System* pSys, const std::shared_ptr<Atlas> &pAtlas, const float bMonocular, bool bInertial, const string &_strSeqName):
     mpSystem(pSys), mbMonocular(bMonocular), mbInertial(bInertial), mbResetRequested(false), mbResetRequestedActiveMap(false), mbFinishRequested(false), mbFinished(true), mpAtlas(pAtlas), bInitializing(false),
     mbAbortBA(false), mbStopped(false), mbStopRequested(false), mbNotStop(false), mbAcceptKeyFrames(true),
     mIdxInit(0), mScale(1.0), mInitSect(0), mbNotBA1(true), mbNotBA2(true), mIdxIteration(0), infoInertial(Eigen::MatrixXd::Zero(9,9))
@@ -51,12 +51,12 @@ LocalMapping::LocalMapping(System* pSys, Atlas *pAtlas, const float bMonocular, 
 
 }
 
-void LocalMapping::SetLoopCloser(LoopClosing* pLoopCloser)
+void LocalMapping::SetLoopCloser(const std::shared_ptr<LoopClosing> &pLoopCloser)
 {
     mpLoopCloser = pLoopCloser;
 }
 
-void LocalMapping::SetTracker(Tracking *pTracker)
+void LocalMapping::SetTracker(const std::shared_ptr<Tracking> &pTracker)
 {
     mpTracker=pTracker;
 }
@@ -1076,7 +1076,7 @@ void LocalMapping::RequestReset()
     cout << "LM: Map reset, Done!!!" << endl;
 }
 
-void LocalMapping::RequestResetActiveMap(Map* pMap)
+void LocalMapping::RequestResetActiveMap(const std::shared_ptr<Map> &pMap)
 {
     {
         unique_lock<mutex> lock(mMutexReset);

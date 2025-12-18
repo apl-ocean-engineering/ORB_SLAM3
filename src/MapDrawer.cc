@@ -26,31 +26,13 @@ namespace ORB_SLAM3
 {
 
 
-MapDrawer::MapDrawer(Atlas* pAtlas, const string &strSettingPath, Settings* settings):mpAtlas(pAtlas)
+MapDrawer::MapDrawer(const std::shared_ptr<Atlas> &pAtlas, const std::shared_ptr<Settings> &settings)
+: mpAtlas(pAtlas)
 {
-    if(settings){
-        newParameterLoader(settings);
-    }
-    else{
-        cv::FileStorage fSettings(strSettingPath, cv::FileStorage::READ);
-        bool is_correct = ParseViewerParamFile(fSettings);
-
-        if(!is_correct)
-        {
-            std::cerr << "**ERROR in the config file, the format is not correct**" << std::endl;
-            try
-            {
-                throw -1;
-            }
-            catch(exception &e)
-            {
-
-            }
-        }
-    }
+    newParameterLoader(settings);
 }
 
-void MapDrawer::newParameterLoader(Settings *settings) {
+void MapDrawer::newParameterLoader(const std::shared_ptr<Settings> &settings) {
     mKeyFrameSize = settings->keyFrameSize();
     mKeyFrameLineWidth = settings->keyFrameLineWidth();
     mGraphLineWidth = settings->graphLineWidth();
@@ -59,82 +41,9 @@ void MapDrawer::newParameterLoader(Settings *settings) {
     mCameraLineWidth  = settings->cameraLineWidth();
 }
 
-bool MapDrawer::ParseViewerParamFile(cv::FileStorage &fSettings)
-{
-    bool b_miss_params = false;
-
-    cv::FileNode node = fSettings["Viewer.KeyFrameSize"];
-    if(!node.empty())
-    {
-        mKeyFrameSize = node.real();
-    }
-    else
-    {
-        std::cerr << "*Viewer.KeyFrameSize parameter doesn't exist or is not a real number*" << std::endl;
-        b_miss_params = true;
-    }
-
-    node = fSettings["Viewer.KeyFrameLineWidth"];
-    if(!node.empty())
-    {
-        mKeyFrameLineWidth = node.real();
-    }
-    else
-    {
-        std::cerr << "*Viewer.KeyFrameLineWidth parameter doesn't exist or is not a real number*" << std::endl;
-        b_miss_params = true;
-    }
-
-    node = fSettings["Viewer.GraphLineWidth"];
-    if(!node.empty())
-    {
-        mGraphLineWidth = node.real();
-    }
-    else
-    {
-        std::cerr << "*Viewer.GraphLineWidth parameter doesn't exist or is not a real number*" << std::endl;
-        b_miss_params = true;
-    }
-
-    node = fSettings["Viewer.PointSize"];
-    if(!node.empty())
-    {
-        mPointSize = node.real();
-    }
-    else
-    {
-        std::cerr << "*Viewer.PointSize parameter doesn't exist or is not a real number*" << std::endl;
-        b_miss_params = true;
-    }
-
-    node = fSettings["Viewer.CameraSize"];
-    if(!node.empty())
-    {
-        mCameraSize = node.real();
-    }
-    else
-    {
-        std::cerr << "*Viewer.CameraSize parameter doesn't exist or is not a real number*" << std::endl;
-        b_miss_params = true;
-    }
-
-    node = fSettings["Viewer.CameraLineWidth"];
-    if(!node.empty())
-    {
-        mCameraLineWidth = node.real();
-    }
-    else
-    {
-        std::cerr << "*Viewer.CameraLineWidth parameter doesn't exist or is not a real number*" << std::endl;
-        b_miss_params = true;
-    }
-
-    return !b_miss_params;
-}
-
 void MapDrawer::DrawMapPoints()
 {
-    Map* pActiveMap = mpAtlas->GetCurrentMap();
+    std::shared_ptr<Map> pActiveMap = mpAtlas->GetCurrentMap();
     if(!pActiveMap)
         return;
 
@@ -181,7 +90,7 @@ void MapDrawer::DrawKeyFrames(const bool bDrawKF, const bool bDrawGraph, const b
     const float h = w*0.75;
     const float z = w*0.6;
 
-    Map* pActiveMap = mpAtlas->GetCurrentMap();
+    std::shared_ptr<Map> pActiveMap = mpAtlas->GetCurrentMap();
     // DEBUG LBA
     std::set<long unsigned int> sOptKFs = pActiveMap->msOptKFs;
     std::set<long unsigned int> sFixedKFs = pActiveMap->msFixedKFs;
@@ -333,11 +242,11 @@ void MapDrawer::DrawKeyFrames(const bool bDrawKF, const bool bDrawGraph, const b
         glEnd();
     }
 
-    vector<Map*> vpMaps = mpAtlas->GetAllMaps();
+    vector<std::shared_ptr<Map>> vpMaps = mpAtlas->GetAllMaps();
 
     if(bDrawKF)
     {
-        for(Map* pMap : vpMaps)
+        for(auto pMap : vpMaps)
         {
             if(pMap == pActiveMap)
                 continue;

@@ -107,9 +107,9 @@ public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     MapPoint();
 
-    MapPoint(const Eigen::Vector3f &Pos, KeyFrame* pRefKF, Map* pMap);
-    MapPoint(const double invDepth, cv::Point2f uv_init, KeyFrame* pRefKF, KeyFrame* pHostKF, Map* pMap);
-    MapPoint(const Eigen::Vector3f &Pos,  Map* pMap, Frame* pFrame, const int &idxF);
+    MapPoint(const Eigen::Vector3f &Pos, KeyFrame* pRefKF, const std::shared_ptr<Map> &pMap);
+    MapPoint(const double invDepth, cv::Point2f uv_init, KeyFrame* pRefKF, KeyFrame* pHostKF, const std::shared_ptr<Map> &pMap);
+    MapPoint(const Eigen::Vector3f &Pos,  const std::shared_ptr<Map> &pMap, Frame* pFrame, const int &idxF);
 
     void SetWorldPos(const Eigen::Vector3f &Pos);
     Eigen::Vector3f GetWorldPos();
@@ -152,8 +152,8 @@ public:
     int PredictScale(const float &currentDist, KeyFrame*pKF);
     int PredictScale(const float &currentDist, Frame* pF);
 
-    Map* GetMap();
-    void UpdateMap(Map* pMap);
+    std::shared_ptr<Map> GetMap();
+    void UpdateMap(const std::shared_ptr<Map> &pMap);
 
     void PrintObservations();
 
@@ -242,7 +242,7 @@ protected:
      float mfMinDistance;
      float mfMaxDistance;
 
-     Map* mpMap;
+     std::shared_ptr<Map> mpMap;
 
      // Mutex
      std::mutex mMutexPos;

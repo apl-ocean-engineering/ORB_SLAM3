@@ -42,7 +42,7 @@ class KeyFrameDatabase;
 class Map;
 
 
-class LoopClosing
+class LoopClosing : public enable_shared_from_this<LoopClosing>
 {
 public:
 
@@ -52,11 +52,17 @@ public:
 
 public:
 
-    LoopClosing(Atlas* pAtlas, KeyFrameDatabase* pDB, ORBVocabulary* pVoc,const bool bFixScale, const bool bActiveLC);
+    LoopClosing() = delete;
+    LoopClosing( const LoopClosing & ) = delete;
 
-    void SetTracker(Tracking* pTracker);
+    LoopClosing(const std::shared_ptr<Atlas>  &pAtlas, 
+        const std::shared_ptr<KeyFrameDatabase> &pDB,
+        const std::shared_ptr<ORBVocabulary> &pVoc,
+        const bool bFixScale, const bool bActiveLC);
 
-    void SetLocalMapper(LocalMapping* pLocalMapper);
+    void SetTracker(const std::shared_ptr<Tracking> &pTracker);
+
+    void SetLocalMapper(const std::shared_ptr<LocalMapping> &pLocalMapper);
 
     // Main function
     void Run();
@@ -64,10 +70,10 @@ public:
     void InsertKeyFrame(KeyFrame *pKF);
 
     void RequestReset();
-    void RequestResetActiveMap(Map* pMap);
+    void RequestResetActiveMap(const std::shared_ptr<Map> &pMap);
 
     // This function will run in a separate thread
-    void RunGlobalBundleAdjustment(Map* pActiveMap, unsigned long nLoopKF);
+    void RunGlobalBundleAdjustment(const std::shared_ptr<Map> &pActiveMap, unsigned long nLoopKF);
 
     bool isRunningGBA(){
         unique_lock<std::mutex> lock(mMutexGBA);
@@ -82,7 +88,8 @@ public:
 
     bool isFinished();
 
-    Viewer* mpViewer;
+    // \amm Unused?
+    std::shared_ptr<Viewer> mpViewer;
 
 #ifdef REGISTER_TIMES
 
@@ -147,7 +154,7 @@ protected:
     void ResetIfRequested();
     bool mbResetRequested;
     bool mbResetActiveMapRequested;
-    Map* mpMapToReset;
+    std::shared_ptr<Map> mpMapToReset;
     std::mutex mMutexReset;
 
     bool CheckFinish();
@@ -156,13 +163,13 @@ protected:
     bool mbFinished;
     std::mutex mMutexFinish;
 
-    Atlas* mpAtlas;
-    Tracking* mpTracker;
+    std::shared_ptr<Atlas> mpAtlas;
+    std::shared_ptr<Tracking> mpTracker;
 
-    KeyFrameDatabase* mpKeyFrameDB;
-    ORBVocabulary* mpORBVocabulary;
+    std::shared_ptr<KeyFrameDatabase> mpKeyFrameDB;
+    std::shared_ptr<ORBVocabulary> mpORBVocabulary;
 
-    LocalMapping *mpLocalMapper;
+    std::shared_ptr<LocalMapping> mpLocalMapper;
 
     std::list<KeyFrame*> mlpLoopKeyFrameQueue;
 
@@ -184,7 +191,7 @@ protected:
     g2o::Sim3 mg2oScw;
 
     //-------
-    Map* mpLastMap;
+    std::shared_ptr<Map> mpLastMap;
 
     bool mbLoopDetected;
     int mnLoopNumCoincidences;

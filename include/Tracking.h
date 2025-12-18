@@ -58,8 +58,10 @@ class Tracking
 
 public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-    Tracking(System* pSys, ORBVocabulary* pVoc, FrameDrawer* pFrameDrawer, MapDrawer* pMapDrawer, Atlas* pAtlas,
-             KeyFrameDatabase* pKFDB, const string &strSettingPath, const int sensor, const std::shared_ptr<Settings> &settings, const string &_nameSeq=std::string());
+    Tracking(System* pSys, const std::shared_ptr<ORBVocabulary> &pVoc, const std::shared_ptr<FrameDrawer> &pFrameDrawer, 
+            const std::shared_ptr<MapDrawer> &pMapDrawer, const std::shared_ptr<Atlas> &pAtlas,
+             const std::shared_ptr<KeyFrameDatabase> &pKFDB, 
+             const std::shared_ptr<Settings> &settings, const string &_nameSeq=std::string());
 
     ~Tracking();
 
@@ -70,11 +72,17 @@ public:
 
     void GrabImuData(const IMU::Point &imuMeasurement);
 
-    void SetLocalMapper(LocalMapping* pLocalMapper);
-    void SetLoopClosing(LoopClosing* pLoopClosing);
-    void SetViewer(Viewer* pViewer);
-    void SetStepByStep(bool bSet);
-    bool GetStepByStep();
+    void SetLocalMapper(const std::shared_ptr<LocalMapping> &pLocalMapper)
+    { mpLocalMapper = pLocalMapper; }
+
+    void SetLoopClosing(const std::shared_ptr<LoopClosing> &pLoopClosing)
+    { mpLoopClosing = pLoopClosing; }
+
+    void SetViewer(const std::shared_ptr<Viewer> &pViewer)
+    { mpViewer = pViewer; }
+
+    void SetStepByStep(bool bSet) { bStepByStep = bSet; }
+    bool GetStepByStep() const { return bStepByStep; }
 
     // Load new settings
     // The focal lenght should be similar or scale prediction will fail when projecting points
@@ -99,7 +107,7 @@ public:
 
     //DEBUG
     void SaveSubTrajectory(string strNameFile_frames, string strNameFile_kf, string strFolder="");
-    void SaveSubTrajectory(string strNameFile_frames, string strNameFile_kf, Map* pMap);
+    void SaveSubTrajectory(string strNameFile_frames, string strNameFile_kf, const std::shared_ptr<Map> &pMap);
 
     float GetImageScale();
 
@@ -127,7 +135,7 @@ public:
     eTrackingState mLastProcessedState;
 
     // Input sensor
-    int mSensor;
+    SensorType mSensor;
 
     // Current Frame
     Frame mCurrentFrame;
@@ -249,16 +257,16 @@ protected:
     bool mbVO;
 
     //Other Thread Pointers
-    LocalMapping* mpLocalMapper;
-    LoopClosing* mpLoopClosing;
+    std::shared_ptr<LocalMapping> mpLocalMapper;
+    std::shared_ptr<LoopClosing> mpLoopClosing;
 
     //ORB
-    ORBextractor* mpORBextractorLeft, *mpORBextractorRight;
-    ORBextractor* mpIniORBextractor;
+    std::shared_ptr<ORBextractor> mpORBextractorLeft, mpORBextractorRight;
+    std::shared_ptr<ORBextractor> mpIniORBextractor;
 
     //BoW
-    ORBVocabulary* mpORBVocabulary;
-    KeyFrameDatabase* mpKeyFrameDB;
+    std::shared_ptr<ORBVocabulary> mpORBVocabulary;
+    std::shared_ptr<KeyFrameDatabase> mpKeyFrameDB;
 
     // Initalization (only for monocular)
     bool mbReadyToInitializate;
@@ -273,13 +281,13 @@ protected:
     System* mpSystem;
     
     //Drawers
-    Viewer* mpViewer;
-    FrameDrawer* mpFrameDrawer;
-    MapDrawer* mpMapDrawer;
+    std::shared_ptr<Viewer> mpViewer;
+    std::shared_ptr<FrameDrawer> mpFrameDrawer;
+    std::shared_ptr<MapDrawer> mpMapDrawer;
     bool bStepByStep;
 
     //Atlas
-    Atlas* mpAtlas;
+    std::shared_ptr<Atlas> mpAtlas;
 
     //Calibration matrix
     cv::Mat mK;

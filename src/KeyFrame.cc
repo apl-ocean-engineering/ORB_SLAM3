@@ -42,7 +42,7 @@ KeyFrame::KeyFrame():
 
 }
 
-KeyFrame::KeyFrame(Frame &F, Map *pMap, KeyFrameDatabase *pKFDB):
+KeyFrame::KeyFrame(Frame &F, const std::shared_ptr<Map> &pMap, const std::shared_ptr<KeyFrameDatabase> &pKFDB):
     bImu(pMap->isImuInitialized()), mnFrameId(F.mnId),  mTimeStamp(F.mTimeStamp), mnGridCols(FRAME_GRID_COLS), mnGridRows(FRAME_GRID_ROWS),
     mfGridElementWidthInv(F.mfGridElementWidthInv), mfGridElementHeightInv(F.mfGridElementHeightInv),
     mnTrackReferenceForFrame(0), mnFuseTargetForKF(0), mnBALocalForKF(0), mnBAFixedForKF(0), mnBALocalForMerge(0),
@@ -832,13 +832,13 @@ IMU::Bias KeyFrame::GetImuBias()
     return mImuBias;
 }
 
-Map* KeyFrame::GetMap()
+std::shared_ptr<Map> KeyFrame::GetMap()
 {
     unique_lock<mutex> lock(mMutexMap);
     return mpMap;
 }
 
-void KeyFrame::UpdateMap(Map* pMap)
+void KeyFrame::UpdateMap(const std::shared_ptr<Map> &pMap)
 {
     unique_lock<mutex> lock(mMutexMap);
     mpMap = pMap;
@@ -1146,12 +1146,12 @@ Eigen::Vector3f KeyFrame::GetRightTranslation() {
     return (mTrl * mTcw).translation();
 }
 
-void KeyFrame::SetORBVocabulary(ORBVocabulary* pORBVoc)
+void KeyFrame::SetORBVocabulary(const std::shared_ptr<ORBVocabulary> &pORBVoc)
 {
     mpORBvocabulary = pORBVoc;
 }
 
-void KeyFrame::SetKeyFrameDatabase(KeyFrameDatabase* pKFDB)
+void KeyFrame::SetKeyFrameDatabase(const std::shared_ptr<KeyFrameDatabase> &pKFDB)
 {
     mpKeyFrameDB = pKFDB;
 }

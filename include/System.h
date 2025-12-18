@@ -57,15 +57,6 @@ class Settings;
 class System
 {
 public:
-    // Input sensor
-    enum eSensor{
-        MONOCULAR=0,
-        STEREO=1,
-        RGBD=2,
-        IMU_MONOCULAR=3,
-        IMU_STEREO=4,
-        IMU_RGBD=5,
-    };
 
     // File type
     enum FileType{
@@ -76,10 +67,10 @@ public:
 public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     // Initialize the SLAM system. It launches the Local Mapping, Loop Closing and Viewer threads.
-    System(const string &strVocFile, const string &strSettingsFile, const eSensor sensor, const int initFr = 0, const string &strSequence = std::string());
+    System(const string &strVocFile, const string &strSettingsFile, const SensorType sensor, const int initFr = 0, const string &strSequence = std::string());
 
     // Initialize the SLAM system. It launches the Local Mapping, Loop Closing and Viewer threads.
-    System(const Settings &settings, const int initFr = 0, const string &strSequence = std::string());
+    System(const std::shared_ptr<Settings> &settings, const int initFr = 0, const string &strSequence = std::string());
 
     // Proccess the given stereo frame. Images must be synchronized and rectified.
     // Input images: RGB (CV_8UC3) or grayscale (CV_8U). RGB is converted to grayscale.
@@ -132,8 +123,8 @@ public:
     void SaveTrajectoryEuRoC(const string &filename);
     void SaveKeyFrameTrajectoryEuRoC(const string &filename);
 
-    void SaveTrajectoryEuRoC(const string &filename, Map* pMap);
-    void SaveKeyFrameTrajectoryEuRoC(const string &filename, Map* pMap);
+    void SaveTrajectoryEuRoC(const string &filename, const std::shared_ptr<Map> &pMap);
+    void SaveKeyFrameTrajectoryEuRoC(const string &filename, const std::shared_ptr<Map> &pMap);
 
     // Save data used for initialization debug
     void SaveDebugData(const int &iniIdx);
@@ -154,9 +145,10 @@ public:
     std::vector<MapPoint*> GetTrackedMapPoints();
     std::vector<cv::KeyPoint> GetTrackedKeyPointsUn();
 
-    FrameDrawer* frameDrawer() { return mpFrameDrawer; }
-    MapDrawer* mapDrawer() { return mpMapDrawer; }
+     std::shared_ptr<FrameDrawer> frameDrawer() { return mpFrameDrawer; }
+     std::shared_ptr<MapDrawer> mapDrawer() { return mpMapDrawer; }
 
+     const SensorType sensorType() const { return settings_->sensor_; }
 
     // For debugging
     double GetTimeFromIMUInit();
@@ -175,45 +167,42 @@ public:
 
 private:
 
-    void printBanner( eSensor mSensor );
+    void printBanner( );
 
-    void initialize( void );
+    void initialize( const int initFr, const string &strSequence );
 
     void SaveAtlas(int type);
     bool LoadAtlas(int type);
 
     string CalculateCheckSum(string filename, int type);
 
-    // Input sensor
-    eSensor mSensor;
-
     // ORB vocabulary used for place recognition and feature matching.
-    ORBVocabulary* mpVocabulary;
+    std::shared_ptr<ORBVocabulary> mpVocabulary;
 
     // KeyFrame database for place recognition (relocalization and loop detection).
-    KeyFrameDatabase* mpKeyFrameDatabase;
+    std::shared_ptr<KeyFrameDatabase> mpKeyFrameDatabase;
 
     // Map structure that stores the pointers to all KeyFrames and MapPoints.
     //Map* mpMap;
-    Atlas* mpAtlas;
+    std::shared_ptr<Atlas> mpAtlas;
 
     // Tracker. It receives a frame and computes the associated camera pose.
     // It also decides when to insert a new keyframe, create some new MapPoints and
     // performs relocalization if tracking fails.
-    Tracking* mpTracker;
+    std::shared_ptr<Tracking> mpTracker;
 
     // Local Mapper. It manages the local map and performs local bundle adjustment.
-    LocalMapping* mpLocalMapper;
+    std::shared_ptr<LocalMapping> mpLocalMapper;
 
     // Loop Closer. It searches loops with every new keyframe. If there is a loop it performs
     // a pose graph optimization and full bundle adjustment (in a new thread) afterwards.
-    LoopClosing* mpLoopCloser;
+    std::shared_ptr<LoopClosing> mpLoopCloser;
 
     // The viewer draws the map and the current camera pose. It uses Pangolin.
-    Viewer* mpViewer;
+    std::shared_ptr<Viewer> mpViewer;
 
-    FrameDrawer* mpFrameDrawer;
-    MapDrawer* mpMapDrawer;
+    std::shared_ptr<FrameDrawer> mpFrameDrawer;
+    std::shared_ptr<MapDrawer> mpMapDrawer;
 
     // System threads: Local Mapping, Loop Closing, Viewer.
     // The Tracking thread "lives" in the main execution thread that creates the System object.
