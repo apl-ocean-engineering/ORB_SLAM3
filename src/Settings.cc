@@ -463,6 +463,7 @@ namespace ORB_SLAM3 {
     void Settings::readViewer(cv::FileStorage &fSettings) {
         bool found;
 
+        useViewer_ = readParameter<int>(fSettings,"Viewer.Enable", found);
         keyFrameSize_ = readParameter<float>(fSettings,"Viewer.KeyFrameSize",found);
         keyFrameLineWidth_ = readParameter<float>(fSettings,"Viewer.KeyFrameLineWidth",found);
         graphLineWidth_ = readParameter<float>(fSettings,"Viewer.GraphLineWidth",found);

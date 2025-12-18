@@ -38,8 +38,9 @@ namespace ORB_SLAM3
 
 Verbose::eLevel Verbose::th = Verbose::VERBOSITY_NORMAL;
 
-System::System(const string &strVocFile, const string &strSettingsFile, const SensorType sensor,
-               const int initFr, const string &strSequence)
+System::System(const string &strVocFile, const string &strSettingsFile, 
+                const SensorType sensor,
+               bool initFr, const string &strSequence)
                :
     mpViewer(nullptr), mbReset(false), mbResetActiveMap(false),
     mbActivateLocalizationMode(false), mbDeactivateLocalizationMode(false), mbShutDown(false)
@@ -68,7 +69,7 @@ initialize(initFr, strSequence);
 }
 
 
-System::System(const std::shared_ptr<Settings> &settings, const int initFr, const string &strSequence):
+System::System(const std::shared_ptr<Settings> &settings, bool initFr, const string &strSequence):
     mpViewer(), mbReset(false), mbResetActiveMap(false),
     mbActivateLocalizationMode(false), mbDeactivateLocalizationMode(false), mbShutDown(false),
     settings_(settings)
@@ -93,7 +94,7 @@ void System::printBanner(  )
 }
 
 
-void System::initialize(const int initFr, const string &strSequence) {
+void System::initialize(bool initFr, const string &strSequence) {
 
     mStrLoadAtlasFromFile = settings_->atlasLoadFile();
     mStrSaveAtlasToFile = settings_->atlasSaveFile();
