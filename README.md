@@ -1,13 +1,15 @@
 > [!NOTE]
-> This is my personal "working" fork of ORBSLAM3, which focuses on integrating ORBSLAM3 into ROS2.   The actual ROS2 integration takes place in [orbslam3_ros2](https://gitlab.com/apl-ocean-engineering/orbslam3_ros2), but this repo contains multiple updates:
+> This is my personal "working" fork of ORBSLAM3, which focuses on integrating ORBSLAM3 into ROS2.   The actual ROS2 integration is implemented in [orbslam3_ros2](https://gitlab.com/apl-ocean-engineering/orbslam3_ros2).   Relative to the original code, this repo contains multiple updates:
 
 * I removed the "ThirdParty" copies of "Sophus" and "g2o" in lieu of packages which can be installed "rosdep".  Due to API changes, this necessitated some syntactically invasive (but functionally equivalent) changes.
 * This branch contains preliminary migration to [spdlog](https://github.com/gabime/spdlog) as a more controllable logging backend.  This is a slow-motion migration to better manage text output from ORBSLAM3.
+* As I dug further into the code, I got more opinionated.  I also added [pre-commit](.pre-commit-config.yaml), which introduced significant textual changes.   No going back!
 
 > [!WARNING]
-> I _am not_ testing this repo outside of ROS2.   I am *only* checking that [orbslam3_ros2](https://gitlab.com/apl-ocean-engineering/orbslam3_ros2) builds in a ROS2 / colcon environment.
+> I _am not_ testing this repo outside of ROS2.   I am *only* checking [orbslam3_ros2](https://gitlab.com/apl-ocean-engineering/orbslam3_ros2) in a ROS2 / colcon environment.
 
 
+-----
 -----
 
 Author's original README follows below.
