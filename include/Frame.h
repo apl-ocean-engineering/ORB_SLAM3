@@ -61,13 +61,19 @@ public:
     // Constructor for stereo cameras.
     Frame(const cv::Mat &imLeft, const cv::Mat &imRight, const double &timeStamp, 
         const std::shared_ptr<ORBextractor> &extractorLeft, const std::shared_ptr<ORBextractor> &extractorRight, 
-        const std::shared_ptr<ORBVocabulary> &voc, cv::Mat &K, cv::Mat &distCoef, const float &bf, const float &thDepth, const std::shared_ptr<GeometricCamera> &pCamera,Frame* pPrevF = static_cast<Frame*>(NULL), const IMU::Calib &ImuCalib = IMU::Calib());
+        const std::shared_ptr<ORBVocabulary> &voc, cv::Mat &K, cv::Mat &distCoef, const float &bf, const float &thDepth, 
+        const std::shared_ptr<GeometricCamera> &pCamera,Frame* pPrevF = static_cast<Frame*>(NULL), const IMU::Calib &ImuCalib = IMU::Calib());
 
     // Constructor for RGB-D cameras.
-    Frame(const cv::Mat &imGray, const cv::Mat &imDepth, const double &timeStamp, const std::shared_ptr<ORBextractor> &extractor,const std::shared_ptr<ORBVocabulary> &voc, cv::Mat &K, cv::Mat &distCoef, const float &bf, const float &thDepth, const std::shared_ptr<GeometricCamera> &pCamera,Frame* pPrevF = static_cast<Frame*>(NULL), const IMU::Calib &ImuCalib = IMU::Calib());
+    Frame(const cv::Mat &imGray, const cv::Mat &imDepth, const double &timeStamp, 
+        const std::shared_ptr<ORBextractor> &extractor,const std::shared_ptr<ORBVocabulary> &voc, 
+        cv::Mat &K, cv::Mat &distCoef, const float &bf, const float &thDepth, 
+        const std::shared_ptr<GeometricCamera> &pCamera,Frame* pPrevF = static_cast<Frame*>(NULL), const IMU::Calib &ImuCalib = IMU::Calib());
 
     // Constructor for Monocular cameras.
-    Frame(const cv::Mat &imGray, const double &timeStamp, const std::shared_ptr<ORBextractor> &extractor,const std::shared_ptr<ORBVocabulary> &voc, const std::shared_ptr<GeometricCamera> &pCamera, cv::Mat &distCoef, const float &bf, const float &thDepth, Frame* pPrevF = static_cast<Frame*>(NULL), const IMU::Calib &ImuCalib = IMU::Calib());
+    Frame(const cv::Mat &imGray, const double &timeStamp, const std::shared_ptr<ORBextractor> &extractor,
+        const std::shared_ptr<ORBVocabulary> &voc, const std::shared_ptr<GeometricCamera> &pCamera, 
+        cv::Mat &distCoef, const float &bf, const float &thDepth, Frame* pPrevF = static_cast<Frame*>(NULL), const IMU::Calib &ImuCalib = IMU::Calib());
 
     // Destructor
     // ~Frame();

@@ -647,7 +647,7 @@ Sophus::SE3f Tracking::GrabImageStereo(const cv::Mat &imRectLeft, const cv::Mat 
       std::chrono::steady_clock::now();
 
       spdlog::info(
-          "Tracking::GrabImageStereo Elapsed time (ms): image_conversion {}, frame_creation {}, track {}",
+          "Tracking::GrabImageStereo Elapsed time (ms): image_conversion {:.4}, frame_creation {:.4}, track {:.4}",
           std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(
               t_post_image_conversion - t_start)
               .count(),
@@ -2241,16 +2241,15 @@ bool Tracking::TrackLocalMap()
         }
     }
 
-spdlog::info("mnMatchesInliers: {}", mnMatchesInliers ); 
+    spdlog::info("mnMatchesInliers: {}", mnMatchesInliers ); 
 
       std::chrono::steady_clock::time_point t_end =
       std::chrono::steady_clock::now();
 
       spdlog::info(
-          "Tracking::TrackLocalMap Elapsed time: Update local map {}, search local points {}, pose optimization {} everything else {}",
+          "Tracking::TrackLocalMap Elapsed time: Update local map {:.4}, search local points {:.4}, pose optimization {:.4} everything else {:.4}",
           std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(
-              t_post_update_local_map - t_start)
-              .count(),
+              t_post_update_local_map - t_start).count(),
           std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(
               t_post_search_local_points - t_post_update_local_map)
               .count(),
