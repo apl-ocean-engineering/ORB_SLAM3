@@ -19,7 +19,7 @@ File.version: "1.0"
 
 Camera.type: "PinHole"
 
-# Camera calibration and distortion parameters (OpenCV) 
+# Camera calibration and distortion parameters (OpenCV)
 Camera1.fx: 458.654
 Camera1.fy: 457.296
 Camera1.cx: 367.215
@@ -43,7 +43,7 @@ Camera2.p2: -3.55590700e-05
 Camera.width: 752
 Camera.height: 480
 
-# Camera frames per second 
+# Camera frames per second
 Camera.fps: 20
 
 # Color order of the images (0: BGR, 1: RGB. It is ignored if images are grayscale)
@@ -84,16 +84,16 @@ IMU.Frequency: 200.0
 # ORB Extractor: Number of features per image
 ORBextractor.nFeatures: 1200
 
-# ORB Extractor: Scale factor between levels in the scale pyramid 	
+# ORB Extractor: Scale factor between levels in the scale pyramid
 ORBextractor.scaleFactor: 1.2
 
-# ORB Extractor: Number of levels in the scale pyramid	
+# ORB Extractor: Number of levels in the scale pyramid
 ORBextractor.nLevels: 8
 
 # ORB Extractor: Fast threshold
 # Image is divided in a grid. At each cell FAST are extracted imposing a minimum response.
 # Firstly we impose iniThFAST. If no corners are detected we impose a lower value minThFAST
-# You can lower these values if your images have low contrast			
+# You can lower these values if your images have low contrast
 ORBextractor.iniThFAST: 20
 ORBextractor.minThFAST: 7
 
@@ -111,4 +111,3 @@ Viewer.ViewpointY: -0.7
 Viewer.ViewpointZ: -1.8
 Viewer.ViewpointF: 500.0
 Viewer.imageViewScale: 1.0
-

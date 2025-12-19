@@ -23,7 +23,7 @@ Camera1.k4: 0.00682387687265873
 Camera.width: 848
 Camera.height: 800
 
-# Camera frames per second 
+# Camera frames per second
 Camera.fps: 30
 
 # Color order of the images (0: BGR, 1: RGB. It is ignored if images are grayscale)
@@ -34,7 +34,7 @@ IMU.T_b_c1: !!opencv-matrix
    rows: 4
    cols: 4
    dt: f
-   data: [-0.999959, -0.00265193, 0.00870996, 0.0107000041753054, 
+   data: [-0.999959, -0.00265193, 0.00870996, 0.0107000041753054,
           0.00262197, -0.999991, -0.0034493, -1.45519152283669e-11,
          0.00871902, -0.00342632, 0.999956, -1.45519152283669e-11,
           0.0, 0.0, 0.0, 1.0]
@@ -43,7 +43,7 @@ IMU.T_b_c1: !!opencv-matrix
 IMU.InsertKFsWhenLost: 0
 
 # IMU noise (Use those from VINS-mono)
-IMU.NoiseGyro: 0.000005148030141 # rad/s^0.5 
+IMU.NoiseGyro: 0.000005148030141 # rad/s^0.5
 IMU.NoiseAcc: 0.000066952452471 # m/s^1.5
 IMU.GyroWalk: 0.000000499999999 # rad/s^1.5
 IMU.AccWalk: 0.000099999997474 # m/s^2.5
@@ -56,16 +56,16 @@ IMU.Frequency: 200.0
 # ORB Extractor: Number of features per image
 ORBextractor.nFeatures: 800 # Tested with 1250
 
-# ORB Extractor: Scale factor between levels in the scale pyramid 	
+# ORB Extractor: Scale factor between levels in the scale pyramid
 ORBextractor.scaleFactor: 1.2
 
-# ORB Extractor: Number of levels in the scale pyramid	
+# ORB Extractor: Number of levels in the scale pyramid
 ORBextractor.nLevels: 8
 
 # ORB Extractor: Fast threshold
 # Image is divided in a grid. At each cell FAST are extracted imposing a minimum response.
 # Firstly we impose iniThFAST. If no corners are detected we impose a lower value minThFAST
-# You can lower these values if your images have low contrast			
+# You can lower these values if your images have low contrast
 ORBextractor.iniThFAST: 20
 ORBextractor.minThFAST: 7
 

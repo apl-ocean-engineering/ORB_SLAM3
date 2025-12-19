@@ -21,12 +21,52 @@
 
 #pragma once
 
-#include "Thirdparty/DBoW2/DBoW2/FORB.h"
-#include "Thirdparty/DBoW2/DBoW2/TemplatedVocabulary.h"
+#include <spdlog/spdlog.h>
+
+#include <memory>
+#include <string>
 
 namespace ORB_SLAM3 {
 
-typedef DBoW2::TemplatedVocabulary<DBoW2::FORB::TDescriptor, DBoW2::FORB>
-    ORBVocabulary;
+class Verbose {
+ public:
+  enum eLevel {
+    VERBOSITY_QUIET = 0,
+    VERBOSITY_NORMAL = 1,
+    VERBOSITY_VERBOSE = 2,
+    VERBOSITY_VERY_VERBOSE = 3,
+    VERBOSITY_DEBUG = 4
+  };
+
+  static eLevel th;
+
+ public:
+  static void PrintMess(std::string str, eLevel lev) {
+    switch (lev) {
+      case VERBOSITY_DEBUG:
+        spdlog::debug("{}", str);
+        break;
+      case VERBOSITY_VERY_VERBOSE:
+        spdlog::debug("{}", str);
+        break;
+      case VERBOSITY_VERBOSE:
+        spdlog::info("{}", str);
+        break;
+      case VERBOSITY_NORMAL:
+        spdlog::error("{}", str);
+        break;
+      case VERBOSITY_QUIET:
+        spdlog::critical("{}", str);
+        break;
+    }
+  }
+
+  static void SetTh(eLevel _th) {}
+
+  static void set_default_logger(
+      const std::shared_ptr<spdlog::logger>& logger) {
+    spdlog::set_default_logger(logger);
+  }
+};
 
 }  // namespace ORB_SLAM3

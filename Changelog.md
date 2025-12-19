@@ -19,7 +19,7 @@ Details of changes between the different versions.
 
 - Capability to measure running time of the system threads.
 
-- Compatibility with OpenCV 4.0 (Requires at least OpenCV 3.0). 
+- Compatibility with OpenCV 4.0 (Requires at least OpenCV 3.0).
 
 - Fixed minor bugs.
 
@@ -44,6 +44,4 @@ Initial release. It has these capabilities:
 
 - Inertial sensor: the IMU initialization takes 2 seconds to achieve a scale error less than 5\% and it is reffined in the next 10 seconds until it is around 1\%. Inertial measures are integrated at frame rate to estimate the scale, gravity and velocity in order to improve the visual features detection and make the system robust to temporal occlusions.
 
-- Fisheye cameras: cameras with wide-angle and fisheye lenses are now fully supported in monocular and stereo. 
-
-
+- Fisheye cameras: cameras with wide-angle and fisheye lenses are now fully supported in monocular and stereo.
