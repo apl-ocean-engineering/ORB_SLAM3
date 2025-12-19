@@ -73,9 +73,9 @@ namespace ORB_SLAM3 {
         /*
          * Getter methods
          */
-        CameraType cameraType() {return cameraType_;}
-        GeometricCamera* camera1() {return calibration1_;}
-        GeometricCamera* camera2() {return calibration2_;}
+        CameraType cameraType() const {return cameraType_;}
+        std::shared_ptr<GeometricCamera> camera1() const {return calibration1_;}
+        std::shared_ptr<GeometricCamera> camera2() const {return calibration2_;}
         cv::Mat camera1DistortionCoef() {return cv::Mat(vPinHoleDistorsion1_.size(),1,CV_32F,vPinHoleDistorsion1_.data());}
         cv::Mat camera2DistortionCoef() {return cv::Mat(vPinHoleDistorsion2_.size(),1,CV_32F,vPinHoleDistorsion1_.data());}
 
@@ -150,8 +150,8 @@ namespace ORB_SLAM3 {
         /*
          * Visual stuff
          */
-        GeometricCamera* calibration1_, *calibration2_;   //Camera calibration
-        GeometricCamera* originalCalib1_, *originalCalib2_;
+        std::shared_ptr<GeometricCamera> calibration1_, calibration2_;   //Camera calibration
+        std::shared_ptr<GeometricCamera> originalCalib1_, originalCalib2_;
         std::vector<float> vPinHoleDistorsion1_, vPinHoleDistorsion2_;
 
         cv::Size originalImSize_, newImSize_;

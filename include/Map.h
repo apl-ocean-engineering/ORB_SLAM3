@@ -130,9 +130,10 @@ public:
 
     unsigned int GetLowerKFID();
 
-    void PreSave(std::set<GeometricCamera*> &spCams);
+    void PreSave(std::set<std::shared_ptr<GeometricCamera> > &spCams);
     void PostLoad(const std::shared_ptr<KeyFrameDatabase> &pKFDB, 
-                  const std::shared_ptr<ORBVocabulary> &pORBVoc/*, map<long unsigned int, KeyFrame*>& mpKeyFrameId*/, map<unsigned int, GeometricCamera*> &mpCams);
+                  const std::shared_ptr<ORBVocabulary> &pORBVoc/*, map<long unsigned int, KeyFrame*>& mpKeyFrameId*/, 
+                  map<unsigned int, std::shared_ptr<GeometricCamera> > &mpCams);
 
     void printReprojectionError(list<KeyFrame*> &lpLocalWindowKFs, KeyFrame* mpCurrentKF, string &name, string &name_folder);
 

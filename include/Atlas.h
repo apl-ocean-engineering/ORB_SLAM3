@@ -89,8 +89,8 @@ public:
     //void EraseMapPoint(MapPoint* pMP);
     //void EraseKeyFrame(KeyFrame* pKF);
 
-    GeometricCamera* AddCamera(GeometricCamera* pCam);
-    std::vector<GeometricCamera*> GetAllCameras();
+    std::shared_ptr<GeometricCamera> AddCamera(const std::shared_ptr<GeometricCamera> &pCam);
+    std::vector<std::shared_ptr<GeometricCamera> > GetAllCameras();
 
     /* All methods without Map pointer work on current map */
     void SetReferenceMapPoints(const std::vector<MapPoint*> &vpMPs);
@@ -148,7 +148,7 @@ protected:
 
     std::shared_ptr<Map> mpCurrentMap;
 
-    std::vector<GeometricCamera*> mvpCameras;
+    std::vector<std::shared_ptr<GeometricCamera> > mvpCameras;
 
     unsigned long int mnLastInitKFidMap;
 

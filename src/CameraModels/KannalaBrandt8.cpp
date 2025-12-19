@@ -213,13 +213,13 @@ namespace ORB_SLAM3 {
     }
 
 
-    bool KannalaBrandt8::epipolarConstrain(GeometricCamera* pCamera2, const cv::KeyPoint &kp1, const cv::KeyPoint &kp2,
+    bool KannalaBrandt8::epipolarConstrain(const std::shared_ptr<GeometricCamera> &pCamera2, const cv::KeyPoint &kp1, const cv::KeyPoint &kp2,
                                            const Eigen::Matrix3f& R12, const Eigen::Vector3f& t12, const float sigmaLevel, const float unc) {
         Eigen::Vector3f p3D;
         return this->TriangulateMatches(pCamera2,kp1,kp2,R12,t12,sigmaLevel,unc,p3D) > 0.0001f;
     }
 
-    bool KannalaBrandt8::matchAndtriangulate(const cv::KeyPoint& kp1, const cv::KeyPoint& kp2, GeometricCamera* pOther,
+    bool KannalaBrandt8::matchAndtriangulate(const cv::KeyPoint& kp1, const cv::KeyPoint& kp2, const std::shared_ptr<GeometricCamera> &pOther,
                                              Sophus::SE3f& Tcw1, Sophus::SE3f& Tcw2,
                                              const float sigmaLevel1, const float sigmaLevel2,
                                              Eigen::Vector3f& x3Dtriangulated){
@@ -303,7 +303,7 @@ namespace ORB_SLAM3 {
         return true;
     }
 
-    float KannalaBrandt8::TriangulateMatches(GeometricCamera *pCamera2, const cv::KeyPoint &kp1, const cv::KeyPoint &kp2, const Eigen::Matrix3f& R12, const Eigen::Vector3f& t12, const float sigmaLevel, const float unc, Eigen::Vector3f& p3D) {
+    float KannalaBrandt8::TriangulateMatches(const std::shared_ptr<GeometricCamera> &pCamera2, const cv::KeyPoint &kp1, const cv::KeyPoint &kp2, const Eigen::Matrix3f& R12, const Eigen::Vector3f& t12, const float sigmaLevel, const float unc, Eigen::Vector3f& p3D) {
 
         Eigen::Vector3f r1 = this->unprojectEig(kp1.pt);
         Eigen::Vector3f r2 = pCamera2->unprojectEig(kp2.pt);
@@ -405,23 +405,23 @@ namespace ORB_SLAM3 {
         x3D = x3Dh.head(3)/x3Dh(3);
     }
 
-    bool KannalaBrandt8::IsEqual(GeometricCamera* pCam)
+    bool KannalaBrandt8::IsEqual(const std::shared_ptr<GeometricCamera> &pCam)
     {
         if(pCam->GetType() != GeometricCamera::CAM_FISHEYE)
             return false;
 
-        KannalaBrandt8* pKBCam = (KannalaBrandt8*) pCam;
+        KannalaBrandt8 &pKBCam = dynamic_cast<KannalaBrandt8&>(*pCam);
 
-        if(abs(precision - pKBCam->GetPrecision()) > 1e-6)
+        if(abs(precision - pKBCam.GetPrecision()) > 1e-6)
             return false;
 
-        if(size() != pKBCam->size())
+        if(size() != pKBCam.size())
             return false;
 
         bool is_same_camera = true;
         for(size_t i=0; i<size(); ++i)
         {
-            if(abs(mvParameters[i] - pKBCam->getParameter(i)) > 1e-6)
+            if(abs(mvParameters[i] - pKBCam.getParameter(i)) > 1e-6)
             {
                 is_same_camera = false;
                 break;

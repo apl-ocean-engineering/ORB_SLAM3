@@ -59,9 +59,9 @@ Tracking::Tracking(System *pSys, const std::shared_ptr<ORBVocabulary> &pVoc,
     mbInitWith3KFs = false;
     mnNumDataset = 0;
 
-    vector<GeometricCamera*> vpCams = mpAtlas->GetAllCameras();
+    vector<std::shared_ptr<GeometricCamera>> vpCams = mpAtlas->GetAllCameras();
     std::cout << "There are " << vpCams.size() << " cameras in the atlas" << std::endl;
-    for(GeometricCamera* pCam : vpCams)
+    for(auto pCam : vpCams)
     {
         std::cout << "Camera " << pCam->GetId();
         if(pCam->GetType() == GeometricCamera::CAM_PINHOLE)

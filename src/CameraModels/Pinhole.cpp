@@ -104,7 +104,7 @@ namespace ORB_SLAM3 {
     }
 
 
-    bool Pinhole::epipolarConstrain(GeometricCamera* pCamera2,  const cv::KeyPoint &kp1, const cv::KeyPoint &kp2, const Eigen::Matrix3f& R12, const Eigen::Vector3f& t12, const float sigmaLevel, const float unc) {
+    bool Pinhole::epipolarConstrain(const std::shared_ptr<GeometricCamera> &pCamera2,  const cv::KeyPoint &kp1, const cv::KeyPoint &kp2, const Eigen::Matrix3f& R12, const Eigen::Vector3f& t12, const float sigmaLevel, const float unc) {
         //Compute Fundamental Matrix
         Eigen::Matrix3f t12x = Sophus::SO3f::hat(t12);
         Eigen::Matrix3f K1 = this->toK_();
@@ -144,20 +144,20 @@ namespace ORB_SLAM3 {
         return is;
     }
 
-    bool Pinhole::IsEqual(GeometricCamera* pCam)
+    bool Pinhole::IsEqual(const std::shared_ptr<GeometricCamera> &pCam)
     {
         if(pCam->GetType() != GeometricCamera::CAM_PINHOLE)
             return false;
 
-        Pinhole* pPinholeCam = (Pinhole*) pCam;
+        Pinhole &PinholeCam = dynamic_cast<Pinhole &>(*pCam);
 
-        if(size() != pPinholeCam->size())
+        if(size() != PinholeCam.size())
             return false;
 
         bool is_same_camera = true;
         for(size_t i=0; i<size(); ++i)
         {
-            if(abs(mvParameters[i] - pPinholeCam->getParameter(i)) > 1e-6)
+            if(abs(mvParameters[i] - PinholeCam.getParameter(i)) > 1e-6)
             {
                 is_same_camera = false;
                 break;

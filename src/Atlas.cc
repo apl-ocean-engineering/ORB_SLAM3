@@ -112,14 +112,15 @@ void Atlas::AddMapPoint(MapPoint* pMP)
     pMapMP->AddMapPoint(pMP);
 }
 
-GeometricCamera* Atlas::AddCamera(GeometricCamera* pCam)
+std::shared_ptr<GeometricCamera> Atlas::AddCamera(const std::shared_ptr<GeometricCamera> &pCam)
 {
     //Check if the camera already exists
     bool bAlreadyInMap = false;
     int index_cam = -1;
     for(size_t i=0; i < mvpCameras.size(); ++i)
     {
-        GeometricCamera* pCam_i = mvpCameras[i];
+        std::shared_ptr<GeometricCamera> pCam_i = mvpCameras[i];
+
         if(!pCam) std::cout << "Not pCam" << std::endl;
         if(!pCam_i) std::cout << "Not pCam_i" << std::endl;
         if(pCam->GetType() != pCam_i->GetType())
@@ -127,7 +128,7 @@ GeometricCamera* Atlas::AddCamera(GeometricCamera* pCam)
 
         if(pCam->GetType() == GeometricCamera::CAM_PINHOLE)
         {
-            if(((Pinhole*)pCam_i)->IsEqual(pCam))
+            if((dynamic_cast<Pinhole*>(pCam_i.get()))->IsEqual(pCam))
             {
                 bAlreadyInMap = true;
                 index_cam = i;
@@ -135,7 +136,7 @@ GeometricCamera* Atlas::AddCamera(GeometricCamera* pCam)
         }
         else if(pCam->GetType() == GeometricCamera::CAM_FISHEYE)
         {
-            if(((KannalaBrandt8*)pCam_i)->IsEqual(pCam))
+            if((dynamic_cast<KannalaBrandt8*>(pCam_i.get()))->IsEqual(pCam))
             {
                 bAlreadyInMap = true;
                 index_cam = i;
@@ -153,7 +154,7 @@ GeometricCamera* Atlas::AddCamera(GeometricCamera* pCam)
     }
 }
 
-std::vector<GeometricCamera*> Atlas::GetAllCameras()
+std::vector<std::shared_ptr<GeometricCamera>> Atlas::GetAllCameras()
 {
     return mvpCameras;
 }
@@ -316,7 +317,7 @@ void Atlas::PreSave()
     std::copy(mspMaps.begin(), mspMaps.end(), std::back_inserter(mvpBackupMaps));
     sort(mvpBackupMaps.begin(), mvpBackupMaps.end(), compFunctor());
 
-    std::set<GeometricCamera*> spCams(mvpCameras.begin(), mvpCameras.end());
+    std::set<std::shared_ptr<GeometricCamera>> spCams(mvpCameras.begin(), mvpCameras.end());
     for(auto pMi : mvpBackupMaps)
     {
         if(!pMi || pMi->IsBad())
@@ -334,8 +335,8 @@ void Atlas::PreSave()
 
 void Atlas::PostLoad()
 {
-    map<unsigned int,GeometricCamera*> mpCams;
-    for(GeometricCamera* pCam : mvpCameras)
+    map<unsigned int,std::shared_ptr<GeometricCamera>> mpCams;
+    for(auto pCam : mvpCameras)
     {
         mpCams[pCam->GetId()] = pCam;
     }

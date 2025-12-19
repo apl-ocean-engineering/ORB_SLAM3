@@ -296,8 +296,8 @@ public:
     bool ProjectPointDistort(MapPoint* pMP, cv::Point2f &kp, float &u, float &v);
     bool ProjectPointUnDistort(MapPoint* pMP, cv::Point2f &kp, float &u, float &v);
 
-    void PreSave(set<KeyFrame*>& spKF,set<MapPoint*>& spMP, set<GeometricCamera*>& spCam);
-    void PostLoad(map<long unsigned int, KeyFrame*>& mpKFid, map<long unsigned int, MapPoint*>& mpMPid, map<unsigned int, GeometricCamera*>& mpCamId);
+    void PreSave(set<KeyFrame*>& spKF,set<MapPoint*>& spMP, set<std::shared_ptr<GeometricCamera> >& spCam);
+    void PostLoad(map<long unsigned int, KeyFrame*>& mpKFid, map<long unsigned int, MapPoint*>& mpMPid, map<unsigned int, std::shared_ptr<GeometricCamera> >& mpCamId);
 
 
     void SetORBVocabulary(const std::shared_ptr<ORBVocabulary> &pORBVoc);
@@ -502,7 +502,7 @@ protected:
     std::mutex mMutexMap;
 
 public:
-    GeometricCamera* mpCamera, *mpCamera2;
+    std::shared_ptr<GeometricCamera> mpCamera, mpCamera2;
 
     //Indexes of stereo observations correspondences
     std::vector<int> mvLeftToRightMatch, mvRightToLeftMatch;

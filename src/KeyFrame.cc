@@ -844,7 +844,7 @@ void KeyFrame::UpdateMap(const std::shared_ptr<Map> &pMap)
     mpMap = pMap;
 }
 
-void KeyFrame::PreSave(set<KeyFrame*>& spKF,set<MapPoint*>& spMP, set<GeometricCamera*>& spCam)
+void KeyFrame::PreSave(set<KeyFrame*>& spKF,set<MapPoint*>& spMP, set<std::shared_ptr<GeometricCamera>>& spCam)
 {
     // Save the id of each MapPoint in this KF, there can be null pointer in the vector
     mvBackupMapPointsId.clear();
@@ -919,7 +919,7 @@ void KeyFrame::PreSave(set<KeyFrame*>& spKF,set<MapPoint*>& spMP, set<GeometricC
         mBackupImuPreintegrated.CopyFrom(mpImuPreintegrated);
 }
 
-void KeyFrame::PostLoad(map<long unsigned int, KeyFrame*>& mpKFid, map<long unsigned int, MapPoint*>& mpMPid, map<unsigned int, GeometricCamera*>& mpCamId){
+void KeyFrame::PostLoad(map<long unsigned int, KeyFrame*>& mpKFid, map<long unsigned int, MapPoint*>& mpMPid, map<unsigned int, std::shared_ptr<GeometricCamera> >& mpCamId){
     // Rebuild the empty variables
 
     // Pose
