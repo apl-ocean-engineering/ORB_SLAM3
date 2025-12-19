@@ -30,7 +30,7 @@ Camera2.k1: -0.00375203299336135
 Camera2.k2: 0.0379297286272049
 Camera2.k3: -0.0352463386952877
 Camera2.k4: 0.00548873096704
-    
+
 # Transformation matrix from right camera to left camera
 Stereo.T_c1_c2: !!opencv-matrix
   rows: 4
@@ -52,7 +52,7 @@ Camera2.lappingEnd: 847
 Camera.width: 848
 Camera.height: 800
 
-# Camera frames per second 
+# Camera frames per second
 Camera.fps: 30.
 
 # Color order of the images (0: BGR, 1: RGB. It is ignored if images are grayscale)
@@ -68,16 +68,16 @@ Stereo.ThDepth: 40.0
 # ORB Extractor: Number of features per image
 ORBextractor.nFeatures: 1000 # Tested with 1250
 
-# ORB Extractor: Scale factor between levels in the scale pyramid 	
+# ORB Extractor: Scale factor between levels in the scale pyramid
 ORBextractor.scaleFactor: 1.2
 
-# ORB Extractor: Number of levels in the scale pyramid	
+# ORB Extractor: Number of levels in the scale pyramid
 ORBextractor.nLevels: 8
 
 # ORB Extractor: Fast threshold
 # Image is divided in a grid. At each cell FAST are extracted imposing a minimum response.
 # Firstly we impose iniThFAST. If no corners are detected we impose a lower value minThFAST
-# You can lower these values if your images have low contrast			
+# You can lower these values if your images have low contrast
 ORBextractor.iniThFAST: 15
 ORBextractor.minThFAST: 7
 

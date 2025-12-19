@@ -1,247 +1,252 @@
 /**
-* This file is part of ORB-SLAM3
-*
-* Copyright (C) 2017-2021 Carlos Campos, Richard Elvira, Juan J. Gómez Rodríguez, José M.M. Montiel and Juan D. Tardós, University of Zaragoza.
-* Copyright (C) 2014-2016 Raúl Mur-Artal, José M.M. Montiel and Juan D. Tardós, University of Zaragoza.
-*
-* ORB-SLAM3 is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
-* License as published by the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* ORB-SLAM3 is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
-* the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License along with ORB-SLAM3.
-* If not, see <http://www.gnu.org/licenses/>.
-*/
+ * This file is part of ORB-SLAM3
+ *
+ * Copyright (C) 2017-2021 Carlos Campos, Richard Elvira, Juan J. Gómez
+ * Rodríguez, José M.M. Montiel and Juan D. Tardós, University of Zaragoza.
+ * Copyright (C) 2014-2016 Raúl Mur-Artal, José M.M. Montiel and Juan D. Tardós,
+ * University of Zaragoza.
+ *
+ * ORB-SLAM3 is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * ORB-SLAM3 is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * ORB-SLAM3. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #pragma once
 
-// Flag to activate the measurement of time in each process (track,localmap, place recognition).
-//#define REGISTER_TIMES
+// Flag to activate the measurement of time in each process (track,localmap,
+// place recognition).
+// #define REGISTER_TIMES
 
 #include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
+
+#include <cstdio>
+#include <cstdlib>
+#include <iostream>
+#include <memory>
 #include <string>
+#include <vector>
 
 #include "CameraModels/GeometricCamera.h"
 #include "Types.h"
 
-
 namespace ORB_SLAM3 {
 
-    class System;
-    
+class System;
 
+// TODO: change to double instead of float
 
-    //TODO: change to double instead of float
+class Settings {
+ public:
+  /*
+   * Enum for the different camera types implemented
+   */
+  enum CameraType { PinHole = 0, Rectified = 1, KannalaBrandt = 2 };
 
-    class Settings {
-    public:
+  /*
+   * Delete default constructor
+   */
+  Settings() = delete;
 
-        /*
-         * Enum for the different camera types implemented
-         */
-        enum CameraType {
-            PinHole = 0,
-            Rectified = 1,
-            KannalaBrandt = 2
-        };
+  explicit Settings(const SensorType sensor);
 
-        /*
-         * Delete default constructor
-         */
-        Settings() = delete;
+  /*
+   * Constructor from file
+   */
+  Settings(const std::string& configFile, const SensorType sensor);
 
-        Settings(const SensorType sensor);
+  // Copy constructor
+  Settings(const Settings&) = default;
 
-        /*
-         * Constructor from file
-         */
-        Settings(const std::string &configFile, const SensorType sensor);
+  /*
+   * Ostream operator overloading to dump settings to the terminal
+   */
+  friend std::ostream& operator<<(std::ostream& output, const Settings& s);
 
-        // Copy constructor
-        Settings( const Settings & ) = default;
+  /*
+   * Getter methods
+   */
+  CameraType cameraType() const { return cameraType_; }
+  std::shared_ptr<GeometricCamera> camera1() const { return calibration1_; }
+  std::shared_ptr<GeometricCamera> camera2() const { return calibration2_; }
+  cv::Mat camera1DistortionCoef() {
+    return cv::Mat(vPinHoleDistorsion1_.size(), 1, CV_32F,
+                   vPinHoleDistorsion1_.data());
+  }
+  cv::Mat camera2DistortionCoef() {
+    return cv::Mat(vPinHoleDistorsion2_.size(), 1, CV_32F,
+                   vPinHoleDistorsion1_.data());
+  }
 
-        /*
-         * Ostream operator overloading to dump settings to the terminal
-         */
-        friend std::ostream &operator<<(std::ostream &output, const Settings &s);
+  Sophus::SE3f Tlr() { return Tlr_; }
+  float bf() { return bf_; }
+  float b() { return b_; }
+  float thDepth() { return thDepth_; }
 
-        /*
-         * Getter methods
-         */
-        CameraType cameraType() const {return cameraType_;}
-        std::shared_ptr<GeometricCamera> camera1() const {return calibration1_;}
-        std::shared_ptr<GeometricCamera> camera2() const {return calibration2_;}
-        cv::Mat camera1DistortionCoef() {return cv::Mat(vPinHoleDistorsion1_.size(),1,CV_32F,vPinHoleDistorsion1_.data());}
-        cv::Mat camera2DistortionCoef() {return cv::Mat(vPinHoleDistorsion2_.size(),1,CV_32F,vPinHoleDistorsion1_.data());}
+  bool needToUndistort() { return bNeedToUndistort_; }
 
-        Sophus::SE3f Tlr() {return Tlr_;}
-        float bf() {return bf_;}
-        float b() {return b_;}
-        float thDepth() {return thDepth_;}
+  cv::Size newImSize() { return newImSize_; }
+  float fps() { return fps_; }
+  bool rgb() { return bRGB_; }
+  bool needToResize() { return bNeedToResize1_; }
+  bool needToRectify() { return bNeedToRectify_; }
 
-        bool needToUndistort() {return bNeedToUndistort_;}
+  float noiseGyro() { return noiseGyro_; }
+  float noiseAcc() { return noiseAcc_; }
+  float gyroWalk() { return gyroWalk_; }
+  float accWalk() { return accWalk_; }
+  float imuFrequency() { return imuFrequency_; }
+  Sophus::SE3f Tbc() { return Tbc_; }
+  bool insertKFsWhenLost() { return insertKFsWhenLost_; }
 
-        cv::Size newImSize() {return newImSize_;}
-        float fps() {return fps_;}
-        bool rgb() {return bRGB_;}
-        bool needToResize() {return bNeedToResize1_;}
-        bool needToRectify() {return bNeedToRectify_;}
+  float depthMapFactor() { return depthMapFactor_; }
 
-        float noiseGyro() {return noiseGyro_;}
-        float noiseAcc() {return noiseAcc_;}
-        float gyroWalk() {return gyroWalk_;}
-        float accWalk() {return accWalk_;}
-        float imuFrequency() {return imuFrequency_;}
-        Sophus::SE3f Tbc() {return Tbc_;}
-        bool insertKFsWhenLost() {return insertKFsWhenLost_;}
+  int nFeatures() { return nFeatures_; }
+  int nLevels() { return nLevels_; }
+  float initThFAST() { return initThFAST_; }
+  float minThFAST() { return minThFAST_; }
+  float scaleFactor() { return scaleFactor_; }
 
-        float depthMapFactor() {return depthMapFactor_;}
+  bool useViewer() const { return useViewer_; }
+  float keyFrameSize() { return keyFrameSize_; }
+  float keyFrameLineWidth() { return keyFrameLineWidth_; }
+  float graphLineWidth() { return graphLineWidth_; }
+  float pointSize() { return pointSize_; }
+  float cameraSize() { return cameraSize_; }
+  float cameraLineWidth() { return cameraLineWidth_; }
+  float viewPointX() { return viewPointX_; }
+  float viewPointY() { return viewPointY_; }
+  float viewPointZ() { return viewPointZ_; }
+  float viewPointF() { return viewPointF_; }
+  float imageViewerScale() { return imageViewerScale_; }
 
-        int nFeatures() {return nFeatures_;}
-        int nLevels() {return nLevels_;}
-        float initThFAST() {return initThFAST_;}
-        float minThFAST() {return minThFAST_;}
-        float scaleFactor() {return scaleFactor_;}
+  std::string atlasLoadFile() { return sLoadFrom_; }
+  std::string atlasSaveFile() { return sSaveto_; }
 
-        bool useViewer() const { return useViewer_; }
-        float keyFrameSize() {return keyFrameSize_;}
-        float keyFrameLineWidth() {return keyFrameLineWidth_;}
-        float graphLineWidth() {return graphLineWidth_;}
-        float pointSize() {return pointSize_;}
-        float cameraSize() {return cameraSize_;}
-        float cameraLineWidth() {return cameraLineWidth_;}
-        float viewPointX() {return viewPointX_;}
-        float viewPointY() {return viewPointY_;}
-        float viewPointZ() {return viewPointZ_;}
-        float viewPointF() {return viewPointF_;}
-        float imageViewerScale() {return imageViewerScale_;}
+  float thFarPoints() { return thFarPoints_; }
 
-        std::string atlasLoadFile() {return sLoadFrom_;}
-        std::string atlasSaveFile() {return sSaveto_;}
+  cv::Mat M1l() { return M1l_; }
+  cv::Mat M2l() { return M2l_; }
+  cv::Mat M1r() { return M1r_; }
+  cv::Mat M2r() { return M2r_; }
 
-        float thFarPoints() {return thFarPoints_;}
+  void readCamera1(cv::FileStorage& fSettings);
+  void readCamera2(cv::FileStorage& fSettings);
+  void readImageInfo(cv::FileStorage& fSettings);
+  void readIMU(cv::FileStorage& fSettings);
+  void readRGBD(cv::FileStorage& fSettings);
+  void readORB(cv::FileStorage& fSettings);
+  void readViewer(cv::FileStorage& fSettings);
+  void readLoadAndSave(cv::FileStorage& fSettings);
+  void readOtherParameters(cv::FileStorage& fSettings);
 
-        cv::Mat M1l() {return M1l_;}
-        cv::Mat M2l() {return M2l_;}
-        cv::Mat M1r() {return M1r_;}
-        cv::Mat M2r() {return M2r_;}
+  void precomputeRectificationMaps();
 
+  SensorType sensor_;
+  CameraType cameraType_;  // Camera type
 
-        void readCamera1(cv::FileStorage& fSettings);
-        void readCamera2(cv::FileStorage& fSettings);
-        void readImageInfo(cv::FileStorage& fSettings);
-        void readIMU(cv::FileStorage& fSettings);
-        void readRGBD(cv::FileStorage& fSettings);
-        void readORB(cv::FileStorage& fSettings);
-        void readViewer(cv::FileStorage& fSettings);
-        void readLoadAndSave(cv::FileStorage& fSettings);
-        void readOtherParameters(cv::FileStorage& fSettings);
+  /*
+   * Visual stuff
+   */
+  std::shared_ptr<GeometricCamera> calibration1_,
+      calibration2_;  // Camera calibration
+  std::shared_ptr<GeometricCamera> originalCalib1_, originalCalib2_;
+  std::vector<float> vPinHoleDistorsion1_, vPinHoleDistorsion2_;
 
-        void precomputeRectificationMaps();
+  cv::Size originalImSize_, newImSize_;
+  float fps_;
+  bool bRGB_;
 
-        SensorType sensor_;
-        CameraType cameraType_;     //Camera type
+  bool bNeedToUndistort_;
+  bool bNeedToRectify_;
+  bool bNeedToResize1_, bNeedToResize2_;
 
-        /*
-         * Visual stuff
-         */
-        std::shared_ptr<GeometricCamera> calibration1_, calibration2_;   //Camera calibration
-        std::shared_ptr<GeometricCamera> originalCalib1_, originalCalib2_;
-        std::vector<float> vPinHoleDistorsion1_, vPinHoleDistorsion2_;
+  Sophus::SE3f Tlr_;
+  float thDepth_;
+  float bf_, b_;
 
-        cv::Size originalImSize_, newImSize_;
-        float fps_;
-        bool bRGB_;
+  /*
+   * Rectification stuff
+   */
+  cv::Mat M1l_, M2l_;
+  cv::Mat M1r_, M2r_;
 
-        bool bNeedToUndistort_;
-        bool bNeedToRectify_;
-        bool bNeedToResize1_, bNeedToResize2_;
+  /*
+   * Inertial stuff
+   */
+  float noiseGyro_, noiseAcc_;
+  float gyroWalk_, accWalk_;
+  float imuFrequency_;
+  Sophus::SE3f Tbc_;
+  bool insertKFsWhenLost_;
 
-        Sophus::SE3f Tlr_;
-        float thDepth_;
-        float bf_, b_;
+  /*
+   * RGBD stuff
+   */
+  float depthMapFactor_;
 
-        /*
-         * Rectification stuff
-         */
-        cv::Mat M1l_, M2l_;
-        cv::Mat M1r_, M2r_;
+  /*
+   * ORB stuff
+   */
+  int nFeatures_;
+  float scaleFactor_;
+  int nLevels_;
+  int initThFAST_, minThFAST_;
 
-        /*
-         * Inertial stuff
-         */
-        float noiseGyro_, noiseAcc_;
-        float gyroWalk_, accWalk_;
-        float imuFrequency_;
-        Sophus::SE3f Tbc_;
-        bool insertKFsWhenLost_;
+  /*
+   * Viewer stuff
+   */
+  bool useViewer_;
+  float keyFrameSize_;
+  float keyFrameLineWidth_;
+  float graphLineWidth_;
+  float pointSize_;
+  float cameraSize_;
+  float cameraLineWidth_;
+  float viewPointX_, viewPointY_, viewPointZ_, viewPointF_;
+  float imageViewerScale_;
 
-        /*
-         * RGBD stuff
-         */
-        float depthMapFactor_;
+  /*
+   * Save & load maps
+   */
+  std::string sLoadFrom_, sSaveto_;
 
-        /*
-         * ORB stuff
-         */
-        int nFeatures_;
-        float scaleFactor_;
-        int nLevels_;
-        int initThFAST_, minThFAST_;
+  /*
+   * Other stuff
+   */
+  float thFarPoints_;
 
-        /*
-         * Viewer stuff
-         */
-        bool useViewer_;
-        float keyFrameSize_;
-        float keyFrameLineWidth_;
-        float graphLineWidth_;
-        float pointSize_;
-        float cameraSize_;
-        float cameraLineWidth_;
-        float viewPointX_, viewPointY_, viewPointZ_, viewPointF_;
-        float imageViewerScale_;
+  bool loopClosing_;
+  std::string strVocFile_;
 
-        /*
-         * Save & load maps
-         */
-        std::string sLoadFrom_, sSaveto_;
+ private:
+  template <typename T>
+  T readParameter(cv::FileStorage& fSettings, const std::string& name,
+                  bool& found, const bool required = true) {
+    cv::FileNode node = fSettings[name];
+    if (node.empty()) {
+      if (required) {
+        std::cerr << name << " required parameter does not exist, aborting..."
+                  << std::endl;
+        exit(-1);
+      } else {
+        std::cerr << name << " optional parameter does not exist..."
+                  << std::endl;
+        found = false;
+        return T();
+      }
 
-        /*
-         * Other stuff
-         */
-        float thFarPoints_;
-
-        bool loopClosing_;
-        std::string strVocFile_;
-
-    private:
-        template<typename T>
-        T readParameter(cv::FileStorage& fSettings, const std::string& name, bool& found,const bool required = true){
-            cv::FileNode node = fSettings[name];
-            if(node.empty()){
-                if(required){
-                    std::cerr << name << " required parameter does not exist, aborting..." << std::endl;
-                    exit(-1);
-                }
-                else{
-                    std::cerr << name << " optional parameter does not exist..." << std::endl;
-                    found = false;
-                    return T();
-                }
-
-            }
-            else{
-                found = true;
-                return (T) node;
-            }
-        }
-
-    };
+    } else {
+      found = true;
+      return (T)node;
+    }
+  }
 };
-
+};  // namespace ORB_SLAM3

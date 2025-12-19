@@ -7,7 +7,7 @@ File.version: "1.0"
 
 Camera.type: "PinHole"
 
-# Camera calibration and distortion parameters (OpenCV) 
+# Camera calibration and distortion parameters (OpenCV)
 Camera1.fx: 458.654
 Camera1.fy: 457.296
 Camera1.cx: 367.215
@@ -25,7 +25,7 @@ Camera.height: 480
 Camera.newWidth: 600
 Camera.newHeight: 350
 
-# Camera frames per second 
+# Camera frames per second
 Camera.fps: 20
 
 # Color order of the images (0: BGR, 1: RGB. It is ignored if images are grayscale)
@@ -44,7 +44,7 @@ IMU.T_b_c1: !!opencv-matrix
 # IMU noise
 IMU.NoiseGyro: 1.7e-4 #1.6968e-04
 IMU.NoiseAcc: 2.0000e-3 #2.0e-3
-IMU.GyroWalk: 1.9393e-05 
+IMU.GyroWalk: 1.9393e-05
 IMU.AccWalk: 3.0000e-03 # 3e-03
 IMU.Frequency: 200.0
 
@@ -55,16 +55,16 @@ IMU.Frequency: 200.0
 # ORB Extractor: Number of features per image
 ORBextractor.nFeatures: 1000 # 1000
 
-# ORB Extractor: Scale factor between levels in the scale pyramid 	
+# ORB Extractor: Scale factor between levels in the scale pyramid
 ORBextractor.scaleFactor: 1.2
 
-# ORB Extractor: Number of levels in the scale pyramid	
+# ORB Extractor: Number of levels in the scale pyramid
 ORBextractor.nLevels: 8
 
 # ORB Extractor: Fast threshold
 # Image is divided in a grid. At each cell FAST are extracted imposing a minimum response.
 # Firstly we impose iniThFAST. If no corners are detected we impose a lower value minThFAST
-# You can lower these values if your images have low contrast			
+# You can lower these values if your images have low contrast
 ORBextractor.iniThFAST: 20
 ORBextractor.minThFAST: 7
 
@@ -81,4 +81,3 @@ Viewer.ViewpointX: 0.0
 Viewer.ViewpointY: -0.7
 Viewer.ViewpointZ: -3.5 # -1.8
 Viewer.ViewpointF: 500.0
-
