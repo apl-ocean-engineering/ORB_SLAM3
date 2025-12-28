@@ -441,7 +441,7 @@ void Tracking::PrintTimeStats() {
             << std::endl
             << std::endl;
 
-  f << "Numb exec: " << mpLoopClosing->nLoop << std::endl;
+  f << "Num exec: " << mpLoopClosing->nLoop << std::endl;
   std::cout << "Num exec: " << mpLoopClosing->nLoop << std::endl;
   average = calcAverage(mpLoopClosing->vnLoopKFs);
   deviation = calcDeviation(mpLoopClosing->vnLoopKFs, average);
@@ -472,7 +472,7 @@ void Tracking::PrintTimeStats() {
             << std::endl
             << std::endl;
 
-  f << "Numb exec: " << mpLoopClosing->nMerges << std::endl;
+  f << "Num exec: " << mpLoopClosing->nMerges << std::endl;
   std::cout << "Num exec: " << mpLoopClosing->nMerges << std::endl;
   average = calcAverage(mpLoopClosing->vnMergeKFs);
   deviation = calcDeviation(mpLoopClosing->vnMergeKFs, average);
@@ -503,9 +503,9 @@ void Tracking::PrintTimeStats() {
             << std::endl
             << std::endl;
 
-  f << "Numb exec: " << mpLoopClosing->nFGBA_exec << std::endl;
+  f << "Num exec: " << mpLoopClosing->nFGBA_exec << std::endl;
   std::cout << "Num exec: " << mpLoopClosing->nFGBA_exec << std::endl;
-  f << "Numb abort: " << mpLoopClosing->nFGBA_abort << std::endl;
+  f << "Num abort: " << mpLoopClosing->nFGBA_abort << std::endl;
   std::cout << "Num abort: " << mpLoopClosing->nFGBA_abort << std::endl;
   average = calcAverage(mpLoopClosing->vnGBAKFs);
   deviation = calcDeviation(mpLoopClosing->vnGBAKFs, average);

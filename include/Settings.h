@@ -65,6 +65,11 @@ class Settings {
   // Copy constructor
   Settings(const Settings&) = default;
 
+  ~Settings();
+
+  // Safety checks
+  bool validate();
+
   /*
    * Ostream operator overloading to dump settings to the terminal
    */
@@ -147,6 +152,19 @@ class Settings {
   void readLoadAndSave(cv::FileStorage& fSettings);
   void readOtherParameters(cv::FileStorage& fSettings);
 
+  // For PinHole,       k = {fx, fy, cx, cy}, and dist can be 0, 4 or 5 params
+  // For Rectified,     k = {fx, fy, cx, cy}  and dist is ignored
+  // For KannalaBrandt, k = {fx, fy, cx, cy, k0, k1, k2, k3};
+  void setMonoCamera(CameraType type, const std::vector<float>& k,
+                     const std::vector<float>& dist = {});
+  void setRightCamera(const std::vector<float>& k2,
+                      const std::vector<float>& dist2, const cv::Mat& T_c1_c2,
+                      float thDepth);
+
+  void setStereoRectifiedCamera(const std::vector<float>& k, float baseline,
+                                float thDepth);
+
+  void setImageSize(int width, int height);
   void precomputeRectificationMaps();
 
   SensorType sensor_;

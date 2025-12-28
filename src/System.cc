@@ -48,6 +48,15 @@ namespace ORB_SLAM3 {
 
 Verbose::eLevel Verbose::th = Verbose::VERBOSITY_NORMAL;
 
+FactoryExpected SystemFactory::create(
+    const std::shared_ptr<Settings> &settings) {
+  if (!settings->validate()) {
+    return tl::make_unexpected(false);
+  }
+
+  return std::make_shared<System>(settings);
+}
+
 System::System(const string &strVocFile, const string &strSettingsFile,
                const SensorType sensor, bool initFr, const string &strSequence)
     : mpViewer(nullptr),
@@ -123,8 +132,7 @@ void System::initialize(bool initFr, const string &strSequence) {
 
   if (mStrLoadAtlasFromFile.empty()) {
     // Load ORB Vocabulary
-    cout << endl
-         << "Loading ORB Vocabulary. This could take a while..." << endl;
+    spdlog::info("Loading ORB Vocabulary. This could take a while...");
 
     mpVocabulary = std::make_shared<ORBVocabulary>();
     bool bVocLoad = mpVocabulary->loadFromTextFile(mStrVocabularyFilePath);
@@ -133,18 +141,17 @@ void System::initialize(bool initFr, const string &strSequence) {
       cerr << "Falied to open at: " << mStrVocabularyFilePath << endl;
       exit(-1);
     }
-    cout << "Vocabulary loaded!" << endl << endl;
+    spdlog::info("Vocabulary loaded!");
 
     // Create KeyFrame Database
     mpKeyFrameDatabase = std::make_shared<KeyFrameDatabase>(mpVocabulary);
 
     // Create the Atlas
-    cout << "Initialization of Atlas from scratch " << endl;
+    spdlog::info("Initialization of Atlas from scratch ");
     mpAtlas = std::make_shared<Atlas>(0);
   } else {
     // Load ORB Vocabulary
-    cout << endl
-         << "Loading ORB Vocabulary. This could take a while..." << endl;
+    spdlog::info("Loading ORB Vocabulary. This could take a while...");
 
     mpVocabulary = std::make_shared<ORBVocabulary>();
     bool bVocLoad = mpVocabulary->loadFromTextFile(mStrVocabularyFilePath);
@@ -153,17 +160,15 @@ void System::initialize(bool initFr, const string &strSequence) {
       cerr << "Falied to open at: " << mStrVocabularyFilePath << endl;
       exit(-1);
     }
-    cout << "Vocabulary loaded!" << endl << endl;
+    spdlog::info("Vocabulary loaded!");
 
     // Create KeyFrame Database
     mpKeyFrameDatabase = std::make_shared<KeyFrameDatabase>(mpVocabulary);
 
-    cout << "Load File" << endl;
-
     // Load the file with an earlier session
     // clock_t start = clock();
-    cout << "Initialization of Atlas from file: " << mStrLoadAtlasFromFile
-         << endl;
+    spdlog::info("Initialization of Atlas from file: {}",
+                 mStrLoadAtlasFromFile);
     bool isRead = LoadAtlas(FileType::BINARY_FILE);
 
     if (!isRead) {
@@ -200,7 +205,7 @@ void System::initialize(bool initFr, const string &strSequence) {
   // Initialize the Tracking thread
   // (it will live in the main thread of execution, the one that called this
   // constructor)
-  cout << "Seq. Name: " << strSequence << endl;
+  spdlog::info("Seq. Name: {}", strSequence);
   mpTracker = std::make_shared<Tracking>(
       this, mpVocabulary, mpFrameDrawer, mpMapDrawer, mpAtlas,
       mpKeyFrameDatabase, settings_, strSequence);
@@ -264,9 +269,9 @@ Sophus::SE3f System::TrackStereo(const cv::Mat &imLeft, const cv::Mat &imRight,
                                  const vector<IMU::Point> &vImuMeas,
                                  string filename) {
   if (!sensorType().isStereo()) {
-    cerr << "ERROR: you called TrackStereo but input sensor was not set to "
-            "Stereo nor Stereo-Inertial."
-         << endl;
+    spdlog::error(
+        "ERROR: you called TrackStereo but input sensor was not set to "
+        "Stereo nor Stereo-Inertial.");
     exit(-1);
   }
 

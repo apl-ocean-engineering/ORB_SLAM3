@@ -41,6 +41,7 @@
 #include "MapDrawer.h"
 #include "ORBVocabulary.h"
 #include "Settings.h"
+#include "Thirdparty/tl/expected.hpp"
 #include "Tracking.h"
 #include "Viewer.h"
 
@@ -54,6 +55,13 @@ class Tracking;
 class LocalMapping;
 class LoopClosing;
 class Settings;
+
+typedef tl::expected<std::shared_ptr<System>, bool> FactoryExpected;
+
+class SystemFactory {
+ public:
+  static FactoryExpected create(const std::shared_ptr<Settings> &settings);
+};
 
 class System {
  public:
