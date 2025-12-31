@@ -56,11 +56,14 @@ class LocalMapping;
 class LoopClosing;
 class Settings;
 
-typedef tl::expected<std::shared_ptr<System>, bool> FactoryExpected;
-
 class SystemFactory {
  public:
-  static FactoryExpected create(const std::shared_ptr<Settings> &settings);
+  typedef tl::expected<std::shared_ptr<System>, bool> Expected;
+
+  static Expected create(const std::shared_ptr<Settings> &settings);
+
+  static Expected create(const std::string &configFile,
+                         const SensorType sensor);
 };
 
 class System {
@@ -75,9 +78,9 @@ class System {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   // Initialize the SLAM system. It launches the Local Mapping, Loop Closing and
   // Viewer threads.
-  System(const string &strVocFile, const string &strSettingsFile,
-         const SensorType sensor, bool initFr = false,
-         const string &strSequence = std::string());
+  // System(const string &strVocFile, const string &strSettingsFile,
+  //        const SensorType sensor, bool initFr = false,
+  //        const string &strSequence = std::string());
 
   // Initialize the SLAM system. It launches the Local Mapping, Loop Closing and
   // Viewer threads.

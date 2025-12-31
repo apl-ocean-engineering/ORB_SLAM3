@@ -48,7 +48,7 @@ namespace ORB_SLAM3 {
 
 Verbose::eLevel Verbose::th = Verbose::VERBOSITY_NORMAL;
 
-FactoryExpected SystemFactory::create(
+SystemFactory::Expected SystemFactory::create(
     const std::shared_ptr<Settings> &settings) {
   if (!settings->validate()) {
     return tl::make_unexpected(false);
@@ -57,35 +57,49 @@ FactoryExpected SystemFactory::create(
   return std::make_shared<System>(settings);
 }
 
-System::System(const string &strVocFile, const string &strSettingsFile,
-               const SensorType sensor, bool initFr, const string &strSequence)
-    : mpViewer(nullptr),
-      mbReset(false),
-      mbResetActiveMap(false),
-      mbActivateLocalizationMode(false),
-      mbDeactivateLocalizationMode(false),
-      mbShutDown(false) {
-  // Check settings file
-  cv::FileStorage fsSettings(strSettingsFile.c_str(), cv::FileStorage::READ);
-  if (!fsSettings.isOpened()) {
-    cerr << "Failed to open settings file at: " << strSettingsFile << endl;
-    exit(-1);
+SystemFactory::Expected SystemFactory::create(const std::string &configFile,
+                                              const SensorType sensor) {
+  auto settings = SettingsLoader::load(configFile, sensor);
+
+  if (settings.has_value()) {
+    return std::make_shared<System>(settings.value());
   }
 
-  cv::FileNode node = fsSettings["File.version"];
-  if (node.empty() || (node.isString() && node.string() != "1.0")) {
-    std::cerr << "UNABLE TO LOAD CONFIG FILE THAT IS NOT VERSION 1.0"
-              << std::endl;
-  }
-
-  settings_ = std::make_shared<Settings>(strSettingsFile, sensor);
-
-  // This is currently not loaded from the settings file
-  settings_->strVocFile_ = strVocFile;
-
-  printBanner();
-  initialize(initFr, strSequence);
+  return tl::make_unexpected(false);
 }
+
+//===================================================================
+
+// System::System(const string &strVocFile, const string &strSettingsFile,
+//                const SensorType sensor, bool initFr, const string
+//                &strSequence)
+//     : mpViewer(nullptr),
+//       mbReset(false),
+//       mbResetActiveMap(false),
+//       mbActivateLocalizationMode(false),
+//       mbDeactivateLocalizationMode(false),
+//       mbShutDown(false) {
+//   // Check settings file
+//   cv::FileStorage fsSettings(strSettingsFile.c_str(), cv::FileStorage::READ);
+//   if (!fsSettings.isOpened()) {
+//     cerr << "Failed to open settings file at: " << strSettingsFile << endl;
+//     exit(-1);
+//   }
+
+//   cv::FileNode node = fsSettings["File.version"];
+//   if (node.empty() || (node.isString() && node.string() != "1.0")) {
+//     std::cerr << "UNABLE TO LOAD CONFIG FILE THAT IS NOT VERSION 1.0"
+//               << std::endl;
+//   }
+
+//   settings_ = std::make_shared<Settings>(strSettingsFile, sensor);
+
+//   // This is currently not loaded from the settings file
+//   settings_->strVocFile_ = strVocFile;
+
+//   printBanner();
+//   initialize(initFr, strSequence);
+// }
 
 System::System(const std::shared_ptr<Settings> &settings, bool initFr,
                const string &strSequence)
