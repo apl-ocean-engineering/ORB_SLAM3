@@ -21,6 +21,7 @@
 
 #include "G2oTypes.h"
 
+#include <memory>
 #include <vector>
 
 #include "Converter.h"
@@ -471,7 +472,7 @@ VertexAccBias::VertexAccBias(Frame* pF) {
   setEstimate(ba);
 }
 
-EdgeInertial::EdgeInertial(IMU::Preintegrated* pInt)
+EdgeInertial::EdgeInertial(const std::shared_ptr<IMU::Preintegrated>& pInt)
     : JRg(pInt->JRg.cast<double>()),
       JVg(pInt->JVg.cast<double>()),
       JPg(pInt->JPg.cast<double>()),
@@ -586,7 +587,7 @@ void EdgeInertial::linearizeOplus() {
   _jacobianOplus[5].block<3, 3>(3, 0) = Rbw1;  // OK
 }
 
-EdgeInertialGS::EdgeInertialGS(IMU::Preintegrated* pInt)
+EdgeInertialGS::EdgeInertialGS(const std::shared_ptr<IMU::Preintegrated>& pInt)
     : JRg(pInt->JRg.cast<double>()),
       JVg(pInt->JVg.cast<double>()),
       JPg(pInt->JPg.cast<double>()),

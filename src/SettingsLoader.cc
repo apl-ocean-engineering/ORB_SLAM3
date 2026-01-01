@@ -19,6 +19,7 @@
  * ORB-SLAM3. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <Eigen/Eigen>
 #include <filesystem>  // NOLINT {build/c++17}
 #include <iostream>
 #include <memory>

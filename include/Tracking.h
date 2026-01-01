@@ -245,7 +245,7 @@ class Tracking {
   bool mbMapUpdated;
 
   // Imu preintegration from last frame
-  IMU::Preintegrated *mpImuPreintegratedFromLastKF;
+  std::shared_ptr<IMU::Preintegrated> mpImuPreintegratedFromLastKF;
 
   // Queue of IMU measurements between frames
   std::list<IMU::Point> mlQueueImuData;

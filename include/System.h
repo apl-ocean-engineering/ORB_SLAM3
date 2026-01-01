@@ -162,7 +162,7 @@ class System {
   // http://www.cvlibs.net/datasets/kitti/eval_odometry.php
   void SaveTrajectoryKITTI(const string &filename);
 
-  // TODO: Save/Load functions
+  // \todo{} Serialization is currently broken
   // SaveMap(const string &filename);
   // LoadMap(const string &filename);
 
@@ -236,9 +236,9 @@ class System {
   // System threads: Local Mapping, Loop Closing, Viewer.
   // The Tracking thread "lives" in the main execution thread that creates the
   // System object.
-  std::thread *mptLocalMapping;
-  std::thread *mptLoopClosing;
-  std::thread *mptViewer;
+  std::unique_ptr<std::thread> mptLocalMapping;
+  std::unique_ptr<std::thread> mptLoopClosing;
+  std::unique_ptr<std::thread> mptViewer;
 
   // Reset flag
   std::mutex mMutexReset;
@@ -258,12 +258,6 @@ class System {
   std::vector<MapPoint *> mTrackedMapPoints;
   std::vector<cv::KeyPoint> mTrackedKeyPointsUn;
   std::mutex mMutexState;
-
-  //
-  string mStrLoadAtlasFromFile;
-  string mStrSaveAtlasToFile;
-
-  string mStrVocabularyFilePath;
 
   std::shared_ptr<Settings> settings_;
 };

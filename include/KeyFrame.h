@@ -184,7 +184,7 @@ class KeyFrame {
 
     // Inertial variables
     ar & mImuBias;
-    ar & mBackupImuPreintegrated;
+    ar&(*mpBackupImuPreintegrated);
     ar & mImuCalib;
     ar & mBackupPrevKFId;
     ar & mBackupNextKFId;
@@ -414,7 +414,7 @@ class KeyFrame {
   KeyFrame* mPrevKF;
   KeyFrame* mNextKF;
 
-  IMU::Preintegrated* mpImuPreintegrated;
+  std::shared_ptr<IMU::Preintegrated> mpImuPreintegrated;
   IMU::Calib mImuCalib;
 
   unsigned int mnOriginMapId;
@@ -493,7 +493,7 @@ class KeyFrame {
   // Backup variables for inertial
   long long int mBackupPrevKFId;
   long long int mBackupNextKFId;
-  IMU::Preintegrated mBackupImuPreintegrated;
+  std::shared_ptr<IMU::Preintegrated> mpBackupImuPreintegrated;
 
   // Backup for Cameras
   unsigned int mnBackupIdCamera, mnBackupIdCamera2;

@@ -88,6 +88,7 @@ KeyFrame::KeyFrame()
       mPrevKF(nullptr),
       mNextKF(nullptr),
       mbFirstConnection(true),
+      mpBackupImuPreintegrated(std::make_shared<IMU::Preintegrated>()),
       mpParent(NULL),
       mbNotErase(false),
       mbToBeErased(false),
@@ -153,6 +154,7 @@ KeyFrame::KeyFrame(Frame &F, const std::shared_ptr<Map> &pMap,
       mPrevKF(NULL),
       mNextKF(NULL),
       mpImuPreintegrated(F.mpImuPreintegrated),
+      mpBackupImuPreintegrated(std::make_shared<IMU::Preintegrated>()),
       mImuCalib(F.mImuCalib),
       mvpMapPoints(F.mvpMapPoints),
       mpKeyFrameDB(pKFDB),
@@ -939,7 +941,8 @@ void KeyFrame::PreSave(set<KeyFrame *> &spKF, set<MapPoint *> &spMP,
   if (mNextKF && spKF.find(mNextKF) != spKF.end())
     mBackupNextKFId = mNextKF->mnId;
 
-  if (mpImuPreintegrated) mBackupImuPreintegrated.CopyFrom(mpImuPreintegrated);
+  if (mpImuPreintegrated)
+    mpBackupImuPreintegrated->CopyFrom(mpImuPreintegrated);
 }
 
 void KeyFrame::PostLoad(
@@ -1021,7 +1024,12 @@ void KeyFrame::PostLoad(
   if (mBackupNextKFId != -1) {
     mNextKF = mpKFid[mBackupNextKFId];
   }
-  mpImuPreintegrated = &mBackupImuPreintegrated;
+
+  // \todo{} WAS:
+  // mpImuPreintegrated = &mBackupImuPreintegrated;
+  //
+  // Which doesn't work with shared ptrs.  Switched to:
+  mpImuPreintegrated = mpBackupImuPreintegrated;
 
   // Remove all backup container
   mvBackupMapPointsId.clear();

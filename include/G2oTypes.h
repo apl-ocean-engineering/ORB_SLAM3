@@ -28,6 +28,7 @@
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 #include <cmath>
+#include <memory>
 #include <opencv2/core/core.hpp>
 #include <vector>
 
@@ -458,7 +459,7 @@ class EdgeInertial : public g2o::BaseMultiEdge<9, Vector9d> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-  explicit EdgeInertial(IMU::Preintegrated* pInt);
+  explicit EdgeInertial(const std::shared_ptr<IMU::Preintegrated>& pInt);
 
   virtual bool read(std::istream& is) { return false; }
   virtual bool write(std::ostream& os) const { return false; }
@@ -499,7 +500,7 @@ class EdgeInertial : public g2o::BaseMultiEdge<9, Vector9d> {
 
   const Eigen::Matrix3d JRg, JVg, JPg;
   const Eigen::Matrix3d JVa, JPa;
-  IMU::Preintegrated* mpInt;
+  std::shared_ptr<IMU::Preintegrated> mpInt;
   const double dt;
   Eigen::Vector3d g;
 };
@@ -510,7 +511,7 @@ class EdgeInertialGS : public g2o::BaseMultiEdge<9, Vector9d> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-  explicit EdgeInertialGS(IMU::Preintegrated* pInt);
+  explicit EdgeInertialGS(const std::shared_ptr<IMU::Preintegrated>& pInt);
 
   virtual bool read(std::istream& is) { return false; }
   virtual bool write(std::ostream& os) const { return false; }
@@ -520,7 +521,7 @@ class EdgeInertialGS : public g2o::BaseMultiEdge<9, Vector9d> {
 
   const Eigen::Matrix3d JRg, JVg, JPg;
   const Eigen::Matrix3d JVa, JPa;
-  IMU::Preintegrated* mpInt;
+  std::shared_ptr<IMU::Preintegrated> mpInt;
   const double dt;
   Eigen::Vector3d g, gI;
 

@@ -273,12 +273,12 @@ class Frame {
   IMU::Calib mImuCalib;
 
   // Imu preintegration from last keyframe
-  IMU::Preintegrated *mpImuPreintegrated;
+  std::shared_ptr<IMU::Preintegrated> mpImuPreintegrated;
   KeyFrame *mpLastKeyFrame;
 
   // Pointer to previous frame
   Frame *mpPrevFrame;
-  IMU::Preintegrated *mpImuPreintegratedFrame;
+  std::shared_ptr<IMU::Preintegrated> mpImuPreintegratedFrame;
 
   // Current and Next Frame id.
   static long unsigned int nNextId;

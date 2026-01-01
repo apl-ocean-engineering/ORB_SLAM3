@@ -22,6 +22,7 @@
 #include "ImuTypes.h"
 
 #include <iostream>
+#include <memory>
 #include <vector>
 
 #include "Converter.h"
@@ -111,7 +112,7 @@ Preintegrated::Preintegrated(const Bias &b_, const Calib &calib) {
 }
 
 // Copy constructor
-Preintegrated::Preintegrated(Preintegrated *pImuPre)
+Preintegrated::Preintegrated(const std::shared_ptr<Preintegrated> &pImuPre)
     : dT(pImuPre->dT),
       C(pImuPre->C),
       Info(pImuPre->Info),
@@ -132,7 +133,7 @@ Preintegrated::Preintegrated(Preintegrated *pImuPre)
       db(pImuPre->db),
       mvMeasurements(pImuPre->mvMeasurements) {}
 
-void Preintegrated::CopyFrom(Preintegrated *pImuPre) {
+void Preintegrated::CopyFrom(const std::shared_ptr<Preintegrated> &pImuPre) {
   dT = pImuPre->dT;
   C = pImuPre->C;
   Info = pImuPre->Info;
@@ -246,8 +247,8 @@ void Preintegrated::IntegrateNewMeasurement(const Eigen::Vector3f &acceleration,
   dT += dt;
 }
 
-void Preintegrated::MergePrevious(Preintegrated *pPrev) {
-  if (pPrev == this) return;
+void Preintegrated::MergePrevious(const std::shared_ptr<Preintegrated> &pPrev) {
+  if (pPrev.get() == this) return;
 
   std::unique_lock<std::mutex> lock1(mMutex);
   std::unique_lock<std::mutex> lock2(pPrev->mMutex);

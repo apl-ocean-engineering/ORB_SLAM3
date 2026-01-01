@@ -51,11 +51,11 @@ float Frame::mfGridElementWidthInv, Frame::mfGridElementHeightInv;
 cv::BFMatcher Frame::BFmatcher = cv::BFMatcher(cv::NORM_HAMMING);
 
 Frame::Frame()
-    : mpcpi(NULL),
-      mpImuPreintegrated(NULL),
-      mpPrevFrame(NULL),
-      mpImuPreintegratedFrame(NULL),
-      mpReferenceKF(static_cast<KeyFrame *>(NULL)),
+    : mpcpi(),
+      mpImuPreintegrated(),
+      mpPrevFrame(),
+      mpImuPreintegratedFrame(),
+      mpReferenceKF(),
       mbIsSet(false),
       mbImuPreintegrated(false),
       mbHasPose(false),
@@ -159,7 +159,7 @@ Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight,
              cv::Mat &distCoef, const float &bf, const float &thDepth,
              const std::shared_ptr<GeometricCamera> &pCamera, Frame *pPrevF,
              const IMU::Calib &ImuCalib)
-    : mpcpi(NULL),
+    : mpcpi(nullptr),
       mpORBvocabulary(voc),
       mpORBextractorLeft(extractorLeft),
       mpORBextractorRight(extractorRight),
@@ -170,10 +170,10 @@ Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight,
       mbf(bf),
       mThDepth(thDepth),
       mImuCalib(ImuCalib),
-      mpImuPreintegrated(NULL),
+      mpImuPreintegrated(nullptr),
       mpPrevFrame(pPrevF),
-      mpImuPreintegratedFrame(NULL),
-      mpReferenceKF(static_cast<KeyFrame *>(NULL)),
+      mpImuPreintegratedFrame(nullptr),
+      mpReferenceKF(static_cast<KeyFrame *>(nullptr)),
       mbIsSet(false),
       mbImuPreintegrated(false),
       mpCamera(pCamera),
@@ -231,7 +231,7 @@ Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight,
           .count();
 #endif
 
-  mvpMapPoints = vector<MapPoint *>(N, static_cast<MapPoint *>(NULL));
+  mvpMapPoints = vector<MapPoint *>(N, static_cast<MapPoint *>(nullptr));
   mvbOutlier = vector<bool>(N, false);
   mmProjectPoints.clear();
   mmMatchedInImage.clear();
@@ -285,7 +285,7 @@ Frame::Frame(const cv::Mat &imGray, const cv::Mat &imDepth,
              cv::Mat &distCoef, const float &bf, const float &thDepth,
              const std::shared_ptr<GeometricCamera> &pCamera, Frame *pPrevF,
              const IMU::Calib &ImuCalib)
-    : mpcpi(NULL),
+    : mpcpi(nullptr),
       mpORBvocabulary(voc),
       mpORBextractorLeft(extractor),
       mpORBextractorRight(nullptr),
@@ -296,10 +296,10 @@ Frame::Frame(const cv::Mat &imGray, const cv::Mat &imDepth,
       mbf(bf),
       mThDepth(thDepth),
       mImuCalib(ImuCalib),
-      mpImuPreintegrated(NULL),
+      mpImuPreintegrated(nullptr),
       mpPrevFrame(pPrevF),
-      mpImuPreintegratedFrame(NULL),
-      mpReferenceKF(static_cast<KeyFrame *>(NULL)),
+      mpImuPreintegratedFrame(nullptr),
+      mpReferenceKF(static_cast<KeyFrame *>(nullptr)),
       mbIsSet(false),
       mbImuPreintegrated(false),
       mpCamera(pCamera),
@@ -342,7 +342,7 @@ Frame::Frame(const cv::Mat &imGray, const cv::Mat &imDepth,
 
   ComputeStereoFromRGBD(imDepth);
 
-  mvpMapPoints = vector<MapPoint *>(N, static_cast<MapPoint *>(NULL));
+  mvpMapPoints = vector<MapPoint *>(N, static_cast<MapPoint *>(nullptr));
 
   mmProjectPoints.clear();
   mmMatchedInImage.clear();
@@ -397,7 +397,7 @@ Frame::Frame(const cv::Mat &imGray, const double &timeStamp,
              const std::shared_ptr<GeometricCamera> &pCamera, cv::Mat &distCoef,
              const float &bf, const float &thDepth, Frame *pPrevF,
              const IMU::Calib &ImuCalib)
-    : mpcpi(NULL),
+    : mpcpi(nullptr),
       mpORBvocabulary(voc),
       mpORBextractorLeft(extractor),
       mpORBextractorRight(nullptr),
@@ -408,9 +408,9 @@ Frame::Frame(const cv::Mat &imGray, const double &timeStamp,
       mbf(bf),
       mThDepth(thDepth),
       mImuCalib(ImuCalib),
-      mpImuPreintegrated(NULL),
+      mpImuPreintegrated(nullptr),
       mpPrevFrame(pPrevF),
-      mpImuPreintegratedFrame(NULL),
+      mpImuPreintegratedFrame(nullptr),
       mpReferenceKF(nullptr),
       mbIsSet(false),
       mbImuPreintegrated(false),
@@ -456,10 +456,10 @@ Frame::Frame(const cv::Mat &imGray, const double &timeStamp,
   mvDepth = vector<float>(N, -1);
   mnCloseMPs = 0;
 
-  mvpMapPoints = vector<MapPoint *>(N, static_cast<MapPoint *>(NULL));
+  mvpMapPoints = vector<MapPoint *>(N, static_cast<MapPoint *>(nullptr));
 
   mmProjectPoints.clear();  // = map<long unsigned int, cv::Point2f>(N,
-                            // static_cast<cv::Point2f>(NULL));
+                            // static_cast<cv::Point2f>(nullptr));
   mmMatchedInImage.clear();
 
   mvbOutlier = vector<bool>(N, false);
@@ -1120,7 +1120,7 @@ Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight,
              const std::shared_ptr<GeometricCamera> &pCamera,
              const std::shared_ptr<GeometricCamera> &pCamera2,
              Sophus::SE3f &Tlr, Frame *pPrevF, const IMU::Calib &ImuCalib)
-    : mpcpi(NULL),
+    : mpcpi(nullptr),
       mpORBvocabulary(voc),
       mpORBextractorLeft(extractorLeft),
       mpORBextractorRight(extractorRight),
@@ -1131,10 +1131,10 @@ Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight,
       mbf(bf),
       mThDepth(thDepth),
       mImuCalib(ImuCalib),
-      mpImuPreintegrated(NULL),
+      mpImuPreintegrated(nullptr),
       mpPrevFrame(pPrevF),
-      mpImuPreintegratedFrame(NULL),
-      mpReferenceKF(static_cast<KeyFrame *>(NULL)),
+      mpImuPreintegratedFrame(nullptr),
+      mpReferenceKF(static_cast<KeyFrame *>(nullptr)),
       mbImuPreintegrated(false),
       mpCamera(pCamera),
       mpCamera2(pCamera2),

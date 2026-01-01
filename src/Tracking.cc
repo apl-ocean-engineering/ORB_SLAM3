@@ -613,7 +613,7 @@ void Tracking::newParameterLoader(const std::shared_ptr<Settings>& settings) {
   mpImuCalib = new IMU::Calib(Tbc, Ng * sf, Na * sf, Ngw / sf, Naw / sf);
 
   mpImuPreintegratedFromLastKF =
-      new IMU::Preintegrated(IMU::Bias(), *mpImuCalib);
+      std::make_shared<IMU::Preintegrated>(IMU::Bias(), *mpImuCalib);
 }
 
 Sophus::SE3f Tracking::GrabImageStereo(const cv::Mat& imRectLeft,
@@ -848,8 +848,9 @@ void Tracking::PreintegrateIMU() {
     return;
   }
 
-  IMU::Preintegrated* pImuPreintegratedFromLastFrame =
-      new IMU::Preintegrated(mLastFrame.mImuBias, mCurrentFrame.mImuCalib);
+  std::shared_ptr<IMU::Preintegrated> pImuPreintegratedFromLastFrame =
+      std::make_shared<IMU::Preintegrated>(mLastFrame.mImuBias,
+                                           mCurrentFrame.mImuCalib);
 
   for (int i = 0; i < n; i++) {
     float tstep;
@@ -891,7 +892,7 @@ void Tracking::PreintegrateIMU() {
     }
 
     if (!mpImuPreintegratedFromLastKF)
-      cout << "mpImuPreintegratedFromLastKF does not exist" << endl;
+      spdlog::warn("mpImuPreintegratedFromLastKF does not exist");
     mpImuPreintegratedFromLastKF->IntegrateNewMeasurement(acc, angVel, tstep);
     pImuPreintegratedFromLastFrame->IntegrateNewMeasurement(acc, angVel, tstep);
   }
@@ -1356,8 +1357,12 @@ void Tracking::Track() {
       pF->mpPrevFrame = new Frame(mLastFrame);
 
       // Load preintegration
-      pF->mpImuPreintegratedFrame =
-          new IMU::Preintegrated(mCurrentFrame.mpImuPreintegratedFrame);
+      //
+      // \todo{AMM}.  I believe this was correct, want to make a deep copy of
+      // the Preintegration?
+      pF->mpImuPreintegratedFrame = std::make_shared<IMU::Preintegrated>();
+      pF->mpImuPreintegratedFrame->CopyFrom(
+          mCurrentFrame.mpImuPreintegratedFrame);
     }
 
     if (pCurrentMap->isImuInitialized()) {
@@ -1528,10 +1533,8 @@ void Tracking::StereoInitialization() {
         return;
       }
 
-      if (mpImuPreintegratedFromLastKF) delete mpImuPreintegratedFromLastKF;
-
       mpImuPreintegratedFromLastKF =
-          new IMU::Preintegrated(IMU::Bias(), *mpImuCalib);
+          std::make_shared<IMU::Preintegrated>(IMU::Bias(), *mpImuCalib);
       mCurrentFrame.mpImuPreintegrated = mpImuPreintegratedFromLastKF;
     }
 
@@ -1637,11 +1640,8 @@ void Tracking::MonocularInitialization() {
       fill(mvIniMatches.begin(), mvIniMatches.end(), -1);
 
       if (mSensor == SensorType::IMU_MONOCULAR) {
-        if (mpImuPreintegratedFromLastKF) {
-          delete mpImuPreintegratedFromLastKF;
-        }
         mpImuPreintegratedFromLastKF =
-            new IMU::Preintegrated(IMU::Bias(), *mpImuCalib);
+            std::make_shared<IMU::Preintegrated>(IMU::Bias(), *mpImuCalib);
         mCurrentFrame.mpImuPreintegrated = mpImuPreintegratedFromLastKF;
       }
 
@@ -1698,8 +1698,7 @@ void Tracking::CreateInitialMapMonocular() {
   KeyFrame* pKFcur =
       new KeyFrame(mCurrentFrame, mpAtlas->GetCurrentMap(), mpKeyFrameDB);
 
-  if (mSensor == SensorType::IMU_MONOCULAR)
-    pKFini->mpImuPreintegrated = (IMU::Preintegrated*)(NULL);
+  if (mSensor == SensorType::IMU_MONOCULAR) pKFini->mpImuPreintegrated.reset();
 
   pKFini->ComputeBoW();
   pKFcur->ComputeBoW();
@@ -1781,7 +1780,7 @@ void Tracking::CreateInitialMapMonocular() {
     pKFini->mNextKF = pKFcur;
     pKFcur->mpImuPreintegrated = mpImuPreintegratedFromLastKF;
 
-    mpImuPreintegratedFromLastKF = new IMU::Preintegrated(
+    mpImuPreintegratedFromLastKF = std::make_shared<IMU::Preintegrated>(
         pKFcur->mpImuPreintegrated->GetUpdatedBias(), pKFcur->mImuCalib);
   }
 
@@ -1849,12 +1848,9 @@ void Tracking::CreateMapInAtlas() {
     mbReadyToInitializate = false;
   }
 
-  if ((mSensor == SensorType::IMU_MONOCULAR ||
-       mSensor == SensorType::IMU_STEREO || mSensor == SensorType::IMU_RGBD) &&
-      mpImuPreintegratedFromLastKF) {
-    delete mpImuPreintegratedFromLastKF;
+  if (mSensor.isImu() && mpImuPreintegratedFromLastKF) {
     mpImuPreintegratedFromLastKF =
-        new IMU::Preintegrated(IMU::Bias(), *mpImuCalib);
+        std::make_shared<IMU::Preintegrated>(IMU::Bias(), *mpImuCalib);
   }
 
   if (mpLastKeyFrame) mpLastKeyFrame = static_cast<KeyFrame*>(NULL);
@@ -2449,7 +2445,7 @@ void Tracking::CreateNewKeyFrame() {
   if (mSensor == SensorType::IMU_MONOCULAR ||
       mSensor == SensorType::IMU_STEREO || mSensor == SensorType::IMU_RGBD) {
     mpImuPreintegratedFromLastKF =
-        new IMU::Preintegrated(pKF->GetImuBias(), pKF->mImuCalib);
+        std::make_shared<IMU::Preintegrated>(pKF->GetImuBias(), pKF->mImuCalib);
   }
 
   // TODO check if incluide imu_stereo

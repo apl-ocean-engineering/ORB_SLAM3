@@ -27,6 +27,7 @@
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/vector.hpp>
 #include <iostream>
+#include <memory>
 #include <mutex>
 #include <opencv2/core/core.hpp>
 #include <sophus/se3.hpp>
@@ -178,16 +179,19 @@ class Preintegrated {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   Preintegrated(const Bias &b_, const Calib &calib);
-  explicit Preintegrated(Preintegrated *pImuPre);
+
+  // \todo{}  Why not the default copy constructor?
+  explicit Preintegrated(const std::shared_ptr<Preintegrated> &pImuPre);
+
   Preintegrated() = default;
 
   ~Preintegrated() {}
-  void CopyFrom(Preintegrated *pImuPre);
+  void CopyFrom(const std::shared_ptr<Preintegrated> &pImuPre);
   void Initialize(const Bias &b_);
   void IntegrateNewMeasurement(const Eigen::Vector3f &acceleration,
                                const Eigen::Vector3f &angVel, const float &dt);
   void Reintegrate();
-  void MergePrevious(Preintegrated *pPrev);
+  void MergePrevious(const std::shared_ptr<Preintegrated> &pPrev);
   void SetNewBias(const Bias &bu_);
   IMU::Bias GetDeltaBias(const Bias &b_);
 

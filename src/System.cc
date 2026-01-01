@@ -61,7 +61,7 @@ SystemFactory::Expected SystemFactory::create(const std::string &configFile,
                                               const SensorType sensor) {
   auto settings = SettingsLoader::load(configFile, sensor);
 
-  if (settings.has_value()) {
+  if (settings) {
     return std::make_shared<System>(settings.value());
   }
 
@@ -130,17 +130,17 @@ void System::printBanner() {
        << "under certain conditions. See LICENSE.txt." << endl
        << endl;
 
-  cout << "Input sensor was set to: " << sensorType().toString();
+  spdlog::info("Input sensor was set to: {}", sensorType().toString());
 }
 
 void System::initialize(bool initFr, const string &strSequence) {
-  mStrLoadAtlasFromFile = settings_->atlasLoadFile();
-  mStrSaveAtlasToFile = settings_->atlasSaveFile();
+  const string mStrLoadAtlasFromFile = settings_->atlasLoadFile();
+  const string mStrSaveAtlasToFile = settings_->atlasSaveFile();
 
   cout << (*settings_) << endl;
 
   const bool activeLC = settings_->loopClosing_;
-  mStrVocabularyFilePath = settings_->strVocFile_;
+  const string vocabularyFilePath = settings_->strVocFile_;
 
   bool loadedAtlas = false;
 
@@ -149,10 +149,10 @@ void System::initialize(bool initFr, const string &strSequence) {
     spdlog::info("Loading ORB Vocabulary. This could take a while...");
 
     mpVocabulary = std::make_shared<ORBVocabulary>();
-    bool bVocLoad = mpVocabulary->loadFromTextFile(mStrVocabularyFilePath);
+    bool bVocLoad = mpVocabulary->loadFromTextFile(vocabularyFilePath);
     if (!bVocLoad) {
       cerr << "Wrong path to vocabulary. " << endl;
-      cerr << "Falied to open at: " << mStrVocabularyFilePath << endl;
+      cerr << "Falied to open at: " << vocabularyFilePath << endl;
       exit(-1);
     }
     spdlog::info("Vocabulary loaded!");
@@ -168,10 +168,10 @@ void System::initialize(bool initFr, const string &strSequence) {
     spdlog::info("Loading ORB Vocabulary. This could take a while...");
 
     mpVocabulary = std::make_shared<ORBVocabulary>();
-    bool bVocLoad = mpVocabulary->loadFromTextFile(mStrVocabularyFilePath);
+    bool bVocLoad = mpVocabulary->loadFromTextFile(vocabularyFilePath);
     if (!bVocLoad) {
       cerr << "Wrong path to vocabulary. " << endl;
-      cerr << "Falied to open at: " << mStrVocabularyFilePath << endl;
+      cerr << "Falied to open at: " << vocabularyFilePath << endl;
       exit(-1);
     }
     spdlog::info("Vocabulary loaded!");
@@ -228,7 +228,8 @@ void System::initialize(bool initFr, const string &strSequence) {
   mpLocalMapper =
       std::make_shared<LocalMapping>(this, mpAtlas, sensorType().isMonocular(),
                                      sensorType().isImu(), strSequence);
-  mptLocalMapping = new thread(&ORB_SLAM3::LocalMapping::Run, mpLocalMapper);
+  mptLocalMapping =
+      std::make_unique<thread>(&ORB_SLAM3::LocalMapping::Run, mpLocalMapper);
   mpLocalMapper->mInitFr = initFr;
   mpLocalMapper->mThFarPoints = settings_->thFarPoints();
 
@@ -249,7 +250,8 @@ void System::initialize(bool initFr, const string &strSequence) {
       std::make_shared<LoopClosing>(mpAtlas, mpKeyFrameDatabase, mpVocabulary,
                                     sensorType() != SensorType::MONOCULAR,
                                     activeLC);  // sensorType()!=MONOCULAR);
-  mptLoopClosing = new thread(&ORB_SLAM3::LoopClosing::Run, mpLoopCloser);
+  mptLoopClosing =
+      std::make_unique<thread>(&ORB_SLAM3::LoopClosing::Run, mpLoopCloser);
 
   // Set pointers between threads
   mpTracker->SetLocalMapper(mpLocalMapper);
@@ -267,7 +269,7 @@ void System::initialize(bool initFr, const string &strSequence) {
   if (settings_->useViewer_) {
     mpViewer = std::make_shared<Viewer>(this, mpFrameDrawer, mpMapDrawer,
                                         mpTracker, settings_);
-    mptViewer = new thread(&Viewer::Run, mpViewer);
+    mptViewer = std::make_unique<thread>(&Viewer::Run, mpViewer);
     mpTracker->SetViewer(mpViewer);
     mpLoopCloser->mpViewer = mpViewer;
     mpViewer->both = mpFrameDrawer->both;
@@ -565,6 +567,7 @@ void System::Shutdown() {
   /*usleep(5000);
 }*/
 
+  const string mStrSaveAtlasToFile = settings_->atlasSaveFile();
   if (!mStrSaveAtlasToFile.empty()) {
     Verbose::PrintMess("Atlas saving to file " + mStrSaveAtlasToFile,
                        Verbose::VERBOSITY_NORMAL);
@@ -1431,6 +1434,8 @@ void System::InsertTrackTime(double &time) {
 #endif
 
 void System::SaveAtlas(int type) {
+  const string mStrSaveAtlasToFile = settings_->atlasSaveFile();
+
   if (!mStrSaveAtlasToFile.empty()) {
     // clock_t start = clock();
 
@@ -1441,10 +1446,12 @@ void System::SaveAtlas(int type) {
     pathSaveFileName = pathSaveFileName.append(mStrSaveAtlasToFile);
     pathSaveFileName = pathSaveFileName.append(".osa");
 
+    const string vocabularyFilePath = settings_->strVocFile_;
+
     string strVocabularyChecksum =
-        CalculateCheckSum(mStrVocabularyFilePath, TEXT_FILE);
-    std::size_t found = mStrVocabularyFilePath.find_last_of("/\\");
-    string strVocabularyName = mStrVocabularyFilePath.substr(found + 1);
+        CalculateCheckSum(vocabularyFilePath, TEXT_FILE);
+    std::size_t found = vocabularyFilePath.find_last_of("/\\");
+    string strVocabularyName = vocabularyFilePath.substr(found + 1);
 
     if (type == TEXT_FILE) {
       // File text
@@ -1475,6 +1482,9 @@ void System::SaveAtlas(int type) {
 
 bool System::LoadAtlas(int type) {
   string strFileVoc, strVocChecksum;
+
+  const string mStrLoadAtlasFromFile = settings_->atlasLoadFile();
+  const string vocabularyFilePath = settings_->strVocFile_;
   bool isRead = false;
 
   string pathLoadFileName = "./";
@@ -1514,7 +1524,7 @@ bool System::LoadAtlas(int type) {
   if (isRead) {
     // Check if the vocabulary is the same
     string strInputVocabularyChecksum =
-        CalculateCheckSum(mStrVocabularyFilePath, TEXT_FILE);
+        CalculateCheckSum(vocabularyFilePath, TEXT_FILE);
 
     if (strInputVocabularyChecksum.compare(strVocChecksum) != 0) {
       cout << "The vocabulary load isn't the same which the load session was "
