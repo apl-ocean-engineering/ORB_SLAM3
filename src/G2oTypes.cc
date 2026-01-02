@@ -28,7 +28,7 @@
 #include "ImuTypes.h"
 namespace ORB_SLAM3 {
 
-ImuCamPose::ImuCamPose(KeyFrame* pKF) : its(0) {
+ImuCamPose::ImuCamPose(const std::shared_ptr<KeyFrame>& pKF) : its(0) {
   // Load IMU pose
   twb = pKF->GetImuPosition().cast<double>();
   Rwb = pKF->GetImuRotation().cast<double>();
@@ -74,7 +74,7 @@ ImuCamPose::ImuCamPose(KeyFrame* pKF) : its(0) {
   DR.setIdentity();
 }
 
-ImuCamPose::ImuCamPose(Frame* pF) : its(0) {
+ImuCamPose::ImuCamPose(const std::shared_ptr<Frame>& pF) : its(0) {
   // Load IMU pose
   twb = pF->GetImuPosition().cast<double>();
   Rwb = pF->GetImuRotation().cast<double>();
@@ -121,7 +121,7 @@ ImuCamPose::ImuCamPose(Frame* pF) : its(0) {
 }
 
 ImuCamPose::ImuCamPose(Eigen::Matrix3d& _Rwc, Eigen::Vector3d& _twc,
-                       KeyFrame* pKF)
+                       const std::shared_ptr<KeyFrame>& pKF)
     : its(0) {
   // This is only for posegrpah, we do not care about multicamera
   tcw.resize(1);
@@ -251,7 +251,7 @@ void ImuCamPose::UpdateW(const double* pu) {
 }
 
 InvDepthPoint::InvDepthPoint(double _rho, double _u, double _v,
-                             KeyFrame* pHostKF)
+                             const std::shared_ptr<KeyFrame>& pHostKF)
     : u(_u),
       v(_v),
       rho(_rho),
@@ -444,29 +444,29 @@ void EdgeStereoOnlyPose::linearizeOplus() {
   _jacobianOplusXi = proj_jac * Rcb * SE3deriv;
 }
 
-VertexVelocity::VertexVelocity(KeyFrame* pKF) {
+VertexVelocity::VertexVelocity(const std::shared_ptr<KeyFrame>& pKF) {
   setEstimate(pKF->GetVelocity().cast<double>());
 }
 
-VertexVelocity::VertexVelocity(Frame* pF) {
+VertexVelocity::VertexVelocity(const std::shared_ptr<Frame>& pF) {
   setEstimate(pF->GetVelocity().cast<double>());
 }
 
-VertexGyroBias::VertexGyroBias(KeyFrame* pKF) {
+VertexGyroBias::VertexGyroBias(const std::shared_ptr<KeyFrame>& pKF) {
   setEstimate(pKF->GetGyroBias().cast<double>());
 }
 
-VertexGyroBias::VertexGyroBias(Frame* pF) {
+VertexGyroBias::VertexGyroBias(const std::shared_ptr<Frame>& pF) {
   Eigen::Vector3d bg;
   bg << pF->mImuBias.bwx, pF->mImuBias.bwy, pF->mImuBias.bwz;
   setEstimate(bg);
 }
 
-VertexAccBias::VertexAccBias(KeyFrame* pKF) {
+VertexAccBias::VertexAccBias(const std::shared_ptr<KeyFrame>& pKF) {
   setEstimate(pKF->GetAccBias().cast<double>());
 }
 
-VertexAccBias::VertexAccBias(Frame* pF) {
+VertexAccBias::VertexAccBias(const std::shared_ptr<Frame>& pF) {
   Eigen::Vector3d ba;
   ba << pF->mImuBias.bax, pF->mImuBias.bay, pF->mImuBias.baz;
   setEstimate(ba);

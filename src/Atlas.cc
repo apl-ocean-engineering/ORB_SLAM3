@@ -62,19 +62,19 @@ Atlas::~Atlas() {
 
 void Atlas::CreateNewMap() {
   unique_lock<mutex> lock(mMutexAtlas);
-  cout << "Creation of new map with id: " << Map::nNextId << endl;
+  spdlog::info("Creation of new map with id: {}", Map::nNextId);
   if (mpCurrentMap) {
     if (!mspMaps.empty() && mnLastInitKFidMap < mpCurrentMap->GetMaxKFid())
       mnLastInitKFidMap = mpCurrentMap->GetMaxKFid() +
                           1;  // The init KF is the next of current maximum
 
     mpCurrentMap->SetStoredMap();
-    cout << "Stored map with ID: " << mpCurrentMap->GetId() << endl;
+    spdlog::info("Stored map with ID: {}", mpCurrentMap->GetId());
 
     // if(mpViewer)
     //     mpViewer->AddMapToCreateThumbnail(mpCurrentMap);
   }
-  cout << "Creation of new map with last KF id: " << mnLastInitKFidMap << endl;
+  spdlog::info("Creation of new map with last KF id: {}", mnLastInitKFidMap);
 
   mpCurrentMap = std::make_shared<Map>(mnLastInitKFidMap);
   mpCurrentMap->SetCurrentMap();
@@ -83,7 +83,7 @@ void Atlas::CreateNewMap() {
 
 void Atlas::ChangeMap(const std::shared_ptr<Map> &pMap) {
   unique_lock<mutex> lock(mMutexAtlas);
-  cout << "Change to map with id: " << pMap->GetId() << endl;
+  spdlog::info("Change to map with id: {}", pMap->GetId());
   if (mpCurrentMap) {
     mpCurrentMap->SetStoredMap();
   }
@@ -101,7 +101,7 @@ void Atlas::SetViewer(const std::shared_ptr<Viewer> &pViewer) {
   mpViewer = pViewer;
 }
 
-void Atlas::AddKeyFrame(KeyFrame *pKF) {
+void Atlas::AddKeyFrame(const std::shared_ptr<KeyFrame> &pKF) {
   std::shared_ptr<Map> pMapKF = pKF->GetMap();
   pMapKF->AddKeyFrame(pKF);
 }
@@ -121,6 +121,7 @@ std::shared_ptr<GeometricCamera> Atlas::AddCamera(
 
     if (!pCam) std::cout << "Not pCam" << std::endl;
     if (!pCam_i) std::cout << "Not pCam_i" << std::endl;
+
     if (pCam->GetType() != pCam_i->GetType()) continue;
 
     if (pCam->GetType() == GeometricCamera::CAM_PINHOLE) {
@@ -173,7 +174,7 @@ long unsigned Atlas::KeyFramesInMap() {
   return mpCurrentMap->KeyFramesInMap();
 }
 
-std::vector<KeyFrame *> Atlas::GetAllKeyFrames() {
+std::vector<std::shared_ptr<KeyFrame>> Atlas::GetAllKeyFrames() {
   unique_lock<mutex> lock(mMutexAtlas);
   return mpCurrentMap->GetAllKeyFrames();
 }
@@ -307,7 +308,7 @@ void Atlas::PostLoad() {
 
   mspMaps.clear();
   unsigned long int numKF = 0, numMP = 0;
-  for (std::shared_ptr<Map> pMi : mvpBackupMaps) {
+  for (auto pMi : mvpBackupMaps) {
     mspMaps.insert(pMi);
     pMi->PostLoad(mpKeyFrameDB, mpORBVocabulary, mpCams);
     numKF += pMi->GetAllKeyFrames().size();
@@ -336,7 +337,7 @@ std::shared_ptr<ORBVocabulary> Atlas::GetORBVocabulary() {
 long unsigned int Atlas::GetNumLivedKF() {
   unique_lock<mutex> lock(mMutexAtlas);
   long unsigned int num = 0;
-  for (auto pMap_i : mspMaps) {
+  for (auto const &pMap_i : mspMaps) {
     num += pMap_i->GetAllKeyFrames().size();
   }
 
@@ -346,19 +347,19 @@ long unsigned int Atlas::GetNumLivedKF() {
 long unsigned int Atlas::GetNumLivedMP() {
   unique_lock<mutex> lock(mMutexAtlas);
   long unsigned int num = 0;
-  for (auto pMap_i : mspMaps) {
+  for (auto const &pMap_i : mspMaps) {
     num += pMap_i->GetAllMapPoints().size();
   }
 
   return num;
 }
 
-map<long unsigned int, KeyFrame *> Atlas::GetAtlasKeyframes() {
-  map<long unsigned int, KeyFrame *> mpIdKFs;
-  for (auto pMap_i : mvpBackupMaps) {
-    vector<KeyFrame *> vpKFs_Mi = pMap_i->GetAllKeyFrames();
+map<long unsigned int, std::shared_ptr<KeyFrame>> Atlas::GetAtlasKeyframes() {
+  map<long unsigned int, std::shared_ptr<KeyFrame>> mpIdKFs;
+  for (auto const &pMap_i : mvpBackupMaps) {
+    vector<std::shared_ptr<KeyFrame>> vpKFs_Mi = pMap_i->GetAllKeyFrames();
 
-    for (KeyFrame *pKF_j_Mi : vpKFs_Mi) {
+    for (auto pKF_j_Mi : vpKFs_Mi) {
       mpIdKFs[pKF_j_Mi->mnId] = pKF_j_Mi;
     }
   }

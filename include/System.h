@@ -66,26 +66,18 @@ class SystemFactory {
                          const SensorType sensor);
 };
 
-class System {
+class System : public std::enable_shared_from_this<System> {
  public:
+  friend SystemFactory::Expected SystemFactory::create(
+      const std::shared_ptr<Settings> &settings);
+
   // File type
   enum FileType {
     TEXT_FILE = 0,
     BINARY_FILE = 1,
   };
 
- public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  // Initialize the SLAM system. It launches the Local Mapping, Loop Closing and
-  // Viewer threads.
-  // System(const string &strVocFile, const string &strSettingsFile,
-  //        const SensorType sensor, bool initFr = false,
-  //        const string &strSequence = std::string());
-
-  // Initialize the SLAM system. It launches the Local Mapping, Loop Closing and
-  // Viewer threads.
-  System(const std::shared_ptr<Settings> &settings, bool initFr = false,
-         const string &strSequence = std::string());
 
   // Proccess the given stereo frame. Images must be synchronized and rectified.
   // Input images: RGB (CV_8UC3) or grayscale (CV_8U). RGB is converted to
@@ -192,10 +184,24 @@ class System {
   void InsertTrackTime(double &time);
 #endif
 
- private:
+ protected:
+  // Initialize the SLAM system. It launches the Local Mapping, Loop Closing and
+  // Viewer threads.
+  //
+  // All construction should go through the factory to ensure correct
+  // initialization
+  System(const std::shared_ptr<Settings> &settings, bool initFr = false,
+         const string &strSequence = std::string());
+
   void printBanner();
 
-  void initialize(bool initFr, const string &strSequence);
+  bool initialize(bool initFr = false,
+                  const string &strSequence = std::string());
+
+ private:
+  void processLocalizationModeChange(void);
+  void processReset(void);
+  void updateTrackingState();
 
   void SaveAtlas(int type);
   bool LoadAtlas(int type);

@@ -52,7 +52,7 @@ cv::Mat FrameDrawer::DrawFrame(float imageScale) {
   vector<float> vCurrentDepth;
   float thDepth;
 
-  Frame currentFrame;
+  std::shared_ptr<Frame> currentFrame;
   vector<MapPoint *> vpLocalMap;
   vector<cv::KeyPoint> vMatchesKeys;
   vector<MapPoint *> vpMatchedMPs;
@@ -326,15 +326,15 @@ void FrameDrawer::DrawTextInfo(cv::Mat &im, int nState, cv::Mat &imText) {
               cv::FONT_HERSHEY_PLAIN, 1, cv::Scalar(255, 255, 255), 1, 8);
 }
 
-void FrameDrawer::Update(Tracking *pTracker) {
+void FrameDrawer::Update(const std::shared_ptr<Tracking> &pTracker) {
   unique_lock<mutex> lock(mMutex);
   pTracker->mImGray.copyTo(mIm);
-  mvCurrentKeys = pTracker->mCurrentFrame.mvKeys;
-  mThDepth = pTracker->mCurrentFrame.mThDepth;
-  mvCurrentDepth = pTracker->mCurrentFrame.mvDepth;
+  mvCurrentKeys = pTracker->mCurrentFrame->mvKeys;
+  mThDepth = pTracker->mCurrentFrame->mThDepth;
+  mvCurrentDepth = pTracker->mCurrentFrame->mvDepth;
 
   if (both) {
-    mvCurrentKeysRight = pTracker->mCurrentFrame.mvKeysRight;
+    mvCurrentKeysRight = pTracker->mCurrentFrame->mvKeysRight;
     pTracker->mImRight.copyTo(mImRight);
     N = mvCurrentKeys.size() + mvCurrentKeysRight.size();
   } else {
@@ -347,7 +347,7 @@ void FrameDrawer::Update(Tracking *pTracker) {
 
   // Variables for the new visualization
   mCurrentFrame = pTracker->mCurrentFrame;
-  mmProjectPoints = mCurrentFrame.mmProjectPoints;
+  mmProjectPoints = mCurrentFrame->mmProjectPoints;
   mmMatchedInImage.clear();
 
   mvpLocalMap = pTracker->GetLocalMapMPS();
@@ -361,13 +361,14 @@ void FrameDrawer::Update(Tracking *pTracker) {
   mvpOutlierMPs.reserve(N);
 
   if (pTracker->mLastProcessedState == Tracking::NOT_INITIALIZED) {
-    mvIniKeys = pTracker->mInitialFrame.mvKeys;
+    mvIniKeys = pTracker->mInitialFrame->mvKeys;
     mvIniMatches = pTracker->mvIniMatches;
+
   } else if (pTracker->mLastProcessedState == Tracking::OK) {
     for (int i = 0; i < N; i++) {
-      MapPoint *pMP = pTracker->mCurrentFrame.mvpMapPoints[i];
+      MapPoint *pMP = pTracker->mCurrentFrame->mvpMapPoints.at(i);
       if (pMP) {
-        if (!pTracker->mCurrentFrame.mvbOutlier[i]) {
+        if (!pTracker->mCurrentFrame->mvbOutlier[i]) {
           if (pMP->Observations() > 0)
             mvbMap[i] = true;
           else

@@ -47,11 +47,11 @@ class LoopClosing;
 
 class Optimizer {
  public:
-  static void BundleAdjustment(const std::vector<KeyFrame *> &vpKF,
-                               const std::vector<MapPoint *> &vpMP,
-                               int nIterations = 5, bool *pbStopFlag = NULL,
-                               const unsigned long nLoopKF = 0,
-                               const bool bRobust = true);
+  static void BundleAdjustment(
+      const std::vector<std::shared_ptr<KeyFrame>> &vpKF,
+      const std::vector<MapPoint *> &vpMP, int nIterations = 5,
+      bool *pbStopFlag = NULL, const unsigned long nLoopKF = 0,
+      const bool bRobust = true);
   static void GlobalBundleAdjustemnt(const std::shared_ptr<Map> &pMap,
                                      int nIterations = 5,
                                      bool *pbStopFlag = NULL,
@@ -65,41 +65,51 @@ class Optimizer {
                              Eigen::VectorXd *vSingVal = NULL,
                              bool *bHess = NULL);
 
-  static void LocalBundleAdjustment(KeyFrame *pKF, bool *pbStopFlag,
+  static void LocalBundleAdjustment(const std::shared_ptr<KeyFrame> &pKF,
+                                    bool *pbStopFlag,
                                     const std::shared_ptr<Map> &pMap,
                                     int &num_fixedKF, int &num_OptKF,
                                     int &num_MPs, int &num_edges);
 
-  static int PoseOptimization(Frame *pFrame);
-  static int PoseInertialOptimizationLastKeyFrame(Frame *pFrame,
-                                                  bool bRecInit = false);
-  static int PoseInertialOptimizationLastFrame(Frame *pFrame,
-                                               bool bRecInit = false);
+  static int PoseOptimization(const std::shared_ptr<Frame> &pFrame);
+  static int PoseInertialOptimizationLastKeyFrame(
+      const std::shared_ptr<Frame> &pFrame, bool bRecInit = false);
+  static int PoseInertialOptimizationLastFrame(
+      const std::shared_ptr<Frame> &pFrame, bool bRecInit = false);
 
   // if bFixScale is true, 6DoF optimization (stereo,rgbd), 7DoF otherwise
   // (mono)
   static void OptimizeEssentialGraph(
-      const std::shared_ptr<Map> &pMap, KeyFrame *pLoopKF, KeyFrame *pCurKF,
+      const std::shared_ptr<Map> &pMap,
+      const std::shared_ptr<KeyFrame> &pLoopKF,
+      const std::shared_ptr<KeyFrame> &pCurKF,
       const LoopClosing::KeyFrameAndPose &NonCorrectedSim3,
       const LoopClosing::KeyFrameAndPose &CorrectedSim3,
-      const map<KeyFrame *, set<KeyFrame *> > &LoopConnections,
+      const map<std::shared_ptr<KeyFrame>, set<std::shared_ptr<KeyFrame>>>
+          &LoopConnections,
       const bool &bFixScale);
-  static void OptimizeEssentialGraph(KeyFrame *pCurKF,
-                                     vector<KeyFrame *> &vpFixedKFs,
-                                     vector<KeyFrame *> &vpFixedCorrectedKFs,
-                                     vector<KeyFrame *> &vpNonFixedKFs,
-                                     vector<MapPoint *> &vpNonCorrectedMPs);
+
+  static void OptimizeEssentialGraph(
+      const std::shared_ptr<KeyFrame> &pCurKF,
+      vector<std::shared_ptr<KeyFrame>> &vpFixedKFs,
+      vector<std::shared_ptr<KeyFrame>> &vpFixedCorrectedKFs,
+      vector<std::shared_ptr<KeyFrame>> &vpNonFixedKFs,
+      vector<MapPoint *> &vpNonCorrectedMPs);
 
   // For inertial loopclosing
   static void OptimizeEssentialGraph4DoF(
-      const std::shared_ptr<Map> &pMap, KeyFrame *pLoopKF, KeyFrame *pCurKF,
+      const std::shared_ptr<Map> &pMap,
+      const std::shared_ptr<KeyFrame> &pLoopKF,
+      const std::shared_ptr<KeyFrame> &pCurKF,
       const LoopClosing::KeyFrameAndPose &NonCorrectedSim3,
       const LoopClosing::KeyFrameAndPose &CorrectedSim3,
-      const map<KeyFrame *, set<KeyFrame *> > &LoopConnections);
+      const map<std::shared_ptr<KeyFrame>, set<std::shared_ptr<KeyFrame>>>
+          &LoopConnections);
 
   // if bFixScale is true, optimize SE3 (stereo,rgbd), Sim3 otherwise (mono)
   // (NEW)
-  static int OptimizeSim3(KeyFrame *pKF1, KeyFrame *pKF2,
+  static int OptimizeSim3(const std::shared_ptr<KeyFrame> &pKF1,
+                          const std::shared_ptr<KeyFrame> &pKF2,
                           std::vector<MapPoint *> &vpMatches1,
                           g2o::Sim3 &g2oS12, const float th2,
                           const bool bFixScale,
@@ -108,20 +118,23 @@ class Optimizer {
 
   // For inertial systems
 
-  static void LocalInertialBA(KeyFrame *pKF, bool *pbStopFlag,
+  static void LocalInertialBA(const std::shared_ptr<KeyFrame> &pKF,
+                              bool *pbStopFlag,
                               const std::shared_ptr<Map> &pMap,
                               int &num_fixedKF, int &num_OptKF, int &num_MPs,
                               int &num_edges, bool bLarge = false,
                               bool bRecInit = false);
-  static void MergeInertialBA(KeyFrame *pCurrKF, KeyFrame *pMergeKF,
+
+  static void MergeInertialBA(const std::shared_ptr<KeyFrame> &pCurrKF,
+                              const std::shared_ptr<KeyFrame> &pMergeKF,
                               bool *pbStopFlag,
                               const std::shared_ptr<Map> &pMap,
                               LoopClosing::KeyFrameAndPose &corrPoses);
 
   // Local BA in welding area when two maps are merged
-  static void LocalBundleAdjustment(KeyFrame *pMainKF,
-                                    vector<KeyFrame *> vpAdjustKF,
-                                    vector<KeyFrame *> vpFixedKF,
+  static void LocalBundleAdjustment(const std::shared_ptr<KeyFrame> &pMainKF,
+                                    vector<shared_ptr<KeyFrame>> vpAdjustKF,
+                                    vector<shared_ptr<KeyFrame>> vpFixedKF,
                                     bool *pbStopFlag);
 
   // Marginalize block element (start:end,start:end). Perform Schur complement.

@@ -77,15 +77,15 @@ class Map : public std::enable_shared_from_this<Map> {
 
   ~Map();
 
-  void AddKeyFrame(KeyFrame* pKF);
+  void AddKeyFrame(const std::shared_ptr<KeyFrame>& pKF);
   void AddMapPoint(MapPoint* pMP);
   void EraseMapPoint(MapPoint* pMP);
-  void EraseKeyFrame(KeyFrame* pKF);
+  void EraseKeyFrame(const std::shared_ptr<KeyFrame>& pKF);
   void SetReferenceMapPoints(const std::vector<MapPoint*>& vpMPs);
   void InformNewBigChange();
   int GetLastBigChangeIdx();
 
-  std::vector<KeyFrame*> GetAllKeyFrames();
+  std::vector<std::shared_ptr<KeyFrame> > GetAllKeyFrames();
   std::vector<MapPoint*> GetAllMapPoints();
   std::vector<MapPoint*> GetReferenceMapPoints();
 
@@ -98,7 +98,7 @@ class Map : public std::enable_shared_from_this<Map> {
   void SetInitKFid(unsigned long int initKFif);
   unsigned long int GetMaxKFid();
 
-  KeyFrame* GetOriginKF();
+  std::shared_ptr<KeyFrame> GetOriginKF();
 
   void SetCurrentMap();
   void SetStoredMap();
@@ -142,13 +142,14 @@ class Map : public std::enable_shared_from_this<Map> {
           pORBVoc /*, map<unsigned long int, KeyFrame*>& mpKeyFrameId*/,
       map<unsigned int, std::shared_ptr<GeometricCamera> >& mpCams);
 
-  void printReprojectionError(list<KeyFrame*>& lpLocalWindowKFs,
-                              KeyFrame* mpCurrentKF, string& name,
-                              string& name_folder);
+  void printReprojectionError(
+      list<std::shared_ptr<KeyFrame> >& lpLocalWindowKFs,
+      const std::shared_ptr<KeyFrame>& mpCurrentKF, string& name,
+      string& name_folder);
 
-  vector<KeyFrame*> mvpKeyFrameOrigins;
+  vector<std::shared_ptr<KeyFrame> > mvpKeyFrameOrigins;
   vector<unsigned long int> mvBackupKeyFrameOriginsId;
-  KeyFrame* mpFirstRegionKF;
+  std::shared_ptr<KeyFrame> mpFirstRegionKF;
   std::mutex mMutexMapUpdate;
 
   // This avoid that two points are created simultaneously in separate threads
@@ -171,15 +172,15 @@ class Map : public std::enable_shared_from_this<Map> {
   unsigned long int mnId;
 
   std::set<MapPoint*> mspMapPoints;
-  std::set<KeyFrame*> mspKeyFrames;
+  std::set<std::shared_ptr<KeyFrame> > mspKeyFrames;
 
   // Save/load, the set structure is broken in libboost 1.58 for ubuntu 16.04, a
   // vector is serializated
   std::vector<MapPoint*> mvpBackupMapPoints;
-  std::vector<KeyFrame*> mvpBackupKeyFrames;
+  std::vector<std::shared_ptr<KeyFrame> > mvpBackupKeyFrames;
 
-  KeyFrame* mpKFinitial;
-  KeyFrame* mpKFlowerID;
+  std::shared_ptr<KeyFrame> mpKFinitial;
+  std::shared_ptr<KeyFrame> mpKFlowerID;
 
   unsigned long int mnBackupKFinitialID;
   unsigned long int mnBackupKFlowerID;

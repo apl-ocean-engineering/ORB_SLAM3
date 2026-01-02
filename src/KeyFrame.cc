@@ -39,77 +39,78 @@ namespace ORB_SLAM3 {
 
 unsigned long int KeyFrame::nNextId = 0;
 
-KeyFrame::KeyFrame()
-    : mnFrameId(0),
-      mTimeStamp(0),
-      mnGridCols(FRAME_GRID_COLS),
-      mnGridRows(FRAME_GRID_ROWS),
-      mfGridElementWidthInv(0),
-      mfGridElementHeightInv(0),
-      mnTrackReferenceForFrame(0),
-      mnFuseTargetForKF(0),
-      mnBALocalForKF(0),
-      mnBAFixedForKF(0),
-      mnBALocalForMerge(0),
-      mnLoopQuery(0),
-      mnLoopWords(0),
-      mnRelocQuery(0),
-      mnRelocWords(0),
-      mnMergeQuery(0),
-      mnMergeWords(0),
-      mnBAGlobalForKF(0),
-      fx(0),
-      fy(0),
-      cx(0),
-      cy(0),
-      invfx(0),
-      invfy(0),
-      mnPlaceRecognitionQuery(0),
-      mnPlaceRecognitionWords(0),
-      mPlaceRecognitionScore(0),
-      mbf(0),
-      mb(0),
-      mThDepth(0),
-      N(0),
-      mvKeys(),
-      mvKeysUn(),
-      mvuRight(),
-      mvDepth(),
-      mnScaleLevels(0),
-      mfScaleFactor(0),
-      mfLogScaleFactor(0),
-      mvScaleFactors(0),
-      mvLevelSigma2(0),
-      mvInvLevelSigma2(0),
-      mnMinX(0),
-      mnMinY(0),
-      mnMaxX(0),
-      mnMaxY(0),
-      mPrevKF(nullptr),
-      mNextKF(nullptr),
-      mbFirstConnection(true),
-      mpBackupImuPreintegrated(std::make_shared<IMU::Preintegrated>()),
-      mpParent(NULL),
-      mbNotErase(false),
-      mbToBeErased(false),
-      mbBad(false),
-      mHalfBaseline(0),
-      mbCurrentPlaceRecognition(false),
-      mnMergeCorrectedForKF(0),
-      NLeft(0),
-      NRight(0),
-      mnNumberOfOpt(0),
-      mbHasVelocity(false) {}
+// KeyFrame::KeyFrame()
+//     : mnFrameId(0),
+//       mTimeStamp(0),
+//       mnGridCols(FRAME_GRID_COLS),
+//       mnGridRows(FRAME_GRID_ROWS),
+//       mfGridElementWidthInv(0),
+//       mfGridElementHeightInv(0),
+//       mnTrackReferenceForFrame(0),
+//       mnFuseTargetForKF(0),
+//       mnBALocalForKF(0),
+//       mnBAFixedForKF(0),
+//       mnBALocalForMerge(0),
+//       mnLoopQuery(0),
+//       mnLoopWords(0),
+//       mnRelocQuery(0),
+//       mnRelocWords(0),
+//       mnMergeQuery(0),
+//       mnMergeWords(0),
+//       mnBAGlobalForKF(0),
+//       fx(0),
+//       fy(0),
+//       cx(0),
+//       cy(0),
+//       invfx(0),
+//       invfy(0),
+//       mnPlaceRecognitionQuery(0),
+//       mnPlaceRecognitionWords(0),
+//       mPlaceRecognitionScore(0),
+//       mbf(0),
+//       mb(0),
+//       mThDepth(0),
+//       N(0),
+//       mvKeys(),
+//       mvKeysUn(),
+//       mvuRight(),
+//       mvDepth(),
+//       mnScaleLevels(0),
+//       mfScaleFactor(0),
+//       mfLogScaleFactor(0),
+//       mvScaleFactors(0),
+//       mvLevelSigma2(0),
+//       mvInvLevelSigma2(0),
+//       mnMinX(0),
+//       mnMinY(0),
+//       mnMaxX(0),
+//       mnMaxY(0),
+//       mPrevKF(nullptr),
+//       mNextKF(nullptr),
+//       mbFirstConnection(true),
+//       mpBackupImuPreintegrated(std::make_shared<IMU::Preintegrated>()),
+//       mpParent(NULL),
+//       mbNotErase(false),
+//       mbToBeErased(false),
+//       mbBad(false),
+//       mHalfBaseline(0),
+//       mbCurrentPlaceRecognition(false),
+//       mnMergeCorrectedForKF(0),
+//       NLeft(0),
+//       NRight(0),
+//       mnNumberOfOpt(0),
+//       mbHasVelocity(false) {}
 
-KeyFrame::KeyFrame(Frame &F, const std::shared_ptr<Map> &pMap,
+KeyFrame::KeyFrame(const std::shared_ptr<Frame> &F,
+                   const std::shared_ptr<Map> &pMap,
                    const std::shared_ptr<KeyFrameDatabase> &pKFDB)
     : bImu(pMap->isImuInitialized()),
-      mnFrameId(F.mnId),
-      mTimeStamp(F.mTimeStamp),
+      mnFrameId(F->mnId),
+      mTimeStamp(F->mTimeStamp),
       mnGridCols(FRAME_GRID_COLS),
       mnGridRows(FRAME_GRID_ROWS),
-      mfGridElementWidthInv(F.mfGridElementWidthInv),
-      mfGridElementHeightInv(F.mfGridElementHeightInv),
+      mfGridElementWidthInv(F->mfGridElementWidthInv),
+      mfGridElementHeightInv(F->mfGridElementHeightInv),
       mnTrackReferenceForFrame(0),
       mnFuseTargetForKF(0),
       mnBALocalForKF(0),
@@ -123,90 +124,90 @@ KeyFrame::KeyFrame(Frame &F, const std::shared_ptr<Map> &pMap,
       mnPlaceRecognitionQuery(0),
       mnPlaceRecognitionWords(0),
       mPlaceRecognitionScore(0),
-      fx(F.fx),
-      fy(F.fy),
-      cx(F.cx),
-      cy(F.cy),
-      invfx(F.invfx),
-      invfy(F.invfy),
-      mbf(F.mbf),
-      mb(F.mb),
-      mThDepth(F.mThDepth),
-      N(F.N),
-      mvKeys(F.mvKeys),
-      mvKeysUn(F.mvKeysUn),
-      mvuRight(F.mvuRight),
-      mvDepth(F.mvDepth),
-      mDescriptors(F.mDescriptors.clone()),
-      mBowVec(F.mBowVec),
-      mFeatVec(F.mFeatVec),
-      mnScaleLevels(F.mnScaleLevels),
-      mfScaleFactor(F.mfScaleFactor),
-      mfLogScaleFactor(F.mfLogScaleFactor),
-      mvScaleFactors(F.mvScaleFactors),
-      mvLevelSigma2(F.mvLevelSigma2),
-      mvInvLevelSigma2(F.mvInvLevelSigma2),
-      mnMinX(F.mnMinX),
-      mnMinY(F.mnMinY),
-      mnMaxX(F.mnMaxX),
-      mnMaxY(F.mnMaxY),
-      mK_(F.mK_),
+      fx(F->fx),
+      fy(F->fy),
+      cx(F->cx),
+      cy(F->cy),
+      invfx(F->invfx),
+      invfy(F->invfy),
+      mbf(F->mbf),
+      mb(F->mb),
+      mThDepth(F->mThDepth),
+      N(F->N),
+      mvKeys(F->mvKeys),
+      mvKeysUn(F->mvKeysUn),
+      mvuRight(F->mvuRight),
+      mvDepth(F->mvDepth),
+      mDescriptors(F->mDescriptors.clone()),
+      mBowVec(F->mBowVec),
+      mFeatVec(F->mFeatVec),
+      mnScaleLevels(F->mnScaleLevels),
+      mfScaleFactor(F->mfScaleFactor),
+      mfLogScaleFactor(F->mfLogScaleFactor),
+      mvScaleFactors(F->mvScaleFactors),
+      mvLevelSigma2(F->mvLevelSigma2),
+      mvInvLevelSigma2(F->mvInvLevelSigma2),
+      mnMinX(F->mnMinX),
+      mnMinY(F->mnMinY),
+      mnMaxX(F->mnMaxX),
+      mnMaxY(F->mnMaxY),
+      mK_(F->mK_),
       mPrevKF(NULL),
       mNextKF(NULL),
-      mpImuPreintegrated(F.mpImuPreintegrated),
+      mpImuPreintegrated(F->mpImuPreintegrated),
       mpBackupImuPreintegrated(std::make_shared<IMU::Preintegrated>()),
-      mImuCalib(F.mImuCalib),
-      mvpMapPoints(F.mvpMapPoints),
+      mImuCalib(F->mImuCalib),
+      mvpMapPoints(F->mvpMapPoints),
       mpKeyFrameDB(pKFDB),
-      mpORBvocabulary(F.mpORBvocabulary),
+      mpORBvocabulary(F->mpORBvocabulary),
       mbFirstConnection(true),
       mpParent(NULL),
-      mDistCoef(F.mDistCoef),
+      mDistCoef(F->mDistCoef),
       mbNotErase(false),
-      mnDataset(F.mnDataset),
+      mnDataset(F->mnDataset),
       mbToBeErased(false),
       mbBad(false),
-      mHalfBaseline(F.mb / 2),
+      mHalfBaseline(F->mb / 2),
       mpMap(pMap),
       mbCurrentPlaceRecognition(false),
-      mNameFile(F.mNameFile),
+      mNameFile(F->mNameFile),
       mnMergeCorrectedForKF(0),
-      mpCamera(F.mpCamera),
-      mpCamera2(F.mpCamera2),
-      mvLeftToRightMatch(F.mvLeftToRightMatch),
-      mvRightToLeftMatch(F.mvRightToLeftMatch),
-      mTlr(F.GetRelativePoseTlr()),
-      mvKeysRight(F.mvKeysRight),
-      NLeft(F.Nleft),
-      NRight(F.Nright),
-      mTrl(F.GetRelativePoseTrl()),
+      mpCamera(F->mpCamera),
+      mpCamera2(F->mpCamera2),
+      mvLeftToRightMatch(F->mvLeftToRightMatch),
+      mvRightToLeftMatch(F->mvRightToLeftMatch),
+      mTlr(F->GetRelativePoseTlr()),
+      mvKeysRight(F->mvKeysRight),
+      NLeft(F->Nleft),
+      NRight(F->Nright),
+      mTrl(F->GetRelativePoseTrl()),
       mnNumberOfOpt(0),
       mbHasVelocity(false) {
   mnId = nNextId++;
 
   mGrid.resize(mnGridCols);
-  if (F.Nleft != -1) mGridRight.resize(mnGridCols);
+  if (F->Nleft != -1) mGridRight.resize(mnGridCols);
   for (int i = 0; i < mnGridCols; i++) {
     mGrid[i].resize(mnGridRows);
-    if (F.Nleft != -1) mGridRight[i].resize(mnGridRows);
+    if (F->Nleft != -1) mGridRight[i].resize(mnGridRows);
     for (int j = 0; j < mnGridRows; j++) {
-      mGrid[i][j] = F.mGrid[i][j];
-      if (F.Nleft != -1) {
-        mGridRight[i][j] = F.mGridRight[i][j];
+      mGrid[i][j] = F->mGrid[i][j];
+      if (F->Nleft != -1) {
+        mGridRight[i][j] = F->mGridRight[i][j];
       }
     }
   }
 
-  if (!F.HasVelocity()) {
+  if (!F->HasVelocity()) {
     mVw.setZero();
     mbHasVelocity = false;
   } else {
-    mVw = F.GetVelocity();
+    mVw = F->GetVelocity();
     mbHasVelocity = true;
   }
 
-  mImuBias = F.mImuBias;
-  SetPose(F.GetPose());
+  mImuBias = F->mImuBias;
+  SetPose(F->GetPose());
 
   mnOriginMapId = pMap->GetId();
 }
@@ -291,7 +292,8 @@ bool KeyFrame::isVelocitySet() {
   return mbHasVelocity;
 }
 
-void KeyFrame::AddConnection(KeyFrame *pKF, const int &weight) {
+void KeyFrame::AddConnection(const std::shared_ptr<KeyFrame> &pKF,
+                             const int &weight) {
   {
     unique_lock<mutex> lock(mMutexConnections);
     if (!mConnectedKeyFrameWeights.count(pKF))
@@ -307,15 +309,16 @@ void KeyFrame::AddConnection(KeyFrame *pKF, const int &weight) {
 
 void KeyFrame::UpdateBestCovisibles() {
   unique_lock<mutex> lock(mMutexConnections);
-  vector<pair<int, KeyFrame *>> vPairs;
+  vector<pair<int, std::shared_ptr<KeyFrame>>> vPairs;
   vPairs.reserve(mConnectedKeyFrameWeights.size());
-  for (map<KeyFrame *, int>::iterator mit = mConnectedKeyFrameWeights.begin(),
-                                      mend = mConnectedKeyFrameWeights.end();
+  for (map<std::shared_ptr<KeyFrame>, int>::iterator
+           mit = mConnectedKeyFrameWeights.begin(),
+           mend = mConnectedKeyFrameWeights.end();
        mit != mend; mit++)
     vPairs.push_back(make_pair(mit->second, mit->first));
 
   sort(vPairs.begin(), vPairs.end());
-  list<KeyFrame *> lKFs;
+  list<std::shared_ptr<KeyFrame>> lKFs;
   list<int> lWs;
   for (size_t i = 0, iend = vPairs.size(); i < iend; i++) {
     if (!vPairs[i].second->isBad()) {
@@ -324,38 +327,42 @@ void KeyFrame::UpdateBestCovisibles() {
     }
   }
 
-  mvpOrderedConnectedKeyFrames = vector<KeyFrame *>(lKFs.begin(), lKFs.end());
+  mvpOrderedConnectedKeyFrames =
+      vector<std::shared_ptr<KeyFrame>>(lKFs.begin(), lKFs.end());
   mvOrderedWeights = vector<int>(lWs.begin(), lWs.end());
 }
 
-set<KeyFrame *> KeyFrame::GetConnectedKeyFrames() {
+set<std::shared_ptr<KeyFrame>> KeyFrame::GetConnectedKeyFrames() {
   unique_lock<mutex> lock(mMutexConnections);
-  set<KeyFrame *> s;
-  for (map<KeyFrame *, int>::iterator mit = mConnectedKeyFrameWeights.begin();
+  set<std::shared_ptr<KeyFrame>> s;
+  for (map<std::shared_ptr<KeyFrame>, int>::iterator mit =
+           mConnectedKeyFrameWeights.begin();
        mit != mConnectedKeyFrameWeights.end(); mit++)
     s.insert(mit->first);
   return s;
 }
 
-vector<KeyFrame *> KeyFrame::GetVectorCovisibleKeyFrames() {
+vector<std::shared_ptr<KeyFrame>> KeyFrame::GetVectorCovisibleKeyFrames() {
   unique_lock<mutex> lock(mMutexConnections);
   return mvpOrderedConnectedKeyFrames;
 }
 
-vector<KeyFrame *> KeyFrame::GetBestCovisibilityKeyFrames(const int &N) {
+vector<std::shared_ptr<KeyFrame>> KeyFrame::GetBestCovisibilityKeyFrames(
+    int N) {
   unique_lock<mutex> lock(mMutexConnections);
-  if (static_cast<int>(mvpOrderedConnectedKeyFrames.size() < N))
+  if (mvpOrderedConnectedKeyFrames.size() < N)
     return mvpOrderedConnectedKeyFrames;
   else
-    return vector<KeyFrame *>(mvpOrderedConnectedKeyFrames.begin(),
-                              mvpOrderedConnectedKeyFrames.begin() + N);
+    return vector<std::shared_ptr<KeyFrame>>(
+        mvpOrderedConnectedKeyFrames.begin(),
+        mvpOrderedConnectedKeyFrames.begin() + N);
 }
 
-vector<KeyFrame *> KeyFrame::GetCovisiblesByWeight(const int &w) {
+vector<std::shared_ptr<KeyFrame>> KeyFrame::GetCovisiblesByWeight(int w) {
   unique_lock<mutex> lock(mMutexConnections);
 
   if (mvpOrderedConnectedKeyFrames.empty()) {
-    return vector<KeyFrame *>();
+    return vector<std::shared_ptr<KeyFrame>>();
   }
 
   vector<int>::iterator it =
@@ -363,15 +370,16 @@ vector<KeyFrame *> KeyFrame::GetCovisiblesByWeight(const int &w) {
                   KeyFrame::weightComp);
 
   if (it == mvOrderedWeights.end() && mvOrderedWeights.back() < w) {
-    return vector<KeyFrame *>();
+    return vector<std::shared_ptr<KeyFrame>>();
   } else {
     int n = it - mvOrderedWeights.begin();
-    return vector<KeyFrame *>(mvpOrderedConnectedKeyFrames.begin(),
-                              mvpOrderedConnectedKeyFrames.begin() + n);
+    return vector<std::shared_ptr<KeyFrame>>(
+        mvpOrderedConnectedKeyFrames.begin(),
+        mvpOrderedConnectedKeyFrames.begin() + n);
   }
 }
 
-int KeyFrame::GetWeight(KeyFrame *pKF) {
+int KeyFrame::GetWeight(const std::shared_ptr<KeyFrame> &pKF) {
   unique_lock<mutex> lock(mMutexConnections);
   if (mConnectedKeyFrameWeights.count(pKF))
     return mConnectedKeyFrameWeights[pKF];
@@ -400,7 +408,7 @@ void KeyFrame::EraseMapPointMatch(const int &idx) {
 }
 
 void KeyFrame::EraseMapPointMatch(MapPoint *pMP) {
-  tuple<size_t, size_t> indexes = pMP->GetIndexInKeyFrame(this);
+  tuple<size_t, size_t> indexes = pMP->GetIndexInKeyFrame(shared_from_this());
   size_t leftIndex = get<0>(indexes), rightIndex = get<1>(indexes);
   if (leftIndex != -1) mvpMapPoints[leftIndex] = static_cast<MapPoint *>(NULL);
   if (rightIndex != -1)
@@ -454,7 +462,7 @@ MapPoint *KeyFrame::GetMapPoint(const size_t &idx) {
 }
 
 void KeyFrame::UpdateConnections(bool upParent) {
-  map<KeyFrame *, int> KFcounter;
+  map<std::shared_ptr<KeyFrame>, int> KFcounter;
 
   vector<MapPoint *> vpMP;
 
@@ -473,10 +481,12 @@ void KeyFrame::UpdateConnections(bool upParent) {
 
     if (pMP->isBad()) continue;
 
-    map<KeyFrame *, tuple<int, int>> observations = pMP->GetObservations();
+    map<std::shared_ptr<KeyFrame>, tuple<int, int>> observations =
+        pMP->GetObservations();
 
-    for (map<KeyFrame *, tuple<int, int>>::iterator mit = observations.begin(),
-                                                    mend = observations.end();
+    for (map<std::shared_ptr<KeyFrame>, tuple<int, int>>::iterator
+             mit = observations.begin(),
+             mend = observations.end();
          mit != mend; mit++) {
       if (mit->first->mnId == mnId || mit->first->isBad() ||
           mit->first->GetMap() != mpMap)
@@ -492,14 +502,14 @@ void KeyFrame::UpdateConnections(bool upParent) {
   // In case no keyframe counter is over threshold add the one with maximum
   // counter
   int nmax = 0;
-  KeyFrame *pKFmax = NULL;
+  std::shared_ptr<KeyFrame> pKFmax = NULL;
   int th = 15;
 
-  vector<pair<int, KeyFrame *>> vPairs;
+  vector<pair<int, std::shared_ptr<KeyFrame>>> vPairs;
   vPairs.reserve(KFcounter.size());
   if (!upParent) cout << "UPDATE_CONN: current KF " << mnId << endl;
-  for (map<KeyFrame *, int>::iterator mit = KFcounter.begin(),
-                                      mend = KFcounter.end();
+  for (map<std::shared_ptr<KeyFrame>, int>::iterator mit = KFcounter.begin(),
+                                                     mend = KFcounter.end();
        mit != mend; mit++) {
     if (!upParent)
       cout << "  UPDATE_CONN: KF " << mit->first->mnId
@@ -510,17 +520,17 @@ void KeyFrame::UpdateConnections(bool upParent) {
     }
     if (mit->second >= th) {
       vPairs.push_back(make_pair(mit->second, mit->first));
-      (mit->first)->AddConnection(this, mit->second);
+      (mit->first)->AddConnection(shared_from_this(), mit->second);
     }
   }
 
   if (vPairs.empty()) {
     vPairs.push_back(make_pair(nmax, pKFmax));
-    pKFmax->AddConnection(this, nmax);
+    pKFmax->AddConnection(shared_from_this(), nmax);
   }
 
   sort(vPairs.begin(), vPairs.end());
-  list<KeyFrame *> lKFs;
+  list<std::shared_ptr<KeyFrame>> lKFs;
   list<int> lWs;
   for (size_t i = 0; i < vPairs.size(); i++) {
     lKFs.push_front(vPairs[i].second);
@@ -531,50 +541,51 @@ void KeyFrame::UpdateConnections(bool upParent) {
     unique_lock<mutex> lockCon(mMutexConnections);
 
     mConnectedKeyFrameWeights = KFcounter;
-    mvpOrderedConnectedKeyFrames = vector<KeyFrame *>(lKFs.begin(), lKFs.end());
+    mvpOrderedConnectedKeyFrames =
+        vector<std::shared_ptr<KeyFrame>>(lKFs.begin(), lKFs.end());
     mvOrderedWeights = vector<int>(lWs.begin(), lWs.end());
 
     if (mbFirstConnection && mnId != mpMap->GetInitKFid()) {
       mpParent = mvpOrderedConnectedKeyFrames.front();
-      mpParent->AddChild(this);
+      mpParent->AddChild(shared_from_this());
       mbFirstConnection = false;
     }
   }
 }
 
-void KeyFrame::AddChild(KeyFrame *pKF) {
+void KeyFrame::AddChild(const std::shared_ptr<KeyFrame> &pKF) {
   unique_lock<mutex> lockCon(mMutexConnections);
   mspChildrens.insert(pKF);
 }
 
-void KeyFrame::EraseChild(KeyFrame *pKF) {
+void KeyFrame::EraseChild(const std::shared_ptr<KeyFrame> &pKF) {
   unique_lock<mutex> lockCon(mMutexConnections);
   mspChildrens.erase(pKF);
 }
 
-void KeyFrame::ChangeParent(KeyFrame *pKF) {
+void KeyFrame::ChangeParent(const std::shared_ptr<KeyFrame> &pKF) {
   unique_lock<mutex> lockCon(mMutexConnections);
-  if (pKF == this) {
+  if (pKF == shared_from_this()) {
     cout << "ERROR: Change parent KF, the parent and child are the same KF"
          << endl;
     throw std::invalid_argument("The parent and child can not be the same");
   }
 
   mpParent = pKF;
-  pKF->AddChild(this);
+  pKF->AddChild(shared_from_this());
 }
 
-set<KeyFrame *> KeyFrame::GetChilds() {
+set<std::shared_ptr<KeyFrame>> KeyFrame::GetChilds() {
   unique_lock<mutex> lockCon(mMutexConnections);
   return mspChildrens;
 }
 
-KeyFrame *KeyFrame::GetParent() {
+std::shared_ptr<KeyFrame> KeyFrame::GetParent() {
   unique_lock<mutex> lockCon(mMutexConnections);
   return mpParent;
 }
 
-bool KeyFrame::hasChild(KeyFrame *pKF) {
+bool KeyFrame::hasChild(const std::shared_ptr<KeyFrame> &pKF) {
   unique_lock<mutex> lockCon(mMutexConnections);
   return mspChildrens.count(pKF);
 }
@@ -584,24 +595,24 @@ void KeyFrame::SetFirstConnection(bool bFirst) {
   mbFirstConnection = bFirst;
 }
 
-void KeyFrame::AddLoopEdge(KeyFrame *pKF) {
+void KeyFrame::AddLoopEdge(const std::shared_ptr<KeyFrame> &pKF) {
   unique_lock<mutex> lockCon(mMutexConnections);
   mbNotErase = true;
   mspLoopEdges.insert(pKF);
 }
 
-set<KeyFrame *> KeyFrame::GetLoopEdges() {
+set<std::shared_ptr<KeyFrame>> KeyFrame::GetLoopEdges() {
   unique_lock<mutex> lockCon(mMutexConnections);
   return mspLoopEdges;
 }
 
-void KeyFrame::AddMergeEdge(KeyFrame *pKF) {
+void KeyFrame::AddMergeEdge(const std::shared_ptr<KeyFrame> &pKF) {
   unique_lock<mutex> lockCon(mMutexConnections);
   mbNotErase = true;
   mspMergeEdges.insert(pKF);
 }
 
-set<KeyFrame *> KeyFrame::GetMergeEdges() {
+set<std::shared_ptr<KeyFrame>> KeyFrame::GetMergeEdges() {
   unique_lock<mutex> lockCon(mMutexConnections);
   return mspMergeEdges;
 }
@@ -635,15 +646,16 @@ void KeyFrame::SetBadFlag() {
     }
   }
 
-  for (map<KeyFrame *, int>::iterator mit = mConnectedKeyFrameWeights.begin(),
-                                      mend = mConnectedKeyFrameWeights.end();
+  for (map<std::shared_ptr<KeyFrame>, int>::iterator
+           mit = mConnectedKeyFrameWeights.begin(),
+           mend = mConnectedKeyFrameWeights.end();
        mit != mend; mit++) {
-    mit->first->EraseConnection(this);
+    mit->first->EraseConnection(shared_from_this());
   }
 
   for (size_t i = 0; i < mvpMapPoints.size(); i++) {
     if (mvpMapPoints[i]) {
-      mvpMapPoints[i]->EraseObservation(this);
+      mvpMapPoints[i]->EraseObservation(shared_from_this());
     }
   }
 
@@ -655,7 +667,7 @@ void KeyFrame::SetBadFlag() {
     mvpOrderedConnectedKeyFrames.clear();
 
     // Update Spanning Tree
-    set<KeyFrame *> sParentCandidates;
+    set<std::shared_ptr<KeyFrame>> sParentCandidates;
     if (mpParent) sParentCandidates.insert(mpParent);
 
     // Assign at each iteration one children with a parent (the pair with
@@ -665,20 +677,22 @@ void KeyFrame::SetBadFlag() {
       bool bContinue = false;
 
       int max = -1;
-      KeyFrame *pC;
-      KeyFrame *pP;
+      std::shared_ptr<KeyFrame> pC;
+      std::shared_ptr<KeyFrame> pP;
 
-      for (set<KeyFrame *>::iterator sit = mspChildrens.begin(),
-                                     send = mspChildrens.end();
+      for (set<std::shared_ptr<KeyFrame>>::iterator sit = mspChildrens.begin(),
+                                                    send = mspChildrens.end();
            sit != send; sit++) {
-        KeyFrame *pKF = *sit;
+        std::shared_ptr<KeyFrame> pKF = *sit;
         if (pKF->isBad()) continue;
 
         // Check if a parent candidate is connected to the keyframe
-        vector<KeyFrame *> vpConnected = pKF->GetVectorCovisibleKeyFrames();
+        vector<std::shared_ptr<KeyFrame>> vpConnected =
+            pKF->GetVectorCovisibleKeyFrames();
         for (size_t i = 0, iend = vpConnected.size(); i < iend; i++) {
-          for (set<KeyFrame *>::iterator spcit = sParentCandidates.begin(),
-                                         spcend = sParentCandidates.end();
+          for (set<std::shared_ptr<KeyFrame>>::iterator
+                   spcit = sParentCandidates.begin(),
+                   spcend = sParentCandidates.end();
                spcit != spcend; spcit++) {
             if (vpConnected[i]->mnId == (*spcit)->mnId) {
               int w = pKF->GetWeight(vpConnected[i]);
@@ -705,21 +719,21 @@ void KeyFrame::SetBadFlag() {
     // If a children has no covisibility links with any parent candidate, assign
     // to the original parent of this KF
     if (!mspChildrens.empty()) {
-      for (set<KeyFrame *>::iterator sit = mspChildrens.begin();
+      for (set<std::shared_ptr<KeyFrame>>::iterator sit = mspChildrens.begin();
            sit != mspChildrens.end(); sit++) {
         (*sit)->ChangeParent(mpParent);
       }
     }
 
     if (mpParent) {
-      mpParent->EraseChild(this);
+      mpParent->EraseChild(shared_from_this());
       mTcp = mTcw * mpParent->GetPoseInverse();
     }
     mbBad = true;
   }
 
-  mpMap->EraseKeyFrame(this);
-  mpKeyFrameDB->erase(this);
+  mpMap->EraseKeyFrame(shared_from_this());
+  mpKeyFrameDB->erase(shared_from_this());
 }
 
 bool KeyFrame::isBad() {
@@ -727,7 +741,7 @@ bool KeyFrame::isBad() {
   return mbBad;
 }
 
-void KeyFrame::EraseConnection(KeyFrame *pKF) {
+void KeyFrame::EraseConnection(const std::shared_ptr<KeyFrame> &pKF) {
   bool bUpdate = false;
   {
     unique_lock<mutex> lock(mMutexConnections);
@@ -870,7 +884,8 @@ void KeyFrame::UpdateMap(const std::shared_ptr<Map> &pMap) {
   mpMap = pMap;
 }
 
-void KeyFrame::PreSave(set<KeyFrame *> &spKF, set<MapPoint *> &spMP,
+void KeyFrame::PreSave(set<std::shared_ptr<KeyFrame>> &spKF,
+                       set<MapPoint *> &spMP,
                        set<std::shared_ptr<GeometricCamera>> &spCam) {
   // Save the id of each MapPoint in this KF, there can be null pointer in the
   // vector
@@ -886,7 +901,7 @@ void KeyFrame::PreSave(set<KeyFrame *> &spKF, set<MapPoint *> &spMP,
   }
   // Save the id of each connected KF with it weight
   mBackupConnectedKeyFrameIdWeights.clear();
-  for (std::map<KeyFrame *, int>::const_iterator
+  for (std::map<std::shared_ptr<KeyFrame>, int>::const_iterator
            it = mConnectedKeyFrameWeights.begin(),
            end = mConnectedKeyFrameWeights.end();
        it != end; ++it) {
@@ -902,7 +917,7 @@ void KeyFrame::PreSave(set<KeyFrame *> &spKF, set<MapPoint *> &spMP,
   // Save the id of the childrens KF
   mvBackupChildrensId.clear();
   mvBackupChildrensId.reserve(mspChildrens.size());
-  for (KeyFrame *pKFi : mspChildrens) {
+  for (auto pKFi : mspChildrens) {
     if (spKF.find(pKFi) != spKF.end())
       mvBackupChildrensId.push_back(pKFi->mnId);
   }
@@ -910,7 +925,7 @@ void KeyFrame::PreSave(set<KeyFrame *> &spKF, set<MapPoint *> &spMP,
   // Save the id of the loop edge KF
   mvBackupLoopEdgesId.clear();
   mvBackupLoopEdgesId.reserve(mspLoopEdges.size());
-  for (KeyFrame *pKFi : mspLoopEdges) {
+  for (auto pKFi : mspLoopEdges) {
     if (spKF.find(pKFi) != spKF.end())
       mvBackupLoopEdgesId.push_back(pKFi->mnId);
   }
@@ -918,7 +933,7 @@ void KeyFrame::PreSave(set<KeyFrame *> &spKF, set<MapPoint *> &spMP,
   // Save the id of the merge edge KF
   mvBackupMergeEdgesId.clear();
   mvBackupMergeEdgesId.reserve(mspMergeEdges.size());
-  for (KeyFrame *pKFi : mspMergeEdges) {
+  for (auto pKFi : mspMergeEdges) {
     if (spKF.find(pKFi) != spKF.end())
       mvBackupMergeEdgesId.push_back(pKFi->mnId);
   }
@@ -946,7 +961,7 @@ void KeyFrame::PreSave(set<KeyFrame *> &spKF, set<MapPoint *> &spMP,
 }
 
 void KeyFrame::PostLoad(
-    map<unsigned long int, KeyFrame *> &mpKFid,
+    map<unsigned long int, std::shared_ptr<KeyFrame>> &mpKFid,
     map<unsigned long int, MapPoint *> &mpMPid,
     map<unsigned int, std::shared_ptr<GeometricCamera>> &mpCamId) {
   // Rebuild the empty variables
@@ -973,7 +988,7 @@ void KeyFrame::PostLoad(
            it = mBackupConnectedKeyFrameIdWeights.begin(),
            end = mBackupConnectedKeyFrameIdWeights.end();
        it != end; ++it) {
-    KeyFrame *pKFi = mpKFid[it->first];
+    std::shared_ptr<KeyFrame> pKFi = mpKFid[it->first];
     mConnectedKeyFrameWeights[pKFi] = it->second;
   }
 

@@ -86,14 +86,14 @@ class Atlas {
   void SetViewer(const std::shared_ptr<Viewer> &pViewer);
 
   // Method for change components in the current map
-  void AddKeyFrame(KeyFrame *pKF);
+  void AddKeyFrame(const std::shared_ptr<KeyFrame> &pKF);
   void AddMapPoint(MapPoint *pMP);
   // void EraseMapPoint(MapPoint* pMP);
   // void EraseKeyFrame(KeyFrame* pKF);
 
   std::shared_ptr<GeometricCamera> AddCamera(
       const std::shared_ptr<GeometricCamera> &pCam);
-  std::vector<std::shared_ptr<GeometricCamera> > GetAllCameras();
+  std::vector<std::shared_ptr<GeometricCamera>> GetAllCameras();
 
   /* All methods without Map pointer work on current map */
   void SetReferenceMapPoints(const std::vector<MapPoint *> &vpMPs);
@@ -104,11 +104,11 @@ class Atlas {
   long unsigned KeyFramesInMap();
 
   // Method for get data in current map
-  std::vector<KeyFrame *> GetAllKeyFrames();
+  std::vector<std::shared_ptr<KeyFrame>> GetAllKeyFrames();
   std::vector<MapPoint *> GetAllMapPoints();
   std::vector<MapPoint *> GetReferenceMapPoints();
 
-  vector<std::shared_ptr<Map> > GetAllMaps();
+  vector<std::shared_ptr<Map>> GetAllMaps();
 
   int CountMaps();
 
@@ -130,7 +130,7 @@ class Atlas {
   void PreSave();
   void PostLoad();
 
-  map<long unsigned int, KeyFrame *> GetAtlasKeyframes();
+  map<long unsigned int, std::shared_ptr<KeyFrame>> GetAtlasKeyframes();
 
   void SetKeyFrameDababase(const std::shared_ptr<KeyFrameDatabase> &pKFDB);
   std::shared_ptr<KeyFrameDatabase> GetKeyFrameDatabase();
@@ -143,15 +143,15 @@ class Atlas {
   long unsigned int GetNumLivedMP();
 
  protected:
-  std::set<std::shared_ptr<Map> > mspMaps;
-  std::set<std::shared_ptr<Map> > mspBadMaps;
+  std::set<std::shared_ptr<Map>> mspMaps;
+  std::set<std::shared_ptr<Map>> mspBadMaps;
   // Its necessary change the container from set to vector because libboost 1.58
   // and Ubuntu 16.04 have an error with this cointainer
-  std::vector<std::shared_ptr<Map> > mvpBackupMaps;
+  std::vector<std::shared_ptr<Map>> mvpBackupMaps;
 
   std::shared_ptr<Map> mpCurrentMap;
 
-  std::vector<std::shared_ptr<GeometricCamera> > mvpCameras;
+  std::vector<std::shared_ptr<GeometricCamera>> mvpCameras;
 
   unsigned long int mnLastInitKFidMap;
 

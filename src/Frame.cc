@@ -68,7 +68,8 @@ Frame::Frame()
 
 // Copy Constructor
 Frame::Frame(const Frame &frame)
-    : mpcpi(frame.mpcpi),
+    : std::enable_shared_from_this<Frame>(),
+      mpcpi(frame.mpcpi),
       mpORBvocabulary(frame.mpORBvocabulary),
       mpORBextractorLeft(frame.mpORBextractorLeft),
       mpORBextractorRight(frame.mpORBextractorRight),
@@ -157,8 +158,8 @@ Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight,
              const std::shared_ptr<ORBextractor> &extractorRight,
              const std::shared_ptr<ORBVocabulary> &voc, cv::Mat &K,
              cv::Mat &distCoef, const float &bf, const float &thDepth,
-             const std::shared_ptr<GeometricCamera> &pCamera, Frame *pPrevF,
-             const IMU::Calib &ImuCalib)
+             const std::shared_ptr<GeometricCamera> &pCamera,
+             const std::shared_ptr<Frame> &pPrevF, const IMU::Calib &ImuCalib)
     : mpcpi(nullptr),
       mpORBvocabulary(voc),
       mpORBextractorLeft(extractorLeft),
@@ -173,7 +174,7 @@ Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight,
       mpImuPreintegrated(nullptr),
       mpPrevFrame(pPrevF),
       mpImuPreintegratedFrame(nullptr),
-      mpReferenceKF(static_cast<KeyFrame *>(nullptr)),
+      mpReferenceKF(),
       mbIsSet(false),
       mbImuPreintegrated(false),
       mpCamera(pCamera),
@@ -283,8 +284,8 @@ Frame::Frame(const cv::Mat &imGray, const cv::Mat &imDepth,
              const std::shared_ptr<ORBextractor> &extractor,
              const std::shared_ptr<ORBVocabulary> &voc, cv::Mat &K,
              cv::Mat &distCoef, const float &bf, const float &thDepth,
-             const std::shared_ptr<GeometricCamera> &pCamera, Frame *pPrevF,
-             const IMU::Calib &ImuCalib)
+             const std::shared_ptr<GeometricCamera> &pCamera,
+             const std::shared_ptr<Frame> &pPrevF, const IMU::Calib &ImuCalib)
     : mpcpi(nullptr),
       mpORBvocabulary(voc),
       mpORBextractorLeft(extractor),
@@ -299,7 +300,7 @@ Frame::Frame(const cv::Mat &imGray, const cv::Mat &imDepth,
       mpImuPreintegrated(nullptr),
       mpPrevFrame(pPrevF),
       mpImuPreintegratedFrame(nullptr),
-      mpReferenceKF(static_cast<KeyFrame *>(nullptr)),
+      mpReferenceKF(),
       mbIsSet(false),
       mbImuPreintegrated(false),
       mpCamera(pCamera),
@@ -395,8 +396,8 @@ Frame::Frame(const cv::Mat &imGray, const double &timeStamp,
              const std::shared_ptr<ORBextractor> &extractor,
              const std::shared_ptr<ORBVocabulary> &voc,
              const std::shared_ptr<GeometricCamera> &pCamera, cv::Mat &distCoef,
-             const float &bf, const float &thDepth, Frame *pPrevF,
-             const IMU::Calib &ImuCalib)
+             const float &bf, const float &thDepth,
+             const std::shared_ptr<Frame> &pPrevF, const IMU::Calib &ImuCalib)
     : mpcpi(nullptr),
       mpORBvocabulary(voc),
       mpORBextractorLeft(extractor),
@@ -662,7 +663,7 @@ bool Frame::isInFrustum(MapPoint *pMP, float viewingCosLimit) {
     if (viewCos < viewingCosLimit) return false;
 
     // Predict scale in the image
-    const int nPredictedLevel = pMP->PredictScale(dist, this);
+    const int nPredictedLevel = pMP->PredictScale(dist, shared_from_this());
 
     // Data used by the tracking
     pMP->mbTrackInView = true;
@@ -1119,7 +1120,8 @@ Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight,
              cv::Mat &distCoef, const float &bf, const float &thDepth,
              const std::shared_ptr<GeometricCamera> &pCamera,
              const std::shared_ptr<GeometricCamera> &pCamera2,
-             Sophus::SE3f &Tlr, Frame *pPrevF, const IMU::Calib &ImuCalib)
+             Sophus::SE3f &Tlr, const std::shared_ptr<Frame> &pPrevF,
+             const IMU::Calib &ImuCalib)
     : mpcpi(nullptr),
       mpORBvocabulary(voc),
       mpORBextractorLeft(extractorLeft),
@@ -1134,7 +1136,7 @@ Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight,
       mpImuPreintegrated(nullptr),
       mpPrevFrame(pPrevF),
       mpImuPreintegratedFrame(nullptr),
-      mpReferenceKF(static_cast<KeyFrame *>(nullptr)),
+      mpReferenceKF(),
       mbImuPreintegrated(false),
       mpCamera(pCamera),
       mpCamera2(pCamera2),
@@ -1349,7 +1351,7 @@ bool Frame::isInFrustumChecks(MapPoint *pMP, float viewingCosLimit,
   if (viewCos < viewingCosLimit) return false;
 
   // Predict scale in the image
-  const int nPredictedLevel = pMP->PredictScale(dist, this);
+  const int nPredictedLevel = pMP->PredictScale(dist, shared_from_this());
 
   if (bRight) {
     pMP->mTrackProjXR = uv(0);

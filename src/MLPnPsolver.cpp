@@ -54,23 +54,24 @@
 #include <Eigen/Sparse>
 #include <algorithm>
 #include <limits>
+#include <memory>
 #include <vector>
 
 namespace ORB_SLAM3 {
-MLPnPsolver::MLPnPsolver(const Frame &F,
+MLPnPsolver::MLPnPsolver(const std::shared_ptr<Frame> &F,
                          const vector<MapPoint *> &vpMapPointMatches)
     : mnInliersi(0),
       mnIterations(0),
       mnBestInliers(0),
       N(0),
-      mpCamera(F.mpCamera) {
+      mpCamera(F->mpCamera) {
   mvpMapPointMatches = vpMapPointMatches;
-  mvBearingVecs.reserve(F.mvpMapPoints.size());
-  mvP2D.reserve(F.mvpMapPoints.size());
-  mvSigma2.reserve(F.mvpMapPoints.size());
-  mvP3Dw.reserve(F.mvpMapPoints.size());
-  mvKeyPointIndices.reserve(F.mvpMapPoints.size());
-  mvAllIndices.reserve(F.mvpMapPoints.size());
+  mvBearingVecs.reserve(F->mvpMapPoints.size());
+  mvP2D.reserve(F->mvpMapPoints.size());
+  mvSigma2.reserve(F->mvpMapPoints.size());
+  mvP3Dw.reserve(F->mvpMapPoints.size());
+  mvKeyPointIndices.reserve(F->mvpMapPoints.size());
+  mvAllIndices.reserve(F->mvpMapPoints.size());
 
   int idx = 0;
   for (size_t i = 0, iend = mvpMapPointMatches.size(); i < iend; i++) {
@@ -78,11 +79,11 @@ MLPnPsolver::MLPnPsolver(const Frame &F,
 
     if (pMP) {
       if (!pMP->isBad()) {
-        if (i >= F.mvKeysUn.size()) continue;
-        const cv::KeyPoint &kp = F.mvKeysUn[i];
+        if (i >= F->mvKeysUn.size()) continue;
+        const cv::KeyPoint &kp = F->mvKeysUn[i];
 
         mvP2D.push_back(kp.pt);
-        mvSigma2.push_back(F.mvLevelSigma2[kp.octave]);
+        mvSigma2.push_back(F->mvLevelSigma2[kp.octave]);
 
         // Bearing vector should be normalized
         cv::Point3f cv_br = mpCamera->unproject(kp.pt);

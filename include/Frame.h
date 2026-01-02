@@ -48,7 +48,7 @@ class ConstraintPoseImu;
 class GeometricCamera;
 class ORBextractor;
 
-class Frame {
+class Frame : public std::enable_shared_from_this<Frame> {
  public:
   Frame();
 
@@ -62,7 +62,7 @@ class Frame {
         const std::shared_ptr<ORBVocabulary> &voc, cv::Mat &K,
         cv::Mat &distCoef, const float &bf, const float &thDepth,
         const std::shared_ptr<GeometricCamera> &pCamera,
-        Frame *pPrevF = static_cast<Frame *>(NULL),
+        const std::shared_ptr<Frame> &pPrevF = nullptr,
         const IMU::Calib &ImuCalib = IMU::Calib());
 
   // Constructor for RGB-D cameras.
@@ -71,7 +71,7 @@ class Frame {
         const std::shared_ptr<ORBVocabulary> &voc, cv::Mat &K,
         cv::Mat &distCoef, const float &bf, const float &thDepth,
         const std::shared_ptr<GeometricCamera> &pCamera,
-        Frame *pPrevF = static_cast<Frame *>(NULL),
+        const std::shared_ptr<Frame> &pPrevF = nullptr,
         const IMU::Calib &ImuCalib = IMU::Calib());
 
   // Constructor for Monocular cameras.
@@ -80,7 +80,7 @@ class Frame {
         const std::shared_ptr<ORBVocabulary> &voc,
         const std::shared_ptr<GeometricCamera> &pCamera, cv::Mat &distCoef,
         const float &bf, const float &thDepth,
-        Frame *pPrevF = static_cast<Frame *>(NULL),
+        const std::shared_ptr<Frame> &pPrevF = nullptr,
         const IMU::Calib &ImuCalib = IMU::Calib());
 
   // Destructor
@@ -274,10 +274,10 @@ class Frame {
 
   // Imu preintegration from last keyframe
   std::shared_ptr<IMU::Preintegrated> mpImuPreintegrated;
-  KeyFrame *mpLastKeyFrame;
+  std::shared_ptr<KeyFrame> mpLastKeyFrame;
 
   // Pointer to previous frame
-  Frame *mpPrevFrame;
+  std::shared_ptr<Frame> mpPrevFrame;
   std::shared_ptr<IMU::Preintegrated> mpImuPreintegratedFrame;
 
   // Current and Next Frame id.
@@ -285,7 +285,7 @@ class Frame {
   long unsigned int mnId;
 
   // Reference Keyframe.
-  KeyFrame *mpReferenceKF;
+  std::shared_ptr<KeyFrame> mpReferenceKF;
 
   // Scale pyramid info.
   int mnScaleLevels;
@@ -364,7 +364,7 @@ class Frame {
         cv::Mat &distCoef, const float &bf, const float &thDepth,
         const std::shared_ptr<GeometricCamera> &pCamera,
         const std::shared_ptr<GeometricCamera> &pCamera2, Sophus::SE3f &Tlr,
-        Frame *pPrevF = static_cast<Frame *>(NULL),
+        const std::shared_ptr<Frame> &pPrevF = nullptr,
         const IMU::Calib &ImuCalib = IMU::Calib());
 
   // Stereo fisheye
