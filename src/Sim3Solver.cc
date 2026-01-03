@@ -127,7 +127,7 @@ void Sim3Solver::SetRansacParameters(double probability, int minInliers,
   mRansacMinInliers = minInliers;
   mRansacMaxIts = maxIterations;
 
-  N = mvpMapPoints1.size();  // number of correspondences
+  N = std::max<size_t>(1, mvpMapPoints1.size());  // number of correspondences
 
   mvbInliersi.resize(N);
 

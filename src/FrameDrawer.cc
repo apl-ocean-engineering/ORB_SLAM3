@@ -361,6 +361,8 @@ void FrameDrawer::Update(const std::shared_ptr<Tracking> &pTracker) {
   mvpOutlierMPs.reserve(N);
 
   if (pTracker->mLastProcessedState == Tracking::NOT_INITIALIZED) {
+    if (!pTracker->mInitialFrame) return;
+
     mvIniKeys = pTracker->mInitialFrame->mvKeys;
     mvIniMatches = pTracker->mvIniMatches;
 

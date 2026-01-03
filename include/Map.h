@@ -124,10 +124,10 @@ class Map : public std::enable_shared_from_this<Map> {
 
   void SetInertialSensor();
   bool IsInertial();
-  void SetIniertialBA1();
-  void SetIniertialBA2();
-  bool GetIniertialBA1();
-  bool GetIniertialBA2();
+  void SetInertialBA1();
+  void SetInertialBA2();
+  bool GetInertialBA1();
+  bool GetInertialBA2();
 
   void PrintEssentialGraph();
   bool CheckEssentialGraph();

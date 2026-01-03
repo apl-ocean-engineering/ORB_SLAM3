@@ -107,6 +107,8 @@ MLPnPsolver::MLPnPsolver(const std::shared_ptr<Frame> &F,
   SetRansacParameters();
 }
 
+MLPnPsolver::~MLPnPsolver() {}
+
 // RANSAC methods
 bool MLPnPsolver::iterate(int nIterations, bool &bNoMore,
                           vector<bool> &vbInliers, int &nInliers,

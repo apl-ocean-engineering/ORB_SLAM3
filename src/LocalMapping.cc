@@ -175,7 +175,7 @@ void LocalMapping::Run() {
             if (dist > 0.05)
               mTinit += mpCurrentKeyFrame->mTimeStamp -
                         mpCurrentKeyFrame->mPrevKF->mTimeStamp;
-            if (!mpCurrentKeyFrame->GetMap()->GetIniertialBA2()) {
+            if (!mpCurrentKeyFrame->GetMap()->GetInertialBA2()) {
               if ((mTinit < 10.f) && (dist < 0.02)) {
                 cout << "Not enough motion for initializing. Reseting..."
                      << endl;
@@ -192,7 +192,7 @@ void LocalMapping::Run() {
             Optimizer::LocalInertialBA(
                 mpCurrentKeyFrame, &mbAbortBA, mpCurrentKeyFrame->GetMap(),
                 num_FixedKF_BA, num_OptKF_BA, num_MPs_BA, num_edges_BA, bLarge,
-                !mpCurrentKeyFrame->GetMap()->GetIniertialBA2());
+                !mpCurrentKeyFrame->GetMap()->GetInertialBA2());
             b_doneLBA = true;
           } else {
             Optimizer::LocalBundleAdjustment(
@@ -250,10 +250,10 @@ void LocalMapping::Run() {
           // Enter here everytime local-mapping is called
           if (mpCurrentKeyFrame->GetMap()->isImuInitialized() &&
               mpTracker->mState == Tracking::OK) {
-            if (!mpCurrentKeyFrame->GetMap()->GetIniertialBA1()) {
+            if (!mpCurrentKeyFrame->GetMap()->GetInertialBA1()) {
               if (mTinit > 5.0f) {
                 cout << "start VIBA 1" << endl;
-                mpCurrentKeyFrame->GetMap()->SetIniertialBA1();
+                mpCurrentKeyFrame->GetMap()->SetInertialBA1();
                 if (mbMonocular)
                   InitializeIMU(1.f, 1e5, true);
                 else
@@ -261,10 +261,10 @@ void LocalMapping::Run() {
 
                 cout << "end VIBA 1" << endl;
               }
-            } else if (!mpCurrentKeyFrame->GetMap()->GetIniertialBA2()) {
+            } else if (!mpCurrentKeyFrame->GetMap()->GetInertialBA2()) {
               if (mTinit > 15.0f) {
                 cout << "start VIBA 2" << endl;
-                mpCurrentKeyFrame->GetMap()->SetIniertialBA2();
+                mpCurrentKeyFrame->GetMap()->SetInertialBA2();
                 if (mbMonocular)
                   InitializeIMU(0.f, 0.f, true);
                 else
@@ -482,7 +482,7 @@ void LocalMapping::CreateNewMapPoints() {
     // Search matches that fullfil epipolar constraint
     vector<pair<size_t, size_t>> vMatchedIndices;
     bool bCoarse = mbInertial && mpTracker->mState == Tracking::RECENTLY_LOST &&
-                   mpCurrentKeyFrame->GetMap()->GetIniertialBA2();
+                   mpCurrentKeyFrame->GetMap()->GetInertialBA2();
 
     matcher.SearchForTriangulation(mpCurrentKeyFrame, pKF2, vMatchedIndices,
                                    false, bCoarse);
@@ -997,7 +997,7 @@ void LocalMapping::KeyFrameCulling() {
             pKF->mNextKF = NULL;
             pKF->mPrevKF = NULL;
             pKF->SetBadFlag();
-          } else if (!mpCurrentKeyFrame->GetMap()->GetIniertialBA2() &&
+          } else if (!mpCurrentKeyFrame->GetMap()->GetInertialBA2() &&
                      ((pKF->GetImuPosition() - pKF->mPrevKF->GetImuPosition())
                           .norm() < 0.02) &&
                      (t < 3)) {

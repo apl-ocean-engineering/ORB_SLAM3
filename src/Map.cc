@@ -211,16 +211,13 @@ void Map::clear() {
   //    send=mspMapPoints.end(); sit!=send; sit++)
   //        delete *sit;
 
-  for (set<std::shared_ptr<KeyFrame>>::iterator sit = mspKeyFrames.begin(),
-                                                send = mspKeyFrames.end();
-       sit != send; sit++) {
-    std::shared_ptr<KeyFrame> pKF = *sit;
+  for (auto pKF : mspKeyFrames) {
     pKF->UpdateMap(nullptr);
-    //        delete *sit;
   }
+  mspKeyFrames.clear();
 
   mspMapPoints.clear();
-  mspKeyFrames.clear();
+
   mnMaxKFid = mnInitKFid;
   mbImuInitialized = false;
   mvpReferenceMapPoints.clear();
@@ -277,22 +274,22 @@ bool Map::IsInertial() {
   return mbIsInertial;
 }
 
-void Map::SetIniertialBA1() {
+void Map::SetInertialBA1() {
   unique_lock<mutex> lock(mMutexMap);
   mbIMU_BA1 = true;
 }
 
-void Map::SetIniertialBA2() {
+void Map::SetInertialBA2() {
   unique_lock<mutex> lock(mMutexMap);
   mbIMU_BA2 = true;
 }
 
-bool Map::GetIniertialBA1() {
+bool Map::GetInertialBA1() {
   unique_lock<mutex> lock(mMutexMap);
   return mbIMU_BA1;
 }
 
-bool Map::GetIniertialBA2() {
+bool Map::GetInertialBA2() {
   unique_lock<mutex> lock(mMutexMap);
   return mbIMU_BA2;
 }

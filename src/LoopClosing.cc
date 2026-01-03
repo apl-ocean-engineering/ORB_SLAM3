@@ -177,7 +177,7 @@ void LoopClosing::Run() {
               }
               // If inertial, force only yaw
               if ((mpTracker->mSensor.isImu()) &&
-                  mpCurrentKF->GetMap()->GetIniertialBA1()) {
+                  mpCurrentKF->GetMap()->GetInertialBA1()) {
                 Eigen::Vector3d phi =
                     LogSO3(mSold_new.rotation().toRotationMatrix());
                 phi(0) = 0;
@@ -269,7 +269,7 @@ void LoopClosing::Run() {
               if (mpCurrentKF->GetMap()->IsInertial()) {
                 // If inertial, force only yaw
                 if ((mpTracker->mSensor.isImu()) &&
-                    mpCurrentKF->GetMap()->GetIniertialBA2()) {
+                    mpCurrentKF->GetMap()->GetInertialBA2()) {
                   phi(0) = 0;
                   phi(1) = 0;
                   g2oSww_new =
@@ -368,7 +368,7 @@ bool LoopClosing::NewDetectCommonRegions() {
     mpLastMap = mpCurrentKF->GetMap();
   }
 
-  if (mpLastMap->IsInertial() && !mpLastMap->GetIniertialBA2()) {
+  if (mpLastMap->IsInertial() && !mpLastMap->GetInertialBA2()) {
     mpKeyFrameDB->add(mpCurrentKF);
     mpCurrentKF->SetErase();
     return false;
@@ -601,7 +601,7 @@ bool LoopClosing::DetectAndReffineSim3FromLastKF(
     bool bFixedScale =
         mbFixScale;  // TODO CHECK; Solo para el monocular inertial
     if (mpTracker->mSensor == SensorType::IMU_MONOCULAR &&
-        !pCurrentKF->GetMap()->GetIniertialBA2())
+        !pCurrentKF->GetMap()->GetInertialBA2())
       bFixedScale = false;
     int numOptMatches =
         Optimizer::OptimizeSim3(mpCurrentKF, pMatchedKF, vpMatchedMPs, gScm, 10,
@@ -744,7 +744,7 @@ bool LoopClosing::DetectCommonRegionsFromBoW(
       // Geometric validation
       bool bFixedScale = mbFixScale;
       if (mpTracker->mSensor == SensorType::IMU_MONOCULAR &&
-          !mpCurrentKF->GetMap()->GetIniertialBA2())
+          !mpCurrentKF->GetMap()->GetInertialBA2())
         bFixedScale = false;
 
       Sim3Solver solver =
@@ -826,7 +826,7 @@ bool LoopClosing::DetectCommonRegionsFromBoW(
 
           bool bFixedScale = mbFixScale;
           if (mpTracker->mSensor == SensorType::IMU_MONOCULAR &&
-              !mpCurrentKF->GetMap()->GetIniertialBA2())
+              !mpCurrentKF->GetMap()->GetInertialBA2())
             bFixedScale = false;
 
           int numOptMatches =
@@ -1223,7 +1223,7 @@ void LoopClosing::CorrectLoop() {
   bool bFixedScale = mbFixScale;
   // TODO CHECK; Solo para el monocular inertial
   if (mpTracker->mSensor == SensorType::IMU_MONOCULAR &&
-      !mpCurrentKF->GetMap()->GetIniertialBA2())
+      !mpCurrentKF->GetMap()->GetInertialBA2())
     bFixedScale = false;
 
 #ifdef REGISTER_TIMES
@@ -1936,7 +1936,7 @@ void LoopClosing::MergeLocal2() {
 
   const int numKFnew = pCurrentMap->KeyFramesInMap();
 
-  if ((mpTracker->mSensor.isImu()) && !pCurrentMap->GetIniertialBA2()) {
+  if ((mpTracker->mSensor.isImu()) && !pCurrentMap->GetInertialBA2()) {
     // Map is not completly initialized
     Eigen::Vector3d bg, ba;
     bg << 0., 0., 0.;
@@ -1947,8 +1947,8 @@ void LoopClosing::MergeLocal2() {
     mpTracker->UpdateFrameIMU(1.0f, b, mpTracker->GetLastKeyFrame());
 
     // Set map initialized
-    pCurrentMap->SetIniertialBA2();
-    pCurrentMap->SetIniertialBA1();
+    pCurrentMap->SetInertialBA2();
+    pCurrentMap->SetInertialBA1();
     pCurrentMap->SetImuInitialized();
   }
 

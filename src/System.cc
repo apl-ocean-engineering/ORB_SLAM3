@@ -143,7 +143,6 @@ void System::printBanner() {
 
 bool System::initialize(bool initFr, const string &strSequence) {
   const string mStrLoadAtlasFromFile = settings_->atlasLoadFile();
-  const string mStrSaveAtlasToFile = settings_->atlasSaveFile();
 
   cout << (*settings_) << endl;
 
@@ -167,19 +166,18 @@ bool System::initialize(bool initFr, const string &strSequence) {
 
   if (mStrLoadAtlasFromFile.empty()) {
     // Create the Atlas
-    spdlog::info("Initialization of Atlas from scratch ");
+    spdlog::info("Initializing Atlas from scratch ");
     mpAtlas = std::make_shared<Atlas>(0);
   } else {
     // Load the file with an earlier session
     // clock_t start = clock();
-    spdlog::info("Initialization of Atlas from file: {}",
-                 mStrLoadAtlasFromFile);
+    spdlog::info("Initializing Atlas from file: {}", mStrLoadAtlasFromFile);
     bool isRead = LoadAtlas(FileType::BINARY_FILE);
 
     if (!isRead) {
-      cout << "Error to load the file, please try with other session file or "
-              "vocabulary file"
-           << endl;
+      spdlog::error(
+          "Unable to load Atlas file, please try with other session file or "
+          "vocabulary file");
       return false;
     }
 
@@ -207,8 +205,6 @@ bool System::initialize(bool initFr, const string &strSequence) {
   mpLocalMapper = std::make_shared<LocalMapping>(
       shared_from_this(), mpAtlas, sensorType().isMonocular(),
       sensorType().isImu(), strSequence);
-  mptLocalMapping =
-      std::make_unique<thread>(&ORB_SLAM3::LocalMapping::Run, mpLocalMapper);
   mpLocalMapper->mInitFr = initFr;
   mpLocalMapper->mThFarPoints = settings_->thFarPoints();
 
@@ -223,12 +219,14 @@ bool System::initialize(bool initFr, const string &strSequence) {
     mpLocalMapper->mbFarPoints = false;
   }
 
+  mptLocalMapping =
+      std::make_unique<thread>(&ORB_SLAM3::LocalMapping::Run, mpLocalMapper);
+
   // Initialize the Loop Closing thread and launch
   //  sensorType()!=MONOCULAR && sensorType()!=IMU_MONOCULAR
-  mpLoopCloser =
-      std::make_shared<LoopClosing>(mpAtlas, mpKeyFrameDatabase, mpVocabulary,
-                                    sensorType() != SensorType::MONOCULAR,
-                                    activeLC);  // sensorType()!=MONOCULAR);
+  mpLoopCloser = std::make_shared<LoopClosing>(
+      mpAtlas, mpKeyFrameDatabase, mpVocabulary,
+      sensorType() != SensorType::MONOCULAR, activeLC);
   mptLoopClosing =
       std::make_unique<thread>(&ORB_SLAM3::LoopClosing::Run, mpLoopCloser);
 

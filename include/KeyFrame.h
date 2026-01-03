@@ -196,7 +196,9 @@ class KeyFrame : public std::enable_shared_from_this<KeyFrame> {
 
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  // KeyFrame();
+
+  KeyFrame() = delete;
+
   KeyFrame(const std::shared_ptr<Frame>& F, const std::shared_ptr<Map>& pMap,
            const std::shared_ptr<KeyFrameDatabase>& pKFDB);
 
