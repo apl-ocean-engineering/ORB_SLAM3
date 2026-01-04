@@ -32,6 +32,30 @@ namespace ORB_SLAM3 {
 
 long unsigned int GeometricCamera::nNextId = 0;
 
+Pinhole::Pinhole() : GeometricCamera(), tvr() {
+  mvParameters.resize(4);
+  mnId = nNextId++;
+  mnType = CAM_PINHOLE;
+}
+
+Pinhole::Pinhole(const std::vector<float> _vParameters)
+    : GeometricCamera(_vParameters), tvr() {
+  assert(mvParameters.size() == 4);
+  mnId = nNextId++;
+  mnType = CAM_PINHOLE;
+}
+
+Pinhole::Pinhole(const Pinhole &pinhole)
+    : GeometricCamera(pinhole.mvParameters), tvr() {
+  assert(mvParameters.size() == 4);
+  mnId = nNextId++;
+  mnType = CAM_PINHOLE;
+}
+
+Pinhole::~Pinhole() {
+  if (tvr) tvr.reset();
+}
+
 cv::Point2f Pinhole::project(const cv::Point3f &p3D) {
   return cv::Point2f(mvParameters[0] * p3D.x / p3D.z + mvParameters[2],
                      mvParameters[1] * p3D.y / p3D.z + mvParameters[3]);
@@ -91,8 +115,8 @@ bool Pinhole::ReconstructWithTwoViews(const std::vector<cv::KeyPoint> &vKeys1,
                                       std::vector<cv::Point3f> &vP3D,
                                       std::vector<bool> &vbTriangulated) {
   if (!tvr) {
-    Eigen::Matrix3f K = this->toK_();
-    tvr = new TwoViewReconstruction(K);
+    const Eigen::Matrix3f K = this->toK_();
+    tvr = std::make_shared<TwoViewReconstruction>(K);
   }
 
   return tvr->Reconstruct(vKeys1, vKeys2, vMatches12, T21, vP3D,
