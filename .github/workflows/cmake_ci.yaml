@@ -21,5 +21,10 @@ jobs:
           packages: libfmt-dev libg2o-dev libopencv-dev
           version: 1.0
 
+      - name: Build Pangolin with vcpkg
+        uses: lukka/run-vcpkg@v11
+        with:
+          runVcpkgInstall: true
+
       - name: Build Project
         uses: threeal/cmake-action@v2.1.0
