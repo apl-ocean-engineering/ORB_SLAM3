@@ -31,6 +31,7 @@
 #include "Converter.h"
 #include "Eigen/Core"
 #include "ImuTypes.h"
+#include "Logging.h"
 #include "ORBVocabulary.h"
 #include "Settings.h"
 #include "Thirdparty/DBoW2/DBoW2/BowVector.h"
@@ -84,7 +85,7 @@ class Frame : public std::enable_shared_from_this<Frame> {
         const IMU::Calib &ImuCalib = IMU::Calib());
 
   // Destructor
-  // ~Frame();
+  ~Frame();
 
   // Extract ORB on the image. 0 for left image and 1 for right image.
   void ExtractORB(int flag, const cv::Mat &im, const int x0, const int x1);
@@ -388,8 +389,8 @@ class Frame : public std::enable_shared_from_this<Frame> {
           right++;
       }
     }
-    cout << "Point distribution in Frame: left-> " << left << " --- right-> "
-         << right << endl;
+    spdlog::debug("Point distribution in Frame: left-> {} --- right-> {}", left,
+                  right);
   }
 
   Sophus::SE3<double> T_test;
