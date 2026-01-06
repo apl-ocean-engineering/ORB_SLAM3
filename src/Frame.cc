@@ -511,6 +511,8 @@ Frame::Frame(const cv::Mat &imGray, const double &timeStamp,
   mpMutexImu = std::make_shared<std::mutex>();
 }
 
+Frame::~Frame() {}
+
 void Frame::AssignFeaturesToGrid() {
   // Fill matrix with points
   const int nCells = FRAME_GRID_COLS * FRAME_GRID_ROWS;
