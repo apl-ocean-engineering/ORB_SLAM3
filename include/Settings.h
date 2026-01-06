@@ -23,7 +23,7 @@
 
 // Flag to activate the measurement of time in each process (track,localmap,
 // place recognition).
-// #define REGISTER_TIMES
+#define REGISTER_TIMES
 
 #include <unistd.h>
 
@@ -35,7 +35,7 @@
 #include <vector>
 
 #include "CameraModels/GeometricCamera.h"
-#include "Thirdparty/tl/expected.hpp"
+#include "Expected.h"
 #include "Types.h"
 
 namespace ORB_SLAM3 {
@@ -47,7 +47,7 @@ class Settings;
 
 class SettingsLoader {
  public:
-  typedef tl::expected<std::shared_ptr<Settings>, bool> Expected;
+  typedef tl::expected<std::shared_ptr<Settings>, ExpectedError> Expected;
   static Expected load(const std::string& configFile, const SensorType sensor);
 
   explicit SettingsLoader(const SensorType sensor);

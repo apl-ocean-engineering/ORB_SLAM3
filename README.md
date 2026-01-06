@@ -3,18 +3,18 @@
 
 Relative to the original code, this repo contains multiple updates:
 
-* I removed the "ThirdParty" copies of "Sophus" and "g2o" in lieu of packages which can be installed "rosdep".  Due to API changes, this necessitated some syntactically invasive (but functionally equivalent) changes.
+* I removed the "ThirdParty" copies of "Sophus" and "g2o" in lieu of packages which can be installed "rosdep" (or `apt`).  Due to API changes, this necessitated some syntactically invasive (but functionally equivalent) changes.
 * This branch contains preliminary migration to [spdlog](https://github.com/gabime/spdlog) as a more controllable logging backend.  This is a slow-motion migration to better manage text output from ORBSLAM3.
 * As I dug further into the code, I got more opinionated.  I also added [pre-commit](.pre-commit-config.yaml), which introduced significant textual changes.   No going back!
 * [`Thirdparty/tl/`](Thirdparty/tl/) includes a copy of [TartanLlama's expected](https://github.com/TartanLlama/expected) which is released under the [CC0-1.0 (Public doamin) license](http://creativecommons.org/publicdomain/zero/1.0/)
 
 > [!WARNING]
-> I _am not_ testing this repo outside of ROS2.   I am *only* checking [orbslam3_ros2](https://gitlab.com/apl-ocean-engineering/orbslam3_ros2) in a ROS2 / colcon environment.
+> I _am not_ testing this repo outside of ROS2.   I am *only* checking [orbslam3_ros2](https://gitlab.com/apl-ocean-engineering/orbslam3_ros2) in a ROS2 / colcon environment.   I do not expect this to build with `cmake` nor do I expect the original `Examples/` to run.
 
 -----
 -----
 
-Author's original README follows below.
+The author's original README follows below.
 
 
 # ORB-SLAM3
@@ -79,13 +79,16 @@ We use the new thread and chrono functionalities of C++11.
 We use [Pangolin](https://github.com/stevenlovegrove/Pangolin) for visualization and user interface. Dowload and install instructions can be found at: https://github.com/stevenlovegrove/Pangolin.
 
 ## OpenCV
-We use [OpenCV](http://opencv.org) to manipulate images and features. Dowload and install instructions can be found at: http://opencv.org. **Required at leat 3.0. Tested with OpenCV 3.2.0 and 4.4.0**.
+We use [OpenCV](http://opencv.org) to manipulate images and features. Dowload and install instructions can be found at: http://opencv.org. **Required at least 3.0. Tested with OpenCV 3.2.0 and 4.4.0**.
 
 ## Eigen3
 Required by g2o (see below). Download and install instructions can be found at: http://eigen.tuxfamily.org. **Required at least 3.1.0**.
 
 ## DBoW2 and g2o (Included in Thirdparty folder)
-We use modified versions of the [DBoW2](https://github.com/dorian3d/DBoW2) library to perform place recognition and [g2o](https://github.com/RainerKuemmerle/g2o) library to perform non-linear optimizations. Both modified libraries (which are BSD) are included in the *Thirdparty* folder.
+We use modified versions of the [DBoW2](https://github.com/dorian3d/DBoW2) library to perform place recognition ~~and [g2o](https://github.com/RainerKuemmerle/g2o) library to perform non-linear optimizations.~~ Both modified libraries (which are BSD) are included in the *Thirdparty* folder.
+
+**Modified g2o has been removed, use the system version instead.**
+
 
 ## Python
 Required to calculate the alignment of the trajectory with the ground truth. **Required Numpy module**.
@@ -96,7 +99,9 @@ Required to calculate the alignment of the trajectory with the ground truth. **R
 
 ## ROS (optional)
 
-We provide some examples to process input of a monocular, monocular-inertial, stereo, stereo-inertial or RGB-D camera using ROS. Building these examples is optional. These have been tested with ROS Melodic under Ubuntu 18.04.
+~~We provide some examples to process input of a monocular, monocular-inertial, stereo, stereo-inertial or RGB-D camera using ROS. Building these examples is optional. These have been tested with ROS Melodic under Ubuntu 18.04.~~
+
+ROS1 support has been removed.  See [orbslam3_ros2](https://gitlab.com/apl-ocean-engineering/orbslam3_ros2) for ROS2 support.
 
 # 3. Building ORB-SLAM3 library and examples
 

@@ -203,7 +203,7 @@ void Tracking::TrackStats2File() {
        "preint[ms], Pose pred[ms], LM track[ms], KF dec[ms], Total[ms]"
     << endl;
 
-  for (int i = 0; i < vdTrackTotal_ms.size(); ++i) {
+  for (size_t i = 0; i < vdTrackTotal_ms.size(); ++i) {
     double stereo_rect = 0.0;
     if (!vdRectStereo_ms.empty()) {
       stereo_rect = vdRectStereo_ms[i];
@@ -1298,11 +1298,13 @@ void Tracking::Track() {
       if (bOK && !mbVO) bOK = TrackLocalMap();
     }
 
+#ifdef REGISTER_TIMES
     spdlog::info(
         "[Tracking::Track] TrackLocalMap  {} ms ",
         std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(
             std::chrono::steady_clock::now() - time_StartLMTrack)
             .count());
+#endif
 
     if (bOK) {
       mState = OK;
@@ -2644,13 +2646,11 @@ void Tracking::UpdateLocalKeyFrames() {
 
   // All keyframes that observe a map point are included in the local map. Also
   // check which keyframe shares most points
-  for (auto const& it : keyframeCounter) {
-    std::shared_ptr<KeyFrame> pKF = it.first;
-
+  for (auto const& [pKF, count] : keyframeCounter) {
     if (pKF->isBad()) continue;
 
-    if (it.second > max) {
-      max = it.second;
+    if (count > max) {
+      max = count;
       pKFmax = pKF;
     }
 
@@ -3057,7 +3057,7 @@ void Tracking::UpdateFrameIMU(
     const float s, const IMU::Bias& b,
     const std::shared_ptr<KeyFrame>& pCurrentKeyFrame) {
   std::shared_ptr<Map> pMap = pCurrentKeyFrame->GetMap();
-  unsigned int index = mnFirstFrameId;
+  // unsigned int index = mnFirstFrameId;
   list<std::shared_ptr<KeyFrame>>::iterator lRit = mlpReferences.begin();
   list<bool>::iterator lbL = mlbLost.begin();
 

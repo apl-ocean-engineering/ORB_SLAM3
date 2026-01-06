@@ -149,7 +149,8 @@ SettingsLoader::Expected SettingsLoader::load(const std::string& configFile) {
          << endl;
     cerr << "Aborting..." << endl;
 
-    exit(-1);
+    return tl::make_unexpected(
+        ExpectedError::fmt("Unable to open configuration file {}", configFile));
   } else {
     spdlog::info("Loading settings from {}", configFile);
   }
@@ -197,7 +198,7 @@ SettingsLoader::Expected SettingsLoader::load(const std::string& configFile) {
   if (settings_->validate()) {
     return settings_;
   } else {
-    return tl::make_unexpected(false);
+    return tl::unexpected<ExpectedError>("Setting did not validate");
   }
 }
 

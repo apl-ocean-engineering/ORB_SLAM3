@@ -199,9 +199,6 @@ class Map : public std::enable_shared_from_this<Map> {
   // Index related to a big change in the map (loop closure, global BA)
   int mnBigChangeIdx;
 
-  // View of the map in aerial sight (for the AtlasViewer)
-  GLubyte* mThumbnail;
-
   bool mIsInUse;
   bool mHasTumbnail;
   bool mbBad = false;

@@ -133,7 +133,7 @@ class ORBmatcher {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
  protected:
-  float RadiusByViewingCos(const float &viewCos);
+  [[nodiscard]] float RadiusByViewingCos(float viewCos) const;
 
   void ComputeThreeMaxima(std::vector<int> *histo, const int L, int &ind1,
                           int &ind2, int &ind3);

@@ -209,7 +209,7 @@ int ORBmatcher::SearchByProjection(const std::shared_ptr<Frame> &F,
   return nmatches;
 }
 
-float ORBmatcher::RadiusByViewingCos(const float &viewCos) {
+float ORBmatcher::RadiusByViewingCos(float viewCos) const {
   if (viewCos > 0.998)
     return 2.5;
   else

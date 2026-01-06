@@ -571,7 +571,7 @@ bool compFirst(const pair<float, std::shared_ptr<KeyFrame>>& a,
 void KeyFrameDatabase::DetectNBestCandidates(
     const std::shared_ptr<KeyFrame>& pKF,
     vector<std::shared_ptr<KeyFrame>>& vpLoopCand,
-    vector<std::shared_ptr<KeyFrame>>& vpMergeCand, int nNumCandidates) {
+    vector<std::shared_ptr<KeyFrame>>& vpMergeCand, size_t nNumCandidates) {
   list<std::shared_ptr<KeyFrame>> lKFsSharingWords;
   set<std::shared_ptr<KeyFrame>> spConnectedKF;
 
@@ -665,7 +665,7 @@ void KeyFrameDatabase::DetectNBestCandidates(
   vpLoopCand.reserve(nNumCandidates);
   vpMergeCand.reserve(nNumCandidates);
   set<std::shared_ptr<KeyFrame>> spAlreadyAddedKF;
-  int i = 0;
+  size_t i = 0;
   list<pair<float, std::shared_ptr<KeyFrame>>>::iterator it =
       lAccScoreAndMatch.begin();
   while (i < lAccScoreAndMatch.size() &&

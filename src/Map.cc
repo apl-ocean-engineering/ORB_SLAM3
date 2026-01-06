@@ -39,7 +39,6 @@ Map::Map()
       mbImuInitialized(false),
       mnMapChange(0),
       mpFirstRegionKF(nullptr),
-      mThumbnail(nullptr),
       mbFail(false),
       mIsInUse(false),
       mHasTumbnail(false),
@@ -60,7 +59,6 @@ Map::Map(int initKFid)
       mbBad(false),
       mbImuInitialized(false),
       mpFirstRegionKF(nullptr),
-      mThumbnail(nullptr),
       mnMapChange(0),
       mbFail(false),
       mnMapChangeNotified(0),
@@ -76,9 +74,6 @@ Map::~Map() {
 
   // TODO: erase all keyframes from memory
   mspKeyFrames.clear();
-
-  if (mThumbnail) delete mThumbnail;
-  mThumbnail = static_cast<GLubyte*>(NULL);
 
   mvpReferenceMapPoints.clear();
   mvpKeyFrameOrigins.clear();

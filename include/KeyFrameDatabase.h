@@ -77,7 +77,7 @@ class KeyFrameDatabase {
   void DetectNBestCandidates(const std::shared_ptr<KeyFrame> &pKF,
                              vector<std::shared_ptr<KeyFrame>> &vpLoopCand,
                              vector<std::shared_ptr<KeyFrame>> &vpMergeCand,
-                             int nNumCandidates);
+                             size_t nNumCandidates);
 
   // Relocalization
   std::vector<std::shared_ptr<KeyFrame>> DetectRelocalizationCandidates(

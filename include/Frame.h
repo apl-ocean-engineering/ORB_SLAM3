@@ -334,7 +334,7 @@ class Frame : public std::enable_shared_from_this<Frame> {
 
   bool mbImuPreintegrated;
 
-  std::mutex *mpMutexImu;
+  std::shared_ptr<std::mutex> mpMutexImu;
 
  public:
   std::shared_ptr<GeometricCamera> mpCamera, mpCamera2;

@@ -32,6 +32,7 @@
 #include <vector>
 
 #include "Atlas.h"
+#include "Expected.h"
 #include "FrameDrawer.h"
 #include "ImuTypes.h"
 #include "KeyFrameDatabase.h"
@@ -41,7 +42,6 @@
 #include "MapDrawer.h"
 #include "ORBVocabulary.h"
 #include "Settings.h"
-#include "Thirdparty/tl/expected.hpp"
 #include "Tracking.h"
 #include "Viewer.h"
 
@@ -58,18 +58,30 @@ class Settings;
 
 class SystemFactory {
  public:
-  typedef tl::expected<std::shared_ptr<System>, bool> Expected;
+  typedef tl::expected<std::shared_ptr<System>, ExpectedError> Expected;
 
-  static Expected create(const std::shared_ptr<Settings> &settings);
+  static Expected create(const std::shared_ptr<Settings> &settings,
+                         bool initFr = false,
+                         const string &strSequence = std::string());
 
+  static Expected create(const std::string &configFile, const SensorType sensor,
+                         bool initFr = false,
+                         const string &strSequence = std::string());
+
+  // Provided for compatibility with old API
   static Expected create(const std::string &configFile,
-                         const SensorType sensor);
+                         const std::string &vocabFile, const SensorType sensor,
+                         bool initFr = false,
+                         const string &strSequence = std::string());
 };
 
+// System should be created using  SystemFactory::create()
+//
+// It will validate settings and catch errors on startup
 class System : public std::enable_shared_from_this<System> {
  public:
   friend SystemFactory::Expected SystemFactory::create(
-      const std::shared_ptr<Settings> &settings);
+      const std::shared_ptr<Settings> &, bool, const string &);
 
   // File type
   enum FileType {

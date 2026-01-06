@@ -49,31 +49,51 @@ namespace ORB_SLAM3 {
 Verbose::eLevel Verbose::th = Verbose::VERBOSITY_NORMAL;
 
 SystemFactory::Expected SystemFactory::create(
-    const std::shared_ptr<Settings> &settings) {
+    const std::shared_ptr<Settings> &settings, bool initFr,
+    const string &strSequence) {
   if (!settings->validate()) {
-    return tl::make_unexpected(false);
+    return tl::make_unexpected(ExpectedError::fmt("Settings do not validate"));
   }
 
   // Cannot use make_shared with friend constructors?
-  auto sys = std::shared_ptr<System>(new System(settings));
+  auto sys = std::shared_ptr<System>(new System(settings, initFr, strSequence));
 
   // Initialization must occur separately because we use shared_from_this
   if (!sys->initialize()) {
-    return tl::make_unexpected(false);
+    return tl::make_unexpected(
+        ExpectedError::fmt("Unable to initialize SLAM system"));
   }
 
   return sys;
 }
 
 SystemFactory::Expected SystemFactory::create(const std::string &configFile,
-                                              const SensorType sensor) {
-  auto settings = SettingsLoader::load(configFile, sensor);
+                                              const SensorType sensor,
+                                              bool initFr,
+                                              const string &strSequence) {
+  auto exSettings = SettingsLoader::load(configFile, sensor);
 
-  if (settings) {
-    return SystemFactory::create(settings.value());
+  if (!exSettings) {
+    return tl::make_unexpected(ExpectedError::fmt("Enable to load settings"));
   }
 
-  return tl::make_unexpected(false);
+  return SystemFactory::create(exSettings.value(), initFr, strSequence);
+}
+
+SystemFactory::Expected SystemFactory::create(const std::string &configFile,
+                                              const std::string &vocabFile,
+                                              const SensorType sensor,
+                                              bool initFr,
+                                              const string &strSequence) {
+  auto exSettings = SettingsLoader::load(configFile, sensor);
+
+  if (!exSettings) {
+    return tl::make_unexpected(ExpectedError::fmt("Enable to load settings"));
+  }
+
+  auto settings = exSettings.value();
+  settings->strVocFile_ = vocabFile;
+  return SystemFactory::create(settings, initFr, strSequence);
 }
 
 //===================================================================
@@ -609,7 +629,7 @@ void System::SaveTrajectoryEuRoC(const string &filename) {
   }*/
 
   vector<std::shared_ptr<Map>> vpMaps = mpAtlas->GetAllMaps();
-  int numMaxKFs = 0;
+  size_t numMaxKFs = 0;
   std::shared_ptr<Map> pBiggerMap;
   std::cout << "There are " << std::to_string(vpMaps.size())
             << " maps in the atlas" << std::endl;
