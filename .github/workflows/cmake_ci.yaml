@@ -18,7 +18,9 @@ jobs:
       - name: Install apt dependencies
         uses: awalsh128/cache-apt-pkgs-action@latest
         with:
-          packages: libfmt-dev libg2o-dev libopencv-dev nasm
+          packages: libfmt-dev libg2o-dev libopencv-dev nasm \
+                  libgl1-mesa-dev libwayland-dev libxkbcommon-dev wayland-protocols libegl1-mesa-dev \
+                  libc++-dev libepoxy-dev libglew-dev libeigen3-dev cmake g++ ninja-build
           version: 1.0
 
       - name: Build Pangolin with vcpkg
