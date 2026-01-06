@@ -19,6 +19,7 @@ jobs:
         uses: awalsh128/cache-apt-pkgs-action@latest
         with:
           packages: libfmt-dev libg2o-dev libopencv-dev nasm \
+                  libx11-dev libgles2-mesa-dev \
                   libgl1-mesa-dev libwayland-dev libxkbcommon-dev wayland-protocols libegl1-mesa-dev \
                   libc++-dev libepoxy-dev libglew-dev libeigen3-dev cmake g++ ninja-build
           version: 1.0
@@ -28,6 +29,8 @@ jobs:
         with:
           runVcpkgInstall: true
           vcpkgGitCommitId: e3db8f65d2414c301c29a8467c6aee94e3ba09fc
+          # Enable caching of built packages
+          doNotCache: false
 
       - name: Build Project
         uses: threeal/cmake-action@v2.1.0

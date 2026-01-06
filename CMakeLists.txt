@@ -26,7 +26,7 @@ MESSAGE("OPENCV VERSION:")
 MESSAGE(${OpenCV_VERSION})
 
 find_package(Eigen3 3.1.0 REQUIRED)
-find_package(Pangolin REQUIRED)
+find_package(Pangolin CONFIG REQUIRED)
 find_package(Sophus REQUIRED)
 find_package(g2o REQUIRED)
 find_package(fmt REQUIRED)
@@ -73,6 +73,7 @@ add_library(${PROJECT_NAME} SHARED
         src/TwoViewReconstruction.cc
         src/Viewer.cc
 )
+target_compile_definitions(${PROJECT_NAME} PUBLIC REGISTER_TIMES)
 
 target_link_libraries(${PROJECT_NAME}
         ${OpenCV_LIBS}
