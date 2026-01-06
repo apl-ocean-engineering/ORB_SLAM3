@@ -38,6 +38,7 @@ jobs:
         with:
           submodules: true
 
+      # Based on sample workflow from https://github.com/lukka/CppCMakeVcpkgTemplate/blob/v11/.github/workflows/hosted-ninja-vcpkg_submod.yml
       - uses: lukka/get-cmake@latest
 
       - name: Restore from cache and setup vcpkg executable and data files.
@@ -55,6 +56,7 @@ jobs:
       - name: Run CMake+vcpkg+Ninja+CTest to build packages and generate/build/test the code.
         uses: lukka/run-cmake@v10
         with:
-          configurePreset: 'ninja-multi-vcpkg'
-          buildPreset: 'ninja-vcpkg-release'
-          testPreset: 'test-release'
+          configurePreset: 'build'
+          # configurePreset: 'ninja-multi-vcpkg'
+          # buildPreset: 'ninja-vcpkg-release'
+          # testPreset: 'test-release'
