@@ -36,4 +36,4 @@ jobs:
         uses: threeal/cmake-action@v2.1.0
         with:
           options: |
-            CMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg
+            CMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
