@@ -44,7 +44,6 @@ jobs:
       - name: Restore from cache and setup vcpkg executable and data files.
         uses: lukka/run-vcpkg@v11
         with:
-          vcpkgJsonGlob: 'vcpkg.json'
           doNotCache: false
 
       # Note: if the preset misses the "configuration", it is possible to explicitly select the
@@ -56,7 +55,7 @@ jobs:
       - name: Run CMake+vcpkg+Ninja+CTest to build packages and generate/build/test the code.
         uses: lukka/run-cmake@v10
         with:
-          configurePreset: 'build'
+          configurePreset: 'default'
           # configurePreset: 'ninja-multi-vcpkg'
           # buildPreset: 'ninja-vcpkg-release'
           # testPreset: 'test-release'
