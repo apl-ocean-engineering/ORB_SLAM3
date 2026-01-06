@@ -11,6 +11,7 @@
   },
   "dependencies": [
     "pangolin",
-    "sophus"
+    "sophus",
+    "g2o[spdlog]"
   ]
 }
