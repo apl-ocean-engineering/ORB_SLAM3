@@ -12,9 +12,6 @@ jobs:
     name: Build Project
     runs-on: ubuntu-24.04
     steps:
-      - name: Checkout Project
-        uses: actions/checkout@v4.2.2
-
       - name: Install apt dependencies
         uses: awalsh128/cache-apt-pkgs-action@latest
         with:
@@ -36,16 +33,28 @@ jobs:
                   wayland-protocols
           version: 1.0
 
-      - name: Build Pangolin with vcpkg
+      - name: Checkout Project
+        uses: actions/checkout@v4.2.2
+        with:
+          submodules: true
+
+      - uses: lukka/get-cmake@latest
+
+      - name: Restore from cache and setup vcpkg executable and data files.
         uses: lukka/run-vcpkg@v11
         with:
-          runVcpkgInstall: true
-          vcpkgGitCommitId: e3db8f65d2414c301c29a8467c6aee94e3ba09fc
-          # Enable caching of built packages
+          vcpkgJsonGlob: 'vcpkg.json'
           doNotCache: false
 
-      - name: Build Project
-        uses: threeal/cmake-action@v2.1.0
+      # Note: if the preset misses the "configuration", it is possible to explicitly select the
+      # configuration with the additional `--config` flag, e.g.:
+      #   buildPreset: 'ninja-vcpkg'
+      #   buildPresetAdditionalArgs: "[`--config`, `Release`]"
+      #   testPreset: 'ninja-vcpkg'
+      #   testPresetAdditionalArgs: "[`--config`, `Release`]"
+      - name: Run CMake+vcpkg+Ninja+CTest to build packages and generate/build/test the code.
+        uses: lukka/run-cmake@v10
         with:
-          options: |
-            CMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
+          configurePreset: 'ninja-multi-vcpkg'
+          buildPreset: 'ninja-vcpkg-release'
+          testPreset: 'test-release'
