@@ -45,6 +45,7 @@ jobs:
         uses: lukka/run-vcpkg@v11
         with:
           doNotCache: false
+          vcpkgGitCommitId: e3db8f65d2414c301c29a8467c6aee94e3ba09fc
 
       # Note: if the preset misses the "configuration", it is possible to explicitly select the
       # configuration with the additional `--config` flag, e.g.:
