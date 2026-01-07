@@ -9,7 +9,7 @@
           "repository": "https://github.com/Microsoft/vcpkg"
         },
     "overlay-ports": [
-      "vcpkg_overlays"
+      "vcpkg_overlay"
     ]
   },
   "dependencies": [
