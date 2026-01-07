@@ -25,7 +25,7 @@ find_package(OpenCV 4.4)
 MESSAGE("OPENCV VERSION:")
 MESSAGE(${OpenCV_VERSION})
 
-find_package(Eigen3 3.1.0 REQUIRED)
+find_package(Eigen3 REQUIRED)
 find_package(Pangolin CONFIG REQUIRED)
 find_package(Sophus REQUIRED)
 find_package(g2o REQUIRED)
