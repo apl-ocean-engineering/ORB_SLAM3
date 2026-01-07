@@ -16,6 +16,8 @@
     "pangolin",
     "sophus",
     "g2o",
-    "eigen3"
+    "eigen3",
+    "blas",
+    "lapack"
   ]
 }
