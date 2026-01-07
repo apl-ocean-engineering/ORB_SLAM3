@@ -7,8 +7,6 @@ APT_DEPENDENCIES="cmake \
                   libavfilter-dev \
                   libavformat-dev \
                   libavutil-dev \
-                  libswresample-dev \
-                  libswscale-dev \
                   libblas-dev \
                   libboost-serialization-dev \
                   libc++-dev \
@@ -21,10 +19,13 @@ APT_DEPENDENCIES="cmake \
                   libglew-dev \
                   liblapack-dev \
                   libopencv-dev \
-                  nasm \
+                  libspdlog-dev \
+                  libswresample-dev \
+                  libswscale-dev \
                   libwayland-dev \
                   libx11-dev \
                   libxkbcommon-dev \
+                  nasm \
                   ninja-build \
                   wayland-protocols"
 
