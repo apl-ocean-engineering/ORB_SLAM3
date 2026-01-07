@@ -15,7 +15,7 @@ APT_DEPENDENCIES="cmake \
                   libegl1-mesa-dev \
                   libeigen3-dev \
                   libepoxy-dev \
-                  libg2o-dev \
+                  libfmt-dev \
                   libgl1-mesa-dev \
                   libgles2-mesa-dev \
                   libglew-dev \
