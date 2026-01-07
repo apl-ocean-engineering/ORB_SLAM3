@@ -19,7 +19,8 @@ jobs:
 
       # Load the set of APT dependencies from the install_apt_dependencies scripts
       # to reduce repetition
-      - id: generate_deps
+      - name: Generate dependency list
+        id: generate_deps
         run: |
               # Run your script and capture its output into a shell variable
               SCRIPT_OUTPUT=$(./install_apt_dependencies.sh --deps)

@@ -2,6 +2,13 @@
 
 APT_DEPENDENCIES="cmake \
                   g++ \
+                  libavcodec-dev \
+                  libavdevice-dev \
+                  libavfilter-dev \
+                  libavformat-dev \
+                  libavutil-dev \
+                  libswresample-dev \
+                  libswscale-dev \
                   libblas-dev \
                   libboost-serialization-dev \
                   libc++-dev \
