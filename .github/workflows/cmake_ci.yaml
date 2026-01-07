@@ -12,28 +12,20 @@ jobs:
     name: Build Project
     runs-on: ubuntu-24.04
     steps:
+      # Load the set of APT dependencies from the install_apt_dependencies scripts
+      # to reduce repetition
+      - id: generate_deps
+        run: |
+              # Run your script and capture its output into a shell variable
+              SCRIPT_OUTPUT=$(./install_apt_dependencies.sh --deps)
+
+              # Write the variable to the GITHUB_OUTPUT file
+              echo "apt_deps=$SCRIPT_OUTPUT" >> "$GITHUB_OUTPUT"
+
       - name: Install apt dependencies
         uses: awalsh128/cache-apt-pkgs-action@latest
         with:
-          packages: \
-                  cmake \
-                  g++ \
-                  libblas-dev \
-                  libboost-serialization-dev \
-                  libc++-dev \
-                  libegl1-mesa-dev \
-                  libepoxy-dev \
-                  libgl1-mesa-dev \
-                  libgles2-mesa-dev \
-                  libglew-dev \
-                  liblapack-dev \
-                  libopencv-dev \
-                  nasm \
-                  libwayland-dev \
-                  libx11-dev \
-                  libxkbcommon-dev \
-                  ninja-build \
-                  wayland-protocols
+          packages: ${{ steps.generate_deps.outputs.apt_deps }}
           version: 1.0
 
       - name: Checkout Project
