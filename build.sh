@@ -5,4 +5,5 @@ git submodule sync vcpkg
 cd vcpkg && ./bootstrap-vcpkg.sh
 cd ..
 
+cmake --preset ninja-multi-vcpkg
 cmake --build --preset ninja-vcpkg-${BUILD_TYPE}
