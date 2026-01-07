@@ -33,6 +33,7 @@ jobs:
         with:
           packages: ${{ steps.generate_deps.outputs.apt_deps }}
           version: 1.0
+          execute_install_scripts: true
 
       # Based on sample workflow from https://github.com/lukka/CppCMakeVcpkgTemplate/blob/v11/.github/workflows/hosted-ninja-vcpkg_submod.yml
       - uses: lukka/get-cmake@latest
