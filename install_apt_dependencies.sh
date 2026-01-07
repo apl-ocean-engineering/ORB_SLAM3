@@ -6,7 +6,9 @@ APT_DEPENDENCIES="cmake \
                   libboost-serialization-dev \
                   libc++-dev \
                   libegl1-mesa-dev \
+                  libeigen3-dev \
                   libepoxy-dev \
+                  libg2o-dev \
                   libgl1-mesa-dev \
                   libgles2-mesa-dev \
                   libglew-dev \

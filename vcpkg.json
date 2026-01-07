@@ -14,12 +14,6 @@
   },
   "dependencies": [
     "pangolin",
-    "sophus",
-    {
-      "name": "g2o",
-      "features": [
-        "spdlog"
-      ]
-    }
+    "sophus"
   ]
 }
