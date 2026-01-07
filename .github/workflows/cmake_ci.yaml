@@ -12,6 +12,11 @@ jobs:
     name: Build Project
     runs-on: ubuntu-24.04
     steps:
+      - name: Checkout Project
+        uses: actions/checkout@v4.2.2
+        with:
+          submodules: true
+
       # Load the set of APT dependencies from the install_apt_dependencies scripts
       # to reduce repetition
       - id: generate_deps
@@ -27,11 +32,6 @@ jobs:
         with:
           packages: ${{ steps.generate_deps.outputs.apt_deps }}
           version: 1.0
-
-      - name: Checkout Project
-        uses: actions/checkout@v4.2.2
-        with:
-          submodules: true
 
       # Based on sample workflow from https://github.com/lukka/CppCMakeVcpkgTemplate/blob/v11/.github/workflows/hosted-ninja-vcpkg_submod.yml
       - uses: lukka/get-cmake@latest

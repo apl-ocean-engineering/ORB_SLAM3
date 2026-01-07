@@ -14,6 +14,8 @@
   },
   "dependencies": [
     "pangolin",
-    "sophus"
+    "sophus",
+    "g2o",
+    "eigen3"
   ]
 }

@@ -27,7 +27,7 @@ MESSAGE(${OpenCV_VERSION})
 
 find_package(Eigen3 REQUIRED)
 find_package(Pangolin CONFIG REQUIRED)
-find_package(Sophus REQUIRED)
+find_package(Sophus CONFIG REQUIRED)
 find_package(g2o REQUIRED)
 find_package(fmt REQUIRED)
 find_package(spdlog REQUIRED)
