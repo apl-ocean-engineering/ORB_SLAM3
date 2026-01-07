@@ -7,7 +7,6 @@ APT_DEPENDENCIES="cmake \
                   libavfilter-dev \
                   libavformat-dev \
                   libavutil-dev \
-                  libblas3 \
                   libblas-dev \
                   libboost-serialization-dev \
                   libc++-dev \
@@ -18,7 +17,6 @@ APT_DEPENDENCIES="cmake \
                   libgl1-mesa-dev \
                   libgles2-mesa-dev \
                   libglew-dev \
-                  liblapack3 \
                   liblapack-dev \
                   libopencv-dev \
                   libspdlog-dev \

@@ -28,6 +28,8 @@ jobs:
               # Write the variable to the GITHUB_OUTPUT file
               echo "apt_deps=$SCRIPT_OUTPUT" >> "$GITHUB_OUTPUT"
 
+      # Execute_install_scripts runs the preinst,postinst scripts after restoring from cache
+      # I think this necessary to ensure alternatives are set up (for libblas, etc)
       - name: Install apt dependencies
         uses: awalsh128/cache-apt-pkgs-action@latest
         with:
