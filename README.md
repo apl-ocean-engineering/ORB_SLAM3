@@ -13,7 +13,8 @@ As I dug further into the code, I got more opinionated and have made multiple st
    * Add [TartanLlama's expected](https://github.com/TartanLlama/expected) which is released under the [CC0-1.0 (Public doamin) license](http://creativecommons.org/publicdomain/zero/1.0/)  (this may be remove if/when I standardize on C++20)
 * I am only targetting Ubuntu right now.   I've updated the build process as follows:
    * When building for ROS2, use [orbslam3_ros2](https://gitlab.com/apl-ocean-engineering/orbslam3_ros2) which includes this repo as a submodule.   Dependencies (g2o, Sophus, Pangolin) are included from ROS apt via `rosdep`.
-   * For non-ROS builds, I am now using `vcpkg` as a dependency manager as it can build the non-apt-gettable dependencies (Pangolin).   **However** I am using overlays to preferentially use apt versions of packages when available (OpenCV, g2o, etc).
+   * For non-ROS builds, I am now using `vcpkg` as a dependency manager as it can build the non-apt-gettable dependencies (Pangolin).   **However** I am using overlays to preferentially use apt versions of packages when available (OpenCV, etc).
+   * Note we build `g2o` from source even though an APT package is available to get a newer version.
 * Other minor changes:
    * Removed integrated Realsense support.    Realsense-enabled binaries should go in a separate package.
 
@@ -21,7 +22,7 @@ As I dug further into the code, I got more opinionated and have made multiple st
 
 ## Building
 
-I am only testing on Ubuntu 24.04.  As noted above, I prefer to use system packages as much as possible and use `vcpkg` for dependencies with no published binaries (outside of ROS).
+I am only testing on Ubuntu 24.04.  As noted above, I prefer to use system packages as much as possible and use `vcpkg` for dependencies with no published binaries (outside of ROS).  To override this behavior and have vcpkg build additional packages from source, remove the relevant directories from the [`vcpkg_overlays/`](vcpkg_overlays/) directory.
 
 I've gone full koolaid and adopted `ninja` as a builder as well.
 
