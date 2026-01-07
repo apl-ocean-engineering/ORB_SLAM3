@@ -117,7 +117,7 @@ void Settings::setMonoCamera(CameraType type, const std::vector<float>& k,
     //       vOverlapping;
     // }
   } else {
-    spdlog::error("Error: {} not known", type);
+    spdlog::error("Error: {} not known", static_cast<int>(type));
     exit(-1);
   }
 }

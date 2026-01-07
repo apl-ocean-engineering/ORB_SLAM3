@@ -25,13 +25,15 @@ find_package(OpenCV 4.4)
 MESSAGE("OPENCV VERSION:")
 MESSAGE(${OpenCV_VERSION})
 
-find_package(Eigen3 3.1.0 REQUIRED)
-find_package(Pangolin REQUIRED)
-find_package(Sophus REQUIRED)
+find_package(Eigen3 REQUIRED)
+find_package(Pangolin CONFIG REQUIRED)
+find_package(Sophus CONFIG REQUIRED)
 find_package(g2o REQUIRED)
 find_package(fmt REQUIRED)
 find_package(spdlog REQUIRED)
 find_package(Boost REQUIRED COMPONENTS serialization)
+
+add_subdirectory(Thirdparty/DBoW2)
 
 include_directories(
         ${PROJECT_SOURCE_DIR}
@@ -73,13 +75,14 @@ add_library(${PROJECT_NAME} SHARED
         src/TwoViewReconstruction.cc
         src/Viewer.cc
 )
+target_compile_definitions(${PROJECT_NAME} PUBLIC REGISTER_TIMES)
 
 target_link_libraries(${PROJECT_NAME}
         ${OpenCV_LIBS}
         Eigen3::Eigen
         Sophus::Sophus
         ${Pangolin_LIBRARIES}
-        ${PROJECT_SOURCE_DIR}/Thirdparty/DBoW2/lib/libDBoW2.so
+        DBoW2
         fmt::fmt
         g2o::core
         g2o::types_sim3
