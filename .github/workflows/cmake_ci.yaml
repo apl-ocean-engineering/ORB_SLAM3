@@ -28,14 +28,17 @@ jobs:
               # Write the variable to the GITHUB_OUTPUT file
               echo "apt_deps=$SCRIPT_OUTPUT" >> "$GITHUB_OUTPUT"
 
-      # Execute_install_scripts runs the preinst,postinst scripts after restoring from cache
-      # I think this necessary to ensure alternatives are set up (for libblas, etc)
       - name: Install apt dependencies
         uses: awalsh128/cache-apt-pkgs-action@latest
         with:
           packages: ${{ steps.generate_deps.outputs.apt_deps }}
           version: 1.0
-          execute_install_scripts: true
+
+      # I think this necessary to ensure alternatives are set up (for libblas, etc)
+      # It's not properly set up when restoring packages from cache
+      - name: Force install libblas and liblapack
+        run: apt-get install --reinstall libblas-dev liblapack-dev
+        shell: bash
 
       # Based on sample workflow from https://github.com/lukka/CppCMakeVcpkgTemplate/blob/v11/.github/workflows/hosted-ninja-vcpkg_submod.yml
       - uses: lukka/get-cmake@latest
