@@ -18,6 +18,7 @@ jobs:
           packages: \
                   cmake \
                   g++ \
+                  libblas-dev \
                   libboost-serialization-dev \
                   libc++-dev \
                   libegl1-mesa-dev \
@@ -25,7 +26,9 @@ jobs:
                   libgl1-mesa-dev \
                   libgles2-mesa-dev \
                   libglew-dev \
-                  libopencv-dev nasm \
+                  liblapack-dev \
+                  libopencv-dev \
+                  nasm \
                   libwayland-dev \
                   libx11-dev \
                   libxkbcommon-dev \
