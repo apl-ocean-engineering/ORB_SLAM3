@@ -1,18 +1,44 @@
 > [!NOTE]
-> This is my personal "working" fork of ORBSLAM3, which focuses on integrating ORBSLAM3 into ROS2.   The actual ROS2 integration is implemented in [orbslam3_ros2](https://gitlab.com/apl-ocean-engineering/orbslam3_ros2).   Relative to the original code, this repo contains multiple updates:
+> This is my personal "working" fork of ORBSLAM3, which is part of a larger effort to integrate ORBSLAM3 into ROS2.   This repo remains (distantly) related to the author's original upstream repo, and contains no ROS2-specific code.   The actual ROS2 integration is implemented in [orbslam3_ros2](https://gitlab.com/apl-ocean-engineering/orbslam3_ros2) which includes this repo as a submodule.
 
-* I removed the "ThirdParty" copies of "Sophus" and "g2o" in lieu of packages which can be installed "rosdep".  Due to API changes, this necessitated some syntactically invasive (but functionally equivalent) changes.
-* This branch contains preliminary migration to [spdlog](https://github.com/gabime/spdlog) as a more controllable logging backend.  This is a slow-motion migration to better manage text output from ORBSLAM3.
-* As I dug further into the code, I got more opinionated.  I also added [pre-commit](.pre-commit-config.yaml), which introduced significant textual changes.   No going back!
+As I dug further into the code, I got more opinionated and have made multiple stylistic changes.   My intention is to make only positive readability, portability and performance improvements but YMMV:
 
-> [!WARNING]
-> I _am not_ testing this repo outside of ROS2.   I am *only* checking [orbslam3_ros2](https://gitlab.com/apl-ocean-engineering/orbslam3_ros2) in a ROS2 / colcon environment.
+* Started modernization, currently to C++17
+* Replace bare pointers with managed pointers in most cases.
+* Minor updates to the System and Setting initialization procedure, primarily to separate creation of the Settings (from a file or otherwise) from the initialization of System, and provide more paths to catching and reporting errors during initialization.  See the [Examples/](Examples/).
+* Added [pre-commit](.pre-commit-config.yaml), which introduced significant textual changes.
+* Cleanup on dependencies:
+   * Removed built-in `g2o` and `Sophus` sources, get these from a dependency manager (vcpkg for non-ROS, and rosdep for ROS)
+   * Add [TartanLlama's expected](https://github.com/TartanLlama/expected) which is released under the [CC0-1.0 (Public doamin) license](http://creativecommons.org/publicdomain/zero/1.0/)  (this may be remove if/when I standardize on C++20)
+* I am only targetting Ubuntu 24.04 right now.   I've updated the build process as follows:
+   * When building for ROS2, use [orbslam3_ros2](https://gitlab.com/apl-ocean-engineering/orbslam3_ros2) which includes this repo as a submodule.   Dependencies (g2o, Sophus, Pangolin) are included from ROS apt via rosdep.
+   * For non-ROS builds, I am now using `vcpkg` as a dependency manager as it can build the non-apt-gettable dependencies (Pangolin).   **However** I am using overlays to preferentially use apt versions of packages whenever feasible (ffmpeg, etc).
+   * In some cases (`g2o` and its dependencies) we use vcpkg's version to ensure dependencies stay in sycn.
+* Other minor changes:
+   * Removed integrated Realsense support.    Realsense-enabled binaries should go in a separate package.
 
+
+## Building
+
+I am only testing on Ubuntu 24.04.
+
+As noted above, I prefer to use system packages as much as possible and use `vcpkg` for dependencies with no published binaries (outside of ROS).  To override this behavior and have vcpkg build additional packages from source, remove the relevant directories from the [`vcpkg_overlays/`](vcpkg_overlays/) directory.
+
+I've gone full koolaid and adopted `ninja` as a builder as well.
+
+To build in Ubuntu, use the convenience scripts:
+
+```
+./install_apt_dependencies.sh
+./build.sh
+```
+
+This will build Release versions the ORB_SLAM3 library and all of the `Examples`.
 
 -----
 -----
 
-Author's original README follows below.
+The author's original README follows below.
 
 
 # ORB-SLAM3
@@ -77,13 +103,16 @@ We use the new thread and chrono functionalities of C++11.
 We use [Pangolin](https://github.com/stevenlovegrove/Pangolin) for visualization and user interface. Dowload and install instructions can be found at: https://github.com/stevenlovegrove/Pangolin.
 
 ## OpenCV
-We use [OpenCV](http://opencv.org) to manipulate images and features. Dowload and install instructions can be found at: http://opencv.org. **Required at leat 3.0. Tested with OpenCV 3.2.0 and 4.4.0**.
+We use [OpenCV](http://opencv.org) to manipulate images and features. Dowload and install instructions can be found at: http://opencv.org. **Required at least 3.0. Tested with OpenCV 3.2.0 and 4.4.0**.
 
 ## Eigen3
 Required by g2o (see below). Download and install instructions can be found at: http://eigen.tuxfamily.org. **Required at least 3.1.0**.
 
 ## DBoW2 and g2o (Included in Thirdparty folder)
-We use modified versions of the [DBoW2](https://github.com/dorian3d/DBoW2) library to perform place recognition and [g2o](https://github.com/RainerKuemmerle/g2o) library to perform non-linear optimizations. Both modified libraries (which are BSD) are included in the *Thirdparty* folder.
+We use modified versions of the [DBoW2](https://github.com/dorian3d/DBoW2) library to perform place recognition ~~and [g2o](https://github.com/RainerKuemmerle/g2o) library to perform non-linear optimizations.~~ Both modified libraries (which are BSD) are included in the *Thirdparty* folder.
+
+**Modified g2o has been removed, use the system version instead.**
+
 
 ## Python
 Required to calculate the alignment of the trajectory with the ground truth. **Required Numpy module**.
@@ -94,7 +123,9 @@ Required to calculate the alignment of the trajectory with the ground truth. **R
 
 ## ROS (optional)
 
-We provide some examples to process input of a monocular, monocular-inertial, stereo, stereo-inertial or RGB-D camera using ROS. Building these examples is optional. These have been tested with ROS Melodic under Ubuntu 18.04.
+~~We provide some examples to process input of a monocular, monocular-inertial, stereo, stereo-inertial or RGB-D camera using ROS. Building these examples is optional. These have been tested with ROS Melodic under Ubuntu 18.04.~~
+
+ROS1 support has been removed.  See [orbslam3_ros2](https://gitlab.com/apl-ocean-engineering/orbslam3_ros2) for ROS2 support.
 
 # 3. Building ORB-SLAM3 library and examples
 

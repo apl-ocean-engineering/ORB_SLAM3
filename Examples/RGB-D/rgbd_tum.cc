@@ -63,8 +63,17 @@ int main(int argc, char **argv) {
 
   // Create SLAM system. It initializes all system threads and gets ready to
   // process frames.
-  ORB_SLAM3::System SLAM(argv[1], argv[2], ORB_SLAM3::System::RGBD, true);
-  float imageScale = SLAM.GetImageScale();
+  auto exSLAM = ORB_SLAM3::SystemFactory::create(
+      argv[1], argv[2], ORB_SLAM3::SensorType::RGBD, true);
+
+  if (!exSLAM) {
+    cerr << "Failure to initialize ORBSLAM3: " << exSLAM.error().msg() << endl;
+    exit(-1);
+  }
+
+  auto SLAM = exSLAM.value();
+
+  float imageScale = SLAM->GetImageScale();
 
   // Vector for tracking time statistics
   vector<float> vTimesTrack;
@@ -98,22 +107,12 @@ int main(int argc, char **argv) {
       cv::resize(imD, imD, cv::Size(width, height));
     }
 
-#ifdef COMPILEDWITHC14
     std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
-#else
-    std::chrono::monotonic_clock::time_point t1 =
-        std::chrono::monotonic_clock::now();
-#endif
 
     // Pass the image to the SLAM system
-    SLAM.TrackRGBD(imRGB, imD, tframe);
+    SLAM->TrackRGBD(imRGB, imD, tframe);
 
-#ifdef COMPILEDWITHC14
     std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
-#else
-    std::chrono::monotonic_clock::time_point t2 =
-        std::chrono::monotonic_clock::now();
-#endif
 
     double ttrack =
         std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1)
@@ -132,7 +131,7 @@ int main(int argc, char **argv) {
   }
 
   // Stop all threads
-  SLAM.Shutdown();
+  SLAM->Shutdown();
 
   // Tracking time statistics
   sort(vTimesTrack.begin(), vTimesTrack.end());
@@ -145,8 +144,8 @@ int main(int argc, char **argv) {
   cout << "mean tracking time: " << totaltime / nImages << endl;
 
   // Save camera trajectory
-  SLAM.SaveTrajectoryTUM("CameraTrajectory.txt");
-  SLAM.SaveKeyFrameTrajectoryTUM("KeyFrameTrajectory.txt");
+  SLAM->SaveTrajectoryTUM("CameraTrajectory.txt");
+  SLAM->SaveKeyFrameTrajectoryTUM("KeyFrameTrajectory.txt");
 
   return 0;
 }

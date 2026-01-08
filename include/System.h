@@ -32,6 +32,7 @@
 #include <vector>
 
 #include "Atlas.h"
+#include "Expected.h"
 #include "FrameDrawer.h"
 #include "ImuTypes.h"
 #include "KeyFrameDatabase.h"
@@ -55,26 +56,40 @@ class LocalMapping;
 class LoopClosing;
 class Settings;
 
-class System {
+class SystemFactory {
  public:
+  typedef tl::expected<std::shared_ptr<System>, ExpectedError> Expected;
+
+  static Expected create(const std::shared_ptr<Settings> &settings,
+                         bool initFr = false,
+                         const string &strSequence = std::string());
+
+  static Expected create(const std::string &configFile, const SensorType sensor,
+                         bool initFr = false,
+                         const string &strSequence = std::string());
+
+  // Provided for compatibility with old API
+  static Expected create(const std::string &configFile,
+                         const std::string &vocabFile, const SensorType sensor,
+                         bool initFr = false,
+                         const string &strSequence = std::string());
+};
+
+// System should be created using  SystemFactory::create()
+//
+// It will validate settings and catch errors on startup
+class System : public std::enable_shared_from_this<System> {
+ public:
+  friend SystemFactory::Expected SystemFactory::create(
+      const std::shared_ptr<Settings> &, bool, const string &);
+
   // File type
   enum FileType {
     TEXT_FILE = 0,
     BINARY_FILE = 1,
   };
 
- public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  // Initialize the SLAM system. It launches the Local Mapping, Loop Closing and
-  // Viewer threads.
-  System(const string &strVocFile, const string &strSettingsFile,
-         const SensorType sensor, bool initFr = false,
-         const string &strSequence = std::string());
-
-  // Initialize the SLAM system. It launches the Local Mapping, Loop Closing and
-  // Viewer threads.
-  System(const std::shared_ptr<Settings> &settings, bool initFr = false,
-         const string &strSequence = std::string());
 
   // Proccess the given stereo frame. Images must be synchronized and rectified.
   // Input images: RGB (CV_8UC3) or grayscale (CV_8U). RGB is converted to
@@ -151,7 +166,7 @@ class System {
   // http://www.cvlibs.net/datasets/kitti/eval_odometry.php
   void SaveTrajectoryKITTI(const string &filename);
 
-  // TODO: Save/Load functions
+  // \todo{} Serialization is currently broken
   // SaveMap(const string &filename);
   // LoadMap(const string &filename);
 
@@ -181,10 +196,24 @@ class System {
   void InsertTrackTime(double &time);
 #endif
 
- private:
+ protected:
+  // Initialize the SLAM system. It launches the Local Mapping, Loop Closing and
+  // Viewer threads.
+  //
+  // All construction should go through the factory to ensure correct
+  // initialization
+  System(const std::shared_ptr<Settings> &settings, bool initFr = false,
+         const string &strSequence = std::string());
+
   void printBanner();
 
-  void initialize(bool initFr, const string &strSequence);
+  bool initialize(bool initFr = false,
+                  const string &strSequence = std::string());
+
+ private:
+  void processLocalizationModeChange(void);
+  void processReset(void);
+  void updateTrackingState();
 
   void SaveAtlas(int type);
   bool LoadAtlas(int type);
@@ -225,9 +254,9 @@ class System {
   // System threads: Local Mapping, Loop Closing, Viewer.
   // The Tracking thread "lives" in the main execution thread that creates the
   // System object.
-  std::thread *mptLocalMapping;
-  std::thread *mptLoopClosing;
-  std::thread *mptViewer;
+  std::unique_ptr<std::thread> mptLocalMapping;
+  std::unique_ptr<std::thread> mptLoopClosing;
+  std::unique_ptr<std::thread> mptViewer;
 
   // Reset flag
   std::mutex mMutexReset;
@@ -247,12 +276,6 @@ class System {
   std::vector<MapPoint *> mTrackedMapPoints;
   std::vector<cv::KeyPoint> mTrackedKeyPointsUn;
   std::mutex mMutexState;
-
-  //
-  string mStrLoadAtlasFromFile;
-  string mStrSaveAtlasToFile;
-
-  string mStrVocabularyFilePath;
 
   std::shared_ptr<Settings> settings_;
 };

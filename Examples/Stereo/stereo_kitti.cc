@@ -52,8 +52,17 @@ int main(int argc, char **argv) {
 
   // Create SLAM system. It initializes all system threads and gets ready to
   // process frames.
-  ORB_SLAM3::System SLAM(argv[1], argv[2], ORB_SLAM3::System::STEREO, true);
-  float imageScale = SLAM.GetImageScale();
+  auto exSLAM = ORB_SLAM3::SystemFactory::create(
+      argv[1], argv[2], ORB_SLAM3::SensorType::STEREO, true);
+
+  if (!exSLAM) {
+    cerr << "Failure to initialize ORBSLAM3: " << exSLAM.error().msg() << endl;
+    exit(-1);
+  }
+
+  auto SLAM = exSLAM.value();
+
+  float imageScale = SLAM->GetImageScale();
 
   // Vector for tracking time statistics
   vector<float> vTimesTrack;
@@ -84,58 +93,41 @@ int main(int argc, char **argv) {
 
     if (imageScale != 1.f) {
 #ifdef REGISTER_TIMES
-#ifdef COMPILEDWITHC14
       std::chrono::steady_clock::time_point t_Start_Resize =
           std::chrono::steady_clock::now();
-#else
-      std::chrono::monotonic_clock::time_point t_Start_Resize =
-          std::chrono::monotonic_clock::now();
 #endif
-#endif
+
       int width = imLeft.cols * imageScale;
       int height = imLeft.rows * imageScale;
       cv::resize(imLeft, imLeft, cv::Size(width, height));
       cv::resize(imRight, imRight, cv::Size(width, height));
+
 #ifdef REGISTER_TIMES
-#ifdef COMPILEDWITHC14
       std::chrono::steady_clock::time_point t_End_Resize =
           std::chrono::steady_clock::now();
-#else
-      std::chrono::monotonic_clock::time_point t_End_Resize =
-          std::chrono::monotonic_clock::now();
-#endif
+
       t_resize = std::chrono::duration_cast<
                      std::chrono::duration<double, std::milli> >(t_End_Resize -
                                                                  t_Start_Resize)
                      .count();
-      SLAM.InsertResizeTime(t_resize);
-#endif
+      SLAM->InsertResizeTime(t_resize);
     }
 
-#ifdef COMPILEDWITHC14
     std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
-#else
-    std::chrono::monotonic_clock::time_point t1 =
-        std::chrono::monotonic_clock::now();
 #endif
 
     // Pass the images to the SLAM system
-    SLAM.TrackStereo(imLeft, imRight, tframe);
-
-#ifdef COMPILEDWITHC14
-    std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
-#else
-    std::chrono::monotonic_clock::time_point t2 =
-        std::chrono::monotonic_clock::now();
-#endif
+    SLAM->TrackStereo(imLeft, imRight, tframe);
 
 #ifdef REGISTER_TIMES
+    std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
+
     t_track =
         t_resize +
         std::chrono::duration_cast<std::chrono::duration<double, std::milli> >(
             t2 - t1)
             .count();
-    SLAM.InsertTrackTime(t_track);
+    SLAM->InsertTrackTime(t_track);
 #endif
 
     double ttrack =
@@ -155,7 +147,7 @@ int main(int argc, char **argv) {
   }
 
   // Stop all threads
-  SLAM.Shutdown();
+  SLAM->Shutdown();
 
   // Tracking time statistics
   sort(vTimesTrack.begin(), vTimesTrack.end());
@@ -168,7 +160,7 @@ int main(int argc, char **argv) {
   cout << "mean tracking time: " << totaltime / nImages << endl;
 
   // Save camera trajectory
-  SLAM.SaveTrajectoryKITTI("CameraTrajectory.txt");
+  SLAM->SaveTrajectoryKITTI("CameraTrajectory.txt");
 
   return 0;
 }

@@ -28,6 +28,7 @@
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 #include <cmath>
+#include <memory>
 #include <opencv2/core/core.hpp>
 #include <vector>
 
@@ -77,9 +78,10 @@ class ImuCamPose {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   ImuCamPose() {}
-  explicit ImuCamPose(KeyFrame* pKF);
-  explicit ImuCamPose(Frame* pF);
-  ImuCamPose(Eigen::Matrix3d& _Rwc, Eigen::Vector3d& _twc, KeyFrame* pKF);
+  explicit ImuCamPose(const std::shared_ptr<KeyFrame>& pKF);
+  explicit ImuCamPose(const std::shared_ptr<Frame>& pF);
+  ImuCamPose(Eigen::Matrix3d& _Rwc, Eigen::Vector3d& _twc,
+             const std::shared_ptr<KeyFrame>& pKF);
 
   void SetParam(const std::vector<Eigen::Matrix3d>& _Rcw,
                 const std::vector<Eigen::Vector3d>& _tcw,
@@ -118,7 +120,8 @@ class InvDepthPoint {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   InvDepthPoint() {}
-  InvDepthPoint(double _rho, double _u, double _v, KeyFrame* pHostKF);
+  InvDepthPoint(double _rho, double _u, double _v,
+                const std::shared_ptr<KeyFrame>& pHostKF);
 
   void Update(const double* pu);
 
@@ -135,8 +138,12 @@ class VertexPose : public g2o::BaseVertex<6, ImuCamPose> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   VertexPose() {}
-  explicit VertexPose(KeyFrame* pKF) { setEstimate(ImuCamPose(pKF)); }
-  explicit VertexPose(Frame* pF) { setEstimate(ImuCamPose(pF)); }
+  explicit VertexPose(const std::shared_ptr<KeyFrame>& pKF) {
+    setEstimate(ImuCamPose(pKF));
+  }
+  explicit VertexPose(const std::shared_ptr<Frame>& pF) {
+    setEstimate(ImuCamPose(pF));
+  }
 
   virtual bool read(std::istream& is);
   virtual bool write(std::ostream& os) const;
@@ -154,9 +161,14 @@ class VertexPose4DoF : public g2o::BaseVertex<4, ImuCamPose> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   VertexPose4DoF() {}
-  explicit VertexPose4DoF(KeyFrame* pKF) { setEstimate(ImuCamPose(pKF)); }
-  explicit VertexPose4DoF(Frame* pF) { setEstimate(ImuCamPose(pF)); }
-  VertexPose4DoF(Eigen::Matrix3d& _Rwc, Eigen::Vector3d& _twc, KeyFrame* pKF) {
+  explicit VertexPose4DoF(const std::shared_ptr<KeyFrame>& pKF) {
+    setEstimate(ImuCamPose(pKF));
+  }
+  explicit VertexPose4DoF(const std::shared_ptr<Frame>& pF) {
+    setEstimate(ImuCamPose(pF));
+  }
+  VertexPose4DoF(Eigen::Matrix3d& _Rwc, Eigen::Vector3d& _twc,
+                 const std::shared_ptr<KeyFrame>& pKF) {
     setEstimate(ImuCamPose(_Rwc, _twc, pKF));
   }
 
@@ -182,8 +194,8 @@ class VertexVelocity : public g2o::BaseVertex<3, Eigen::Vector3d> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   VertexVelocity() {}
-  explicit VertexVelocity(KeyFrame* pKF);
-  explicit VertexVelocity(Frame* pF);
+  explicit VertexVelocity(const std::shared_ptr<KeyFrame>& pKF);
+  explicit VertexVelocity(const std::shared_ptr<Frame>& pF);
 
   virtual bool read(std::istream& is) { return false; }
   virtual bool write(std::ostream& os) const { return false; }
@@ -201,8 +213,8 @@ class VertexGyroBias : public g2o::BaseVertex<3, Eigen::Vector3d> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   VertexGyroBias() {}
-  explicit VertexGyroBias(KeyFrame* pKF);
-  explicit VertexGyroBias(Frame* pF);
+  explicit VertexGyroBias(const std::shared_ptr<KeyFrame>& pKF);
+  explicit VertexGyroBias(const std::shared_ptr<Frame>& pF);
 
   virtual bool read(std::istream& is) { return false; }
   virtual bool write(std::ostream& os) const { return false; }
@@ -220,8 +232,8 @@ class VertexAccBias : public g2o::BaseVertex<3, Eigen::Vector3d> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   VertexAccBias() {}
-  explicit VertexAccBias(KeyFrame* pKF);
-  explicit VertexAccBias(Frame* pF);
+  explicit VertexAccBias(const std::shared_ptr<KeyFrame>& pKF);
+  explicit VertexAccBias(const std::shared_ptr<Frame>& pF);
 
   virtual bool read(std::istream& is) { return false; }
   virtual bool write(std::ostream& os) const { return false; }
@@ -289,7 +301,7 @@ class VertexInvDepth : public g2o::BaseVertex<1, InvDepthPoint> {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   VertexInvDepth() {}
   explicit VertexInvDepth(double invDepth, double u, double v,
-                          KeyFrame* pHostKF) {
+                          const std::shared_ptr<KeyFrame>& pHostKF) {
     setEstimate(InvDepthPoint(invDepth, u, v, pHostKF));
   }
 
@@ -458,7 +470,7 @@ class EdgeInertial : public g2o::BaseMultiEdge<9, Vector9d> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-  explicit EdgeInertial(IMU::Preintegrated* pInt);
+  explicit EdgeInertial(const std::shared_ptr<IMU::Preintegrated>& pInt);
 
   virtual bool read(std::istream& is) { return false; }
   virtual bool write(std::ostream& os) const { return false; }
@@ -499,7 +511,7 @@ class EdgeInertial : public g2o::BaseMultiEdge<9, Vector9d> {
 
   const Eigen::Matrix3d JRg, JVg, JPg;
   const Eigen::Matrix3d JVa, JPa;
-  IMU::Preintegrated* mpInt;
+  std::shared_ptr<IMU::Preintegrated> mpInt;
   const double dt;
   Eigen::Vector3d g;
 };
@@ -510,7 +522,7 @@ class EdgeInertialGS : public g2o::BaseMultiEdge<9, Vector9d> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-  explicit EdgeInertialGS(IMU::Preintegrated* pInt);
+  explicit EdgeInertialGS(const std::shared_ptr<IMU::Preintegrated>& pInt);
 
   virtual bool read(std::istream& is) { return false; }
   virtual bool write(std::ostream& os) const { return false; }
@@ -520,7 +532,7 @@ class EdgeInertialGS : public g2o::BaseMultiEdge<9, Vector9d> {
 
   const Eigen::Matrix3d JRg, JVg, JPg;
   const Eigen::Matrix3d JVa, JPa;
-  IMU::Preintegrated* mpInt;
+  std::shared_ptr<IMU::Preintegrated> mpInt;
   const double dt;
   Eigen::Vector3d g, gI;
 

@@ -39,29 +39,13 @@ class Pinhole : public GeometricCamera {
   }
 
  public:
-  Pinhole() {
-    mvParameters.resize(4);
-    mnId = nNextId++;
-    mnType = CAM_PINHOLE;
-  }
+  Pinhole();
 
-  explicit Pinhole(const std::vector<float> _vParameters)
-      : GeometricCamera(_vParameters), tvr(nullptr) {
-    assert(mvParameters.size() == 4);
-    mnId = nNextId++;
-    mnType = CAM_PINHOLE;
-  }
+  explicit Pinhole(const std::vector<float> _vParameters);
 
-  explicit Pinhole(Pinhole* pPinhole)
-      : GeometricCamera(pPinhole->mvParameters), tvr(nullptr) {
-    assert(mvParameters.size() == 4);
-    mnId = nNextId++;
-    mnType = CAM_PINHOLE;
-  }
+  explicit Pinhole(const Pinhole& pinhole);
 
-  ~Pinhole() {
-    if (tvr) delete tvr;
-  }
+  ~Pinhole();
 
   cv::Point2f project(const cv::Point3f& p3D);
   Eigen::Vector2d project(const Eigen::Vector3d& v3D);
@@ -106,7 +90,7 @@ class Pinhole : public GeometricCamera {
  private:
   // Parameters vector corresponds to
   //       [fx, fy, cx, cy]
-  TwoViewReconstruction* tvr;
+  std::shared_ptr<TwoViewReconstruction> tvr;
 };
 }  // namespace ORB_SLAM3
 

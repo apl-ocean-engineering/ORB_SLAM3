@@ -34,10 +34,11 @@
 
 namespace ORB_SLAM3 {
 
-Sim3Solver::Sim3Solver(KeyFrame *pKF1, KeyFrame *pKF2,
+Sim3Solver::Sim3Solver(const std::shared_ptr<KeyFrame> &pKF1,
+                       const std::shared_ptr<KeyFrame> &pKF2,
                        const vector<MapPoint *> &vpMatched12,
                        const bool bFixScale,
-                       vector<KeyFrame *> vpKeyFrameMatchedMP)
+                       vector<std::shared_ptr<KeyFrame>> vpKeyFrameMatchedMP)
     : mnIterations(0),
       mnBestInliers(0),
       mbFixScale(bFixScale),
@@ -46,7 +47,8 @@ Sim3Solver::Sim3Solver(KeyFrame *pKF1, KeyFrame *pKF2,
   bool bDifferentKFs = false;
   if (vpKeyFrameMatchedMP.empty()) {
     bDifferentKFs = true;
-    vpKeyFrameMatchedMP = vector<KeyFrame *>(vpMatched12.size(), pKF2);
+    vpKeyFrameMatchedMP =
+        vector<std::shared_ptr<KeyFrame>>(vpMatched12.size(), pKF2);
   }
 
   mpKF1 = pKF1;
@@ -72,7 +74,7 @@ Sim3Solver::Sim3Solver(KeyFrame *pKF1, KeyFrame *pKF2,
 
   size_t idx = 0;
 
-  KeyFrame *pKFm = pKF2;  // Default variable
+  std::shared_ptr<KeyFrame> pKFm = pKF2;  // Default variable
   for (int i1 = 0; i1 < mN1; i1++) {
     if (vpMatched12[i1]) {
       MapPoint *pMP1 = vpKeyFrameMP1[i1];
@@ -125,7 +127,7 @@ void Sim3Solver::SetRansacParameters(double probability, int minInliers,
   mRansacMinInliers = minInliers;
   mRansacMaxIts = maxIterations;
 
-  N = mvpMapPoints1.size();  // number of correspondences
+  N = std::max<size_t>(1, mvpMapPoints1.size());  // number of correspondences
 
   mvbInliersi.resize(N);
 

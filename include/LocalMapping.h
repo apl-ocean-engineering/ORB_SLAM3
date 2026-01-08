@@ -44,9 +44,9 @@ class Atlas;
 class LocalMapping {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  LocalMapping(System *pSys, const std::shared_ptr<Atlas> &pAtlas,
-               const float bMonocular, bool bInertial,
-               const string &_strSeqName = std::string());
+  LocalMapping(const std::shared_ptr<System> &pSys,
+               const std::shared_ptr<Atlas> &pAtlas, const float bMonocular,
+               bool bInertial, const string &_strSeqName = std::string());
 
   void SetLoopCloser(const std::shared_ptr<LoopClosing> &pLoopCloser);
 
@@ -55,7 +55,7 @@ class LocalMapping {
   // Main function
   void Run();
 
-  void InsertKeyFrame(KeyFrame *pKF);
+  void InsertKeyFrame(const std::shared_ptr<KeyFrame> &pKF);
   void EmptyQueue();
 
   // Thread Synch
@@ -82,7 +82,7 @@ class LocalMapping {
 
   bool IsInitializing();
   double GetCurrKFTime();
-  KeyFrame *GetCurrKF();
+  std::shared_ptr<KeyFrame> GetCurrKF();
 
   std::mutex mMutexImuInit;
 
@@ -142,7 +142,7 @@ class LocalMapping {
   void SearchInNeighbors();
   void KeyFrameCulling();
 
-  System *mpSystem;
+  std::shared_ptr<System> mpSystem;
 
   bool mbMonocular;
   bool mbInertial;
@@ -164,9 +164,9 @@ class LocalMapping {
   std::shared_ptr<LoopClosing> mpLoopCloser;
   std::shared_ptr<Tracking> mpTracker;
 
-  std::list<KeyFrame *> mlNewKeyFrames;
+  std::list<std::shared_ptr<KeyFrame>> mlNewKeyFrames;
 
-  KeyFrame *mpCurrentKeyFrame;
+  std::shared_ptr<KeyFrame> mpCurrentKeyFrame;
 
   std::list<MapPoint *> mlpRecentAddedMapPoints;
 

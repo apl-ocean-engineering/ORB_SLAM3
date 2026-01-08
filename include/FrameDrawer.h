@@ -46,7 +46,7 @@ class FrameDrawer {
                        bool draw_both = false);
 
   // Update info from the last processed frame.
-  void Update(Tracking *pTracker);
+  void Update(const std::shared_ptr<Tracking> &pTracker);
 
   // Draw last processed frame.
   cv::Mat DrawFrame(float imageScale = 1.f);
@@ -75,7 +75,7 @@ class FrameDrawer {
   std::mutex mMutex;
   vector<pair<cv::Point2f, cv::Point2f> > mvTracks;
 
-  Frame mCurrentFrame;
+  std::shared_ptr<Frame> mCurrentFrame;
   vector<MapPoint *> mvpLocalMap;
   vector<cv::KeyPoint> mvMatchedKeys;
   vector<MapPoint *> mvpMatchedMPs;

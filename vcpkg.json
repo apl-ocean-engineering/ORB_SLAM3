@@ -1,0 +1,21 @@
+{
+  "name": "main",
+  "version-string": "latest",
+  "configuration": {
+    "default-registry":
+        {
+          "kind": "git",
+          "baseline": "e3db8f65d2414c301c29a8467c6aee94e3ba09fc",
+          "repository": "https://github.com/Microsoft/vcpkg"
+        },
+    "overlay-ports": [
+      "vcpkg_overlay"
+    ]
+  },
+  "dependencies": [
+    "pangolin",
+    "sophus",
+    "g2o",
+    "eigen3"
+  ]
+}

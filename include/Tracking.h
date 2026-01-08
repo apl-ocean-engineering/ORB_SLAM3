@@ -55,10 +55,11 @@ class LoopClosing;
 class System;
 class Settings;
 
-class Tracking {
+class Tracking : public std::enable_shared_from_this<Tracking> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  Tracking(System *pSys, const std::shared_ptr<ORBVocabulary> &pVoc,
+  Tracking(const std::shared_ptr<System> &pSys,
+           const std::shared_ptr<ORBVocabulary> &pVoc,
            const std::shared_ptr<FrameDrawer> &pFrameDrawer,
            const std::shared_ptr<MapDrawer> &pMapDrawer,
            const std::shared_ptr<Atlas> &pAtlas,
@@ -103,8 +104,8 @@ class Tracking {
   void InformOnlyTracking(const bool &flag);
 
   void UpdateFrameIMU(const float s, const IMU::Bias &b,
-                      KeyFrame *pCurrentKeyFrame);
-  KeyFrame *GetLastKeyFrame() { return mpLastKeyFrame; }
+                      const std::shared_ptr<KeyFrame> &pCurrentKeyFrame);
+  std::shared_ptr<KeyFrame> GetLastKeyFrame() { return mpLastKeyFrame; }
 
   void CreateMapInAtlas();
   // std::mutex mMutexTracks;
@@ -148,8 +149,8 @@ class Tracking {
   SensorType mSensor;
 
   // Current Frame
-  Frame mCurrentFrame;
-  Frame mLastFrame;
+  std::shared_ptr<Frame> mCurrentFrame;
+  std::shared_ptr<Frame> mLastFrame;
 
   cv::Mat mImGray;
 
@@ -158,13 +159,13 @@ class Tracking {
   std::vector<int> mvIniMatches;
   std::vector<cv::Point2f> mvbPrevMatched;
   std::vector<cv::Point3f> mvIniP3D;
-  Frame mInitialFrame;
+  std::shared_ptr<Frame> mInitialFrame;
 
   // Lists used to recover the full camera trajectory at the end of the
   // execution. Basically we store the reference keyframe for each frame and its
   // relative transformation
   list<Sophus::SE3f> mlRelativeFramePoses;
-  list<KeyFrame *> mlpReferences;
+  list<std::shared_ptr<KeyFrame>> mlpReferences;
   list<double> mlFrameTimes;
   list<bool> mlbLost;
 
@@ -245,7 +246,7 @@ class Tracking {
   bool mbMapUpdated;
 
   // Imu preintegration from last frame
-  IMU::Preintegrated *mpImuPreintegratedFromLastKF;
+  std::shared_ptr<IMU::Preintegrated> mpImuPreintegratedFromLastKF;
 
   // Queue of IMU measurements between frames
   std::list<IMU::Point> mlQueueImuData;
@@ -256,7 +257,7 @@ class Tracking {
   std::mutex mMutexImuQueue;
 
   // Imu calibration parameters
-  IMU::Calib *mpImuCalib;
+  IMU::Calib mImuCalib;
 
   // Last Bias Estimation (at keyframe creation)
   IMU::Bias mLastBias;
@@ -285,12 +286,12 @@ class Tracking {
   bool mbSetInit;
 
   // Local Map
-  KeyFrame *mpReferenceKF;
-  std::vector<KeyFrame *> mvpLocalKeyFrames;
+  std::shared_ptr<KeyFrame> mpReferenceKF;
+  std::vector<std::shared_ptr<KeyFrame>> mvpLocalKeyFrames;
   std::vector<MapPoint *> mvpLocalMapPoints;
 
   // System
-  System *mpSystem;
+  std::shared_ptr<System> mpSystem;
 
   // Drawers
   std::shared_ptr<Viewer> mpViewer;
@@ -333,7 +334,7 @@ class Tracking {
   int mnMatchesInliers;
 
   // Last Frame, KeyFrame and Relocalisation Info
-  KeyFrame *mpLastKeyFrame;
+  std::shared_ptr<KeyFrame> mpLastKeyFrame;
   unsigned int mnLastKeyFrameId;
   unsigned int mnLastRelocFrameId;
   double mTimeStampLost;
