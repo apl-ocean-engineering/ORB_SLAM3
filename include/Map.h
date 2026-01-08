@@ -182,8 +182,8 @@ class Map : public std::enable_shared_from_this<Map> {
   std::shared_ptr<KeyFrame> mpKFinitial;
   std::shared_ptr<KeyFrame> mpKFlowerID;
 
-  unsigned long int mnBackupKFinitialID;
-  unsigned long int mnBackupKFlowerID;
+  long int mnBackupKFinitialID;
+  long int mnBackupKFlowerID;
 
   std::vector<MapPoint*> mvpReferenceMapPoints;
 

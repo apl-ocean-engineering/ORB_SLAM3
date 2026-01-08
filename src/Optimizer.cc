@@ -234,7 +234,8 @@ void Optimizer::BundleAdjustment(const vector<std::shared_ptr<KeyFrame>>& vpKFs,
       if (pKF->mpCamera2) {
         int rightIndex = get<1>(mit->second);
 
-        if (rightIndex != -1 && rightIndex < pKF->mvKeysRight.size()) {
+        if (rightIndex != -1 &&
+            rightIndex < static_cast<int>(pKF->mvKeysRight.size())) {
           rightIndex -= pKF->NLeft;
 
           Eigen::Matrix<double, 2, 1> obs;
@@ -644,9 +645,10 @@ void Optimizer::FullInertialBA(const std::shared_ptr<Map>& pMap, int its,
 
         if (pKFi->mpCamera2) {
           // Monocular right observation
-          size_t rightIndex = get<1>(vObs);
+          int rightIndex = get<1>(vObs);
 
-          if (rightIndex != -1 && rightIndex < pKFi->mvKeysRight.size()) {
+          if (rightIndex != -1 &&
+              rightIndex < static_cast<int>(pKFi->mvKeysRight.size())) {
             rightIndex -= pKFi->NLeft;
 
             Eigen::Matrix<double, 2, 1> obs;
@@ -3384,10 +3386,12 @@ void Optimizer::InertialOptimization(const std::shared_ptr<Map>& pMap,
   optimizer.setVerbose(false);
   optimizer.initializeOptimization();
   optimizer.computeActiveErrors();
-  float err = optimizer.activeRobustChi2();
+  // float err =
+  optimizer.activeRobustChi2();
   optimizer.optimize(its);
   optimizer.computeActiveErrors();
-  float err_end = optimizer.activeRobustChi2();
+  // float err_end =
+  optimizer.activeRobustChi2();
   // Recover optimized data
   scale = VS->estimate();
   Rwg = VGDir->estimate().Rwg;
@@ -3397,7 +3401,7 @@ void Optimizer::LocalBundleAdjustment(const shared_ptr<KeyFrame>& pMainKF,
                                       vector<shared_ptr<KeyFrame>> vpAdjustKF,
                                       vector<shared_ptr<KeyFrame>> vpFixedKF,
                                       bool* pbStopFlag) {
-  bool bShowImages = false;
+  // bool bShowImages = false;
 
   vector<MapPoint*> vpMPs;
 

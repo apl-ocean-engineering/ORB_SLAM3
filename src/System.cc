@@ -1042,7 +1042,7 @@ void System::SaveKeyFrameTrajectoryEuRoC(const string &filename) {
 
   vector<std::shared_ptr<Map>> vpMaps = mpAtlas->GetAllMaps();
   std::shared_ptr<Map> pBiggerMap;
-  int numMaxKFs = 0;
+  size_t numMaxKFs = 0;
   for (auto pMap : vpMaps) {
     if (pMap && pMap->GetAllKeyFrames().size() > numMaxKFs) {
       numMaxKFs = pMap->GetAllKeyFrames().size();

@@ -427,7 +427,7 @@ void Map::PostLoad(
 
   mvpKeyFrameOrigins.clear();
   mvpKeyFrameOrigins.reserve(mvBackupKeyFrameOriginsId.size());
-  for (int i = 0; i < mvBackupKeyFrameOriginsId.size(); ++i) {
+  for (size_t i = 0; i < mvBackupKeyFrameOriginsId.size(); ++i) {
     mvpKeyFrameOrigins.push_back(mpKeyFrameId[mvBackupKeyFrameOriginsId[i]]);
   }
 

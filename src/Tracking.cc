@@ -79,6 +79,7 @@ Tracking::Tracking(const std::shared_ptr<System>& pSys,
       mnFirstFrameId(0),
       mpCamera2(nullptr),
       mpLastKeyFrame(),
+      mThDepth(1.0),
       initID(0),
       lastID(0),
       mbInitWith3KFs(false),
@@ -693,7 +694,7 @@ Sophus::SE3f Tracking::GrabImageStereo(const cv::Mat& imRectLeft,
       std::chrono::steady_clock::now();
 
   spdlog::info(
-      "Tracking::GrabImageStereo Elapsed time (ms): image_conversion {:.4}, "
+      "[Tracking::GrabImageStereo] Elapsed time (ms): image_conversion {:.4}, "
       "frame_creation {:.4}, track {:.4}",
       std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(
           t_post_image_conversion - t_start)
@@ -2009,22 +2010,29 @@ bool Tracking::TrackWithMotionModel() {
   int nmatches = matcher.SearchByProjection(mCurrentFrame, mLastFrame, th,
                                             mSensor.isMonocular());
 
-  spdlog::info("Tracking::TrackWithMotionModel found {}  matches in first pass",
-               nmatches);
+  spdlog::debug(
+      "[Tracking::TrackWithMotionModel] found {} matches in first pass",
+      nmatches);
 
   // If few matches, uses a wider window search
   if (nmatches < 20) {
-    spdlog::info("Not enough matches, wider window search!!");
+    spdlog::info(
+        "[Tracking::TrackWithMotionModel] Not enough matches, wider window "
+        "search!!");
     fill(mCurrentFrame->mvpMapPoints.begin(), mCurrentFrame->mvpMapPoints.end(),
          static_cast<MapPoint*>(NULL));
 
     nmatches = matcher.SearchByProjection(mCurrentFrame, mLastFrame, 2 * th,
                                           mSensor.isMonocular());
-    spdlog::debug("Matches with wider search: {}", to_string(nmatches));
+    spdlog::debug(
+        "[Tracking::TrackWithMotionModel] Matches with wider search: {}",
+        to_string(nmatches));
   }
 
   if (nmatches < 20) {
-    spdlog::info("Not enough matches after wider search!!");
+    spdlog::info(
+        "[Tracking::TrackWithMotionModel] Not enough matches after wider "
+        "search!!");
 
     if (mSensor.isImu())
       return true;
@@ -2057,8 +2065,8 @@ bool Tracking::TrackWithMotionModel() {
     }
   }
 
-  spdlog::info(
-      "Tracking::TrackWithMotionModel this led to {} matches against the map",
+  spdlog::debug(
+      "[Tracking::TrackWithMotionModel] this led to {} matches against the map",
       nmatchesMap);
 
   spdlog::info(
@@ -2076,7 +2084,7 @@ bool Tracking::TrackWithMotionModel() {
     return true;
   } else {
     const bool goodTracking = (nmatchesMap >= 10);
-    spdlog::info("Tracking::TrackWithMotionModel tracking is {}",
+    spdlog::info("[Tracking::TrackWithMotionModel] tracking is {}",
                  (goodTracking ? "GOOD" : "BAD"));
     return goodTracking;
   }
@@ -2115,19 +2123,21 @@ bool Tracking::TrackLocalMap() {
     Optimizer::PoseOptimization(mCurrentFrame);
   } else {
     if (mCurrentFrame->mnId <= mnLastRelocFrameId + mnFramesToResetIMU) {
-      spdlog::info("TLM: PoseOptimization");
+      spdlog::info("[Tracking::TrackLocalMap] PoseOptimization");
       Optimizer::PoseOptimization(mCurrentFrame);
     } else {
       // if(!mbMapUpdated && mState == OK) //  && (mnMatchesInliers>30))
       //
       //  && (mnMatchesInliers>30))
       if (!mbMapUpdated) {
-        spdlog::info("TLM: PoseInertialOptimizationLastFrame");
+        spdlog::info(
+            "[Tracking::TrackLocalMap] PoseInertialOptimizationLastFrame");
         inliers = Optimizer::PoseInertialOptimizationLastFrame(
             mCurrentFrame);  // ,
                              // !mpLastKeyFrame->GetMap()->GetInertialBA1());
       } else {
-        spdlog::info("TLM: PoseInertialOptimizationLastKeyFrame");
+        spdlog::info(
+            "[Tracking::TrackLocalMap] PoseInertialOptimizationLastKeyFrame");
         inliers = Optimizer::PoseInertialOptimizationLastKeyFrame(
             mCurrentFrame);  // ,
                              // !mpLastKeyFrame->GetMap()->GetInertialBA1());
@@ -2166,13 +2176,14 @@ bool Tracking::TrackLocalMap() {
     }
   }
 
-  spdlog::info("mnMatchesInliers: {}", mnMatchesInliers);
+  spdlog::debug("[Tracking::TrackLocalMap] mnMatchesInliers: {}",
+                mnMatchesInliers);
 
   std::chrono::steady_clock::time_point t_end =
       std::chrono::steady_clock::now();
 
   spdlog::info(
-      "Tracking::TrackLocalMap Elapsed time: Update local map {:.4}, search "
+      "[Tracking::TrackLocalMap] Elapsed time: Update local map {:.4}, search "
       "local points {:.4}, pose optimization {:.4} everything else {:.4}",
       std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(
           t_post_update_local_map - t_start)
@@ -2235,7 +2246,9 @@ bool Tracking::NeedNewKeyFrame() {
   if (mpLocalMapper->isStopped() || mpLocalMapper->stopRequested()) {
     /*if(mSensor == SensorType::MONOCULAR)
     {*/
-    spdlog::info("NeedNewKeyFrame: Not adding KF because localmap is stopped");
+    spdlog::info(
+        "[Tracking::NeedNewKeyFrame] Not adding KF because localmap is "
+        "stopped");
 
     return false;
   }
@@ -2276,7 +2289,8 @@ bool Tracking::NeedNewKeyFrame() {
       }
     }
     spdlog::info(
-        "[NEEDNEWKF]-> tracked close points: {}; non tracked close points: {}",
+        "[Tracking::NeedNewKeyFrame] tracked close points: {}; non tracked "
+        "close points: {}",
         to_string(nTrackedClose), to_string(nNonTrackedClose));
   }
 
@@ -2307,8 +2321,10 @@ bool Tracking::NeedNewKeyFrame() {
       thRefRatio = 0.90f;
   }
 
-  spdlog::debug("mnMatchesInliers: {}; nRefMatches: {}; thRefRatio: {}",
-                mnMatchesInliers, nRefMatches, thRefRatio);
+  spdlog::debug(
+      "[Tracking::NeedNewKeyFrame] mnMatchesInliers: {}; nRefMatches: {}; "
+      "thRefRatio: {}",
+      mnMatchesInliers, nRefMatches, thRefRatio);
 
   // Condition 1a: More than "MaxFrames" have passed from last keyframe
   // insertion
@@ -2355,18 +2371,20 @@ bool Tracking::NeedNewKeyFrame() {
   else
     c4 = false;
 
-  std::cout << "NeedNewKF: c1a=" << c1a << "; c1b=" << c1b << "; c1c=" << c1c
-            << "; c2=" << c2 << "; c3=" << c3 << "; c4=" << c4 << std::endl;
+  spdlog::info(
+      "[Tracking::NeedNewKeyFrame] c1a={}; c1b={}; c1c={}; c2={}; c3={}; c4={}",
+      c1a, c1b, c1c, c2, c3, c4);
 
   if (((c1a || c1b || c1c) && c2) || c3 || c4) {
     // If the mapping accepts keyframes, insert keyframe.
     // Otherwise send a signal to interrupt BA
     if (bLocalMappingIdle || mpLocalMapper->IsInitializing()) {
-      std::cout << "!!! Create a new keyframe!" << std::endl;
+      spdlog::info("[Tracking::NeedNewKeyFrame] !!! Create a new keyframe!");
       return true;
     } else {
-      std::cout << "!!! Want to create a new keyframe, interrupting BA"
-                << std::endl;
+      spdlog::info(
+          "[Tracking::NeedNewKeyFrame] !!! Want to create a new keyframe, "
+          "interrupting BA");
       mpLocalMapper->InterruptBA();
       if (mSensor != SensorType::MONOCULAR &&
           mSensor != SensorType::IMU_MONOCULAR) {
@@ -2375,7 +2393,8 @@ bool Tracking::NeedNewKeyFrame() {
         else
           return false;
       } else {
-        std::cout << "NeedNewKeyFrame: localmap is busy" << std::endl;
+        spdlog::info(
+            "[Tracking::NeedNewKeyFrame] NeedNewKeyFrame: localmap is busy");
         return false;
       }
     }
@@ -2403,7 +2422,7 @@ void Tracking::CreateNewKeyFrame() {
     pKF->mPrevKF = mpLastKeyFrame;
     mpLastKeyFrame->mNextKF = pKF;
   } else {
-    spdlog::info("No last KF in KF creation!!");
+    spdlog::info("[Tracking::CreateNewKeyFrame] No last KF in KF creation!!");
   }
   // Reset preintegration from last KF (Create new object)
   if (mSensor.isImu()) {
@@ -2490,7 +2509,8 @@ void Tracking::CreateNewKeyFrame() {
           break;
         }
       }
-      spdlog::info("New stereo KF with {} points", nPoints);
+      spdlog::info("[Tracking::CreateNewKeyFrame] New stereo KF with {} points",
+                   nPoints);
     }
   }
 
@@ -2887,7 +2907,7 @@ bool Tracking::Relocalization() {
 }
 
 void Tracking::Reset(bool bLocMap) {
-  spdlog::info("System resetting");
+  spdlog::info("[Tracking::Reset] System resetting");
 
   if (mpViewer) {
     mpViewer->RequestStop();
@@ -2896,16 +2916,16 @@ void Tracking::Reset(bool bLocMap) {
 
   // Reset Local Mapping
   if (!bLocMap) {
-    spdlog::debug("!! resetting Local Mapper...");
+    spdlog::debug("[Tracking::Reset] !! resetting Local Mapper...");
     mpLocalMapper->RequestReset();
   }
 
   // Reset Loop Closing
-  spdlog::debug("!! resetting Loop Closing...");
+  spdlog::debug("[Tracking::Reset] !! resetting Loop Closing...");
   mpLoopClosing->RequestReset();
 
   // Clear BoW Database
-  spdlog::debug("!! resetting Database...");
+  spdlog::debug("[Tracking::Reset] !! resetting Database...");
   mpKeyFrameDB->clear();
 
   // Clear Map (this erase MapPoints and KeyFrames)
@@ -2934,11 +2954,11 @@ void Tracking::Reset(bool bLocMap) {
 
   if (mpViewer) mpViewer->Release();
 
-  spdlog::info("!! End resetting!");
+  spdlog::info("[Tracking::Reset] !! End resetting!");
 }
 
 void Tracking::ResetActiveMap(bool bLocMap) {
-  spdlog::info("!! Active map resetting");
+  spdlog::info("[Tracking::ResetActiveMap] !! Active map resetting");
   if (mpViewer) {
     mpViewer->RequestStop();
     while (!mpViewer->isStopped()) usleep(3000);
@@ -2947,16 +2967,16 @@ void Tracking::ResetActiveMap(bool bLocMap) {
   std::shared_ptr<Map> pMap(mpAtlas->GetCurrentMap());
 
   if (!bLocMap) {
-    spdlog::info("!! resetting Local Mapper...");
+    spdlog::info("[Tracking::ResetActiveMap] !! resetting Local Mapper...");
     mpLocalMapper->RequestResetActiveMap(pMap);
   }
 
   // Reset Loop Closing
-  spdlog::info("!! resetting Loop Closing...");
+  spdlog::info("[Tracking::ResetActiveMap] !! resetting Loop Closing...");
   mpLoopClosing->RequestResetActiveMap(pMap);
 
   // Clear BoW Database
-  spdlog::info("!! resetting Database");
+  spdlog::info("[Tracking::ResetActiveMap] !! resetting Database");
   mpKeyFrameDB->clearMap(pMap);  // Only clear the active map references
 
   // Clear Map (this erase MapPoints and KeyFrames)
@@ -2992,7 +3012,7 @@ void Tracking::ResetActiveMap(bool bLocMap) {
 
     index++;
   }
-  spdlog::warn("{} frames set to lost", num_lost);
+  spdlog::warn("[Tracking::ResetActiveMap] {} frames set to lost", num_lost);
 
   mlbLost = lbLost;
 
@@ -3009,7 +3029,7 @@ void Tracking::ResetActiveMap(bool bLocMap) {
 
   if (mpViewer) mpViewer->Release();
 
-  spdlog::warn("!! End resetting!");
+  spdlog::warn("[Tracking::ResetActiveMap] !! End resetting!");
 }
 
 vector<MapPoint*> Tracking::GetLocalMapMPS() { return mvpLocalMapPoints; }
