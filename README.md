@@ -1,3 +1,11 @@
+> [!NOTE]
+> This branch exists for baseline evaluation of "stock" ORBSLAM3.   It tracks the [upstream repo](https://github.com/UZ-SLAMLab/ORB_SLAM3.git) with the following "liveability" changes:
+>
+> * `vcpkg` has been added as dependency manager (as a submodule);  it brings in `g2o`, `Sophus` and `Pangolin` (and their deps)
+> * `Thirdparty/g2o/` and `Thirdparty/Sophus/` have been removed in favor of versions from `vcpkg`
+> * Updating to a more modern g2o required minor type and API updates, primarily in [Optimizer.cc](src/Optimizer.cc)
+> * The [build.sh](build.sh) script has been updated to use `vcpkg` and `ninja`
+
 # ORB-SLAM3
 
 ### V1.0, December 22th, 2021
