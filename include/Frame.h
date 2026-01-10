@@ -233,7 +233,7 @@ class Frame : public std::enable_shared_from_this<Frame> {
   float mThDepth;
 
   // Number of KeyPoints.
-  int N;
+  size_t N;
 
   // Vector of keypoints (original for visualization) and undistorted (actually
   // used by the system). In the stereo case, mvKeysUn is redundant as images
@@ -380,8 +380,8 @@ class Frame : public std::enable_shared_from_this<Frame> {
 
   void PrintPointDistribution() {
     int left = 0, right = 0;
-    int Nlim = (Nleft != -1) ? Nleft : N;
-    for (int i = 0; i < N; i++) {
+    const size_t Nlim = (Nleft != -1) ? Nleft : N;
+    for (size_t i = 0; i < N; i++) {
       if (mvpMapPoints[i] && !mvbOutlier[i]) {
         if (i < Nlim)
           left++;

@@ -499,7 +499,7 @@ class KeyFrame : public std::enable_shared_from_this<KeyFrame> {
   std::shared_ptr<IMU::Preintegrated> mpBackupImuPreintegrated;
 
   // Backup for Cameras
-  unsigned int mnBackupIdCamera, mnBackupIdCamera2;
+  int mnBackupIdCamera, mnBackupIdCamera2;
 
   // Calibration
   Eigen::Matrix3f mK_;

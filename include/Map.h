@@ -54,8 +54,8 @@ class Map : public std::enable_shared_from_this<Map> {
 
     // Save/load a set structure, the set structure is broken in libboost 1.58
     // for ubuntu 16.04, a vector is serializated
-    // ar & mspKeyFrames;
-    // ar & mspMapPoints;
+    ar & mspKeyFrames;
+    ar & mspMapPoints;
     ar & mvpBackupKeyFrames;
     ar & mvpBackupMapPoints;
 

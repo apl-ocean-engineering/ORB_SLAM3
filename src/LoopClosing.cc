@@ -119,7 +119,7 @@ void LoopClosing::Run() {
   while (1) {
     // NEW LOOP AND MERGE DETECTION ALGORITHM
     //----------------------------
-    spdlog::debug("@@ LoopClosing: loop running...");
+    // spdlog::debug("@@ LoopClosing: loop running...");
 
     if (CheckNewKeyFrames()) {
       spdlog::info("LoopClosing: Have new frames to check");

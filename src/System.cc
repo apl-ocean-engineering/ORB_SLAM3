@@ -74,7 +74,7 @@ SystemFactory::Expected SystemFactory::create(const std::string &configFile,
   auto exSettings = SettingsLoader::load(configFile, sensor);
 
   if (!exSettings) {
-    return tl::make_unexpected(ExpectedError::fmt("Enable to load settings"));
+    return tl::make_unexpected(ExpectedError::fmt("Unable to load settings"));
   }
 
   return SystemFactory::create(exSettings.value(), initFr, strSequence);
@@ -85,14 +85,13 @@ SystemFactory::Expected SystemFactory::create(const std::string &configFile,
                                               const SensorType sensor,
                                               bool initFr,
                                               const string &strSequence) {
-  auto exSettings = SettingsLoader::load(configFile, sensor);
+  auto exSettings = SettingsLoader::load(configFile, sensor, vocabFile);
 
   if (!exSettings) {
-    return tl::make_unexpected(ExpectedError::fmt("Enable to load settings"));
+    return tl::make_unexpected(ExpectedError::fmt("Unable to load settings"));
   }
 
   auto settings = exSettings.value();
-  settings->strVocFile_ = vocabFile;
   return SystemFactory::create(settings, initFr, strSequence);
 }
 
@@ -304,6 +303,9 @@ Sophus::SE3f System::TrackStereo(const cv::Mat &imLeft, const cv::Mat &imRight,
     imRightToFeed = imRight.clone();
   }
 
+  cv::imwrite("/tmp/left.png", imLeftToFeed);
+  cv::imwrite("/tmp/right.png", imRightToFeed);
+
   // Check mode change
   processLocalizationModeChange();
 
@@ -497,20 +499,22 @@ void System::Shutdown() {
   }*/
 
   // Wait until all thread have effectively stopped
-  /*while(!mpLocalMapper->isFinished() || !mpLoopCloser->isFinished() ||
-  mpLoopCloser->isRunningGBA())
-  {
-      if(!mpLocalMapper->isFinished())
-          cout << "mpLocalMapper is not finished" << endl;*/
-  /*if(!mpLoopCloser->isFinished())
+  while (!mpLocalMapper->isFinished() || !mpLoopCloser->isFinished() ||
+         mpLoopCloser->isRunningGBA()) {
+    if (!mpLocalMapper->isFinished()) {
+      cout << "mpLocalMapper is not finished" << endl;
+    }
+
+    if (!mpLoopCloser->isFinished()) {
       cout << "mpLoopCloser is not finished" << endl;
-  if(mpLoopCloser->isRunningGBA()){
+    }
+    if (mpLoopCloser->isRunningGBA()) {
       cout << "mpLoopCloser is running GBA" << endl;
       cout << "break anyway..." << endl;
       break;
-  }*/
-  /*usleep(5000);
-}*/
+    }
+    usleep(5000);
+  }
 
   const string mStrSaveAtlasToFile = settings_->atlasSaveFile();
   if (!mStrSaveAtlasToFile.empty()) {

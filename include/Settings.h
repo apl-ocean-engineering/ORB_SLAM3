@@ -48,11 +48,14 @@ class Settings;
 class SettingsLoader {
  public:
   typedef tl::expected<std::shared_ptr<Settings>, ExpectedError> Expected;
-  static Expected load(const std::string& configFile, const SensorType sensor);
+  static Expected load(const std::string& configFile, const SensorType sensor,
+                       const std::string& vocabFile = "");
 
   explicit SettingsLoader(const SensorType sensor);
-  Expected load(const std::string& configFile);
+  Expected load(const std::string& configFile,
+                const std::string& vocabFile = "");
 
+ private:
   void readCamera1(cv::FileStorage& fSettings);
   void readCamera2(cv::FileStorage& fSettings);
   void readImageInfo(cv::FileStorage& fSettings);
@@ -63,7 +66,6 @@ class SettingsLoader {
   void readLoadAndSave(cv::FileStorage& fSettings);
   void readOtherParameters(cv::FileStorage& fSettings);
 
- private:
   std::shared_ptr<Settings> settings_;
 
   template <typename T>

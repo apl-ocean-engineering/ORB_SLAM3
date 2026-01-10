@@ -42,7 +42,9 @@ Settings::Settings(const SensorType sensor)
       bNeedToResize2_(false),
       loopClosing_(true),
       sensor_(sensor),
-      imageViewerScale_(1.0f) {
+      imageViewerScale_(1.0f),
+      imuFrequency_(1.0f),
+      thDepth_(5) {
   // if(bNeedToRectify_){
   //     precomputeRectificationMaps();
   //     cout << "\t-Computed rectification maps" << endl;
@@ -52,10 +54,6 @@ Settings::Settings(const SensorType sensor)
 Settings::~Settings() { ; }
 
 bool Settings::validate(void) {
-  if (bNeedToRectify_) {
-    precomputeRectificationMaps();
-  }
-
   // Check all of the variables that are assumed to be set
   if (!calibration1_) return false;
   if (!originalCalib1_) return false;
@@ -78,7 +76,6 @@ bool Settings::validate(void) {
 
 void Settings::setMonoCamera(CameraType type, const std::vector<float>& k,
                              const std::vector<float>& dist) {
-  bool found;
   cameraType_ = type;
 
   if (cameraType_ == PinHole) {
@@ -105,7 +102,8 @@ void Settings::setMonoCamera(CameraType type, const std::vector<float>& k,
     calibration1_ = std::make_shared<KannalaBrandt8>(k);
     originalCalib1_ = std::make_shared<KannalaBrandt8>(k);
 
-    // TBD
+    // \todo{AMM}   Commented this out while making SettingsLoader, did not feel
+    //              like converting it at the time
     // if (sensor_.isStereo()) {
     //   int colBegin =
     //       readParameter<int>(fSettings, "Camera1.overlappingBegin", found);
@@ -133,16 +131,14 @@ void Settings::setRightCamera(const std::vector<float>& k2,
 
     vPinHoleDistorsion2_ = dist2;
 
-    // } else if (cameraType_ == Rectified) {
-    // Weird this wasn't set ... do they assume left and right camera
-    // params are equal for rectified cameras?
-    //   calibration2_ = std::make_shared<Rectified>(k2);
-    //   originalCalib2_ = std::make_shared<Rectified>(k2);
+    // Note to self, for Rectified cameras, the calibration is the same for both
+    // L and R
   } else if (cameraType_ == KannalaBrandt) {
     calibration2_ = std::make_shared<KannalaBrandt8>(k2);
     originalCalib2_ = std::make_shared<KannalaBrandt8>(k2);
 
-    // TBD
+    // \todo{AMM}   Commented this out while making SettingsLoader, did not feel
+    //              like converting it at the time
     // int colBegin =
     //     readParameter<int>(fSettings, "Camera2.overlappingBegin", found);
     // int colEnd = readParameter<int>(fSettings, "Camera2.overlappingEnd",
@@ -177,7 +173,6 @@ void Settings::setStereoRectifiedCamera(const std::vector<float>& k,
 //===
 
 void Settings::setImageSize(int width, int height) {
-  bool found;
   // Read original and desired image dimensions
   int originalRows = height;
   int originalCols = width;
@@ -193,6 +188,10 @@ void Settings::setImageSize(int width, int height) {
 }
 
 void Settings::precomputeRectificationMaps() {
+  spdlog::trace(
+      "[Settings::precomputeRectificationMaps] Precomputing rectification "
+      "maps");
+
   // Precompute rectification maps, new calibrations, ...
   cv::Mat K1 = dynamic_cast<Pinhole&>(*calibration1_).toK();
   K1.convertTo(K1, CV_64F);
@@ -220,6 +219,8 @@ void Settings::precomputeRectificationMaps() {
                               CV_32F, M1r_, M2r_);
 
   // Update calibration
+  // (updating calibrations in place can lead to problems.  Ask me how I
+  // know...)
   calibration1_->setParameter(P1.at<double>(0, 0), 0);
   calibration1_->setParameter(P1.at<double>(1, 1), 1);
   calibration1_->setParameter(P1.at<double>(0, 2), 2);
@@ -277,7 +278,7 @@ ostream& operator<<(std::ostream& output, const Settings& settings) {
     output << " ]" << endl;
 
     if (!settings.vPinHoleDistorsion2_.empty()) {
-      output << "\t-Camera 1 distortion parameters: [ ";
+      output << "\t-Camera 2 distortion parameters: [ ";
       for (float d : settings.vPinHoleDistorsion2_) {
         output << " " << d;
       }
@@ -317,8 +318,7 @@ ostream& operator<<(std::ostream& output, const Settings& settings) {
   output << "\t-Sequence FPS: " << settings.fps_ << endl;
 
   // Stereo stuff
-  if (settings.sensor_ == SensorType::STEREO ||
-      settings.sensor_ == SensorType::IMU_STEREO) {
+  if (settings.sensor_.isStereo()) {
     output << "\t-Stereo baseline: " << settings.b_ << endl;
     output << "\t-Stereo depth threshold : " << settings.thDepth_ << endl;
 
@@ -336,9 +336,7 @@ ostream& operator<<(std::ostream& output, const Settings& settings) {
     }
   }
 
-  if (settings.sensor_ == SensorType::IMU_MONOCULAR ||
-      settings.sensor_ == SensorType::IMU_STEREO ||
-      settings.sensor_ == SensorType::IMU_RGBD) {
+  if (settings.sensor_.isImu()) {
     output << "\t-Gyro noise: " << settings.noiseGyro_ << endl;
     output << "\t-Accelerometer noise: " << settings.noiseAcc_ << endl;
     output << "\t-Gyro walk: " << settings.gyroWalk_ << endl;
@@ -346,8 +344,7 @@ ostream& operator<<(std::ostream& output, const Settings& settings) {
     output << "\t-IMU frequency: " << settings.imuFrequency_ << endl;
   }
 
-  if (settings.sensor_ == SensorType::RGBD ||
-      settings.sensor_ == SensorType::IMU_RGBD) {
+  if (settings.sensor_.isRGBD()) {
     output << "\t-RGB-D depth map factor: " << settings.depthMapFactor_ << endl;
   }
 
@@ -357,7 +354,7 @@ ostream& operator<<(std::ostream& output, const Settings& settings) {
   output << "\t-Initial FAST threshold: " << settings.initThFAST_ << endl;
   output << "\t-Min FAST threshold: " << settings.minThFAST_ << endl;
 
-  output << "\tLoop closing: " << (settings.loopClosing_ ? "YES" : "NO")
+  output << "\t-Loop closing: " << (settings.loopClosing_ ? "YES" : "NO")
          << endl;
 
   return output;

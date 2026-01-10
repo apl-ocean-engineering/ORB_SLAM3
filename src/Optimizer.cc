@@ -957,16 +957,16 @@ int Optimizer::PoseOptimization(const std::shared_ptr<Frame>& pFrame) {
   // at the end they can be classified as inliers again.
   const float chi2Mono[4] = {5.991, 5.991, 5.991, 5.991};
   const float chi2Stereo[4] = {7.815, 7.815, 7.815, 7.815};
-  const int its[4] = {10, 10, 10, 10};
+  const int iterations[4] = {10, 10, 10, 10};
 
   int nBad = 0;
-  for (size_t it = 0; it < 4; it++) {
+  for (int iter = 0; iter < 4; iter++) {
     Tcw = pFrame->GetPose();
     vSE3->setEstimate(g2o::SE3Quat(Tcw.unit_quaternion().cast<double>(),
                                    Tcw.translation().cast<double>()));
 
     optimizer.initializeOptimization(0);
-    optimizer.optimize(its[it]);
+    optimizer.optimize(iterations[iter]);
 
     nBad = 0;
     for (size_t i = 0, iend = vpEdgesMono.size(); i < iend; i++) {
@@ -980,7 +980,7 @@ int Optimizer::PoseOptimization(const std::shared_ptr<Frame>& pFrame) {
 
       const float chi2 = e->chi2();
 
-      if (chi2 > chi2Mono[it]) {
+      if (chi2 > chi2Mono[iter]) {
         pFrame->mvbOutlier[idx] = true;
         e->setLevel(1);
         nBad++;
@@ -989,7 +989,7 @@ int Optimizer::PoseOptimization(const std::shared_ptr<Frame>& pFrame) {
         e->setLevel(0);
       }
 
-      if (it == 2) e->setRobustKernel(0);
+      if (iter == 2) e->setRobustKernel(0);
     }
 
     for (size_t i = 0, iend = vpEdgesMono_FHR.size(); i < iend; i++) {
@@ -1003,7 +1003,7 @@ int Optimizer::PoseOptimization(const std::shared_ptr<Frame>& pFrame) {
 
       const float chi2 = e->chi2();
 
-      if (chi2 > chi2Mono[it]) {
+      if (chi2 > chi2Mono[iter]) {
         pFrame->mvbOutlier[idx] = true;
         e->setLevel(1);
         nBad++;
@@ -1012,7 +1012,7 @@ int Optimizer::PoseOptimization(const std::shared_ptr<Frame>& pFrame) {
         e->setLevel(0);
       }
 
-      if (it == 2) e->setRobustKernel(0);
+      if (iter == 2) e->setRobustKernel(0);
     }
 
     for (size_t i = 0, iend = vpEdgesStereo.size(); i < iend; i++) {
@@ -1026,7 +1026,7 @@ int Optimizer::PoseOptimization(const std::shared_ptr<Frame>& pFrame) {
 
       const float chi2 = e->chi2();
 
-      if (chi2 > chi2Stereo[it]) {
+      if (chi2 > chi2Stereo[iter]) {
         pFrame->mvbOutlier[idx] = true;
         e->setLevel(1);
         nBad++;
@@ -1035,7 +1035,7 @@ int Optimizer::PoseOptimization(const std::shared_ptr<Frame>& pFrame) {
         pFrame->mvbOutlier[idx] = false;
       }
 
-      if (it == 2) e->setRobustKernel(0);
+      if (iter == 2) e->setRobustKernel(0);
     }
 
     if (optimizer.edges().size() < 10) break;

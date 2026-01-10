@@ -215,23 +215,6 @@ Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight,
   N = mvKeys.size();
   if (mvKeys.empty()) return;
 
-  UndistortKeyPoints();
-
-#ifdef REGISTER_TIMES
-  std::chrono::steady_clock::time_point time_StartStereoMatches =
-      std::chrono::steady_clock::now();
-#endif
-  ComputeStereoMatches();
-#ifdef REGISTER_TIMES
-  std::chrono::steady_clock::time_point time_EndStereoMatches =
-      std::chrono::steady_clock::now();
-
-  mTimeStereoMatch =
-      std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(
-          time_EndStereoMatches - time_StartStereoMatches)
-          .count();
-#endif
-
   mvpMapPoints = vector<MapPoint *>(N, static_cast<MapPoint *>(nullptr));
   mvbOutlier = vector<bool>(N, false);
   mmProjectPoints.clear();
@@ -275,6 +258,23 @@ Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight,
   mvStereo3Dpoints = vector<Eigen::Vector3f>(0);
   monoLeft = -1;
   monoRight = -1;
+
+  UndistortKeyPoints();
+
+#ifdef REGISTER_TIMES
+  std::chrono::steady_clock::time_point time_StartStereoMatches =
+      std::chrono::steady_clock::now();
+#endif
+  ComputeStereoMatches();
+#ifdef REGISTER_TIMES
+  std::chrono::steady_clock::time_point time_EndStereoMatches =
+      std::chrono::steady_clock::now();
+
+  mTimeStereoMatch =
+      std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(
+          time_EndStereoMatches - time_StartStereoMatches)
+          .count();
+#endif
 
   AssignFeaturesToGrid();
 }
@@ -339,10 +339,6 @@ Frame::Frame(const cv::Mat &imGray, const cv::Mat &imDepth,
 
   if (mvKeys.empty()) return;
 
-  UndistortKeyPoints();
-
-  ComputeStereoFromRGBD(imDepth);
-
   mvpMapPoints = vector<MapPoint *>(N, static_cast<MapPoint *>(nullptr));
 
   mmProjectPoints.clear();
@@ -388,6 +384,10 @@ Frame::Frame(const cv::Mat &imGray, const cv::Mat &imDepth,
   mvStereo3Dpoints = vector<Eigen::Vector3f>(0);
   monoLeft = -1;
   monoRight = -1;
+
+  UndistortKeyPoints();
+
+  ComputeStereoFromRGBD(imDepth);
 
   AssignFeaturesToGrid();
 }
@@ -527,7 +527,7 @@ void Frame::AssignFeaturesToGrid() {
       }
     }
 
-  for (int i = 0; i < N; i++) {
+  for (size_t i = 0; i < N; i++) {
     const cv::KeyPoint &kp = (Nleft == -1) ? mvKeysUn[i]
                              : (i < Nleft) ? mvKeys[i]
                                            : mvKeysRight[i - Nleft];
@@ -856,7 +856,7 @@ void Frame::UndistortKeyPoints() {
   // Fill matrix with points
   cv::Mat mat(N, 2, CV_32F);
 
-  for (int i = 0; i < N; i++) {
+  for (size_t i = 0; i < N; i++) {
     mat.at<float>(i, 0) = mvKeys[i].pt.x;
     mat.at<float>(i, 1) = mvKeys[i].pt.y;
   }
@@ -869,7 +869,7 @@ void Frame::UndistortKeyPoints() {
 
   // Fill undistorted keypoint vector
   mvKeysUn.resize(N);
-  for (int i = 0; i < N; i++) {
+  for (size_t i = 0; i < N; i++) {
     cv::KeyPoint kp = mvKeys[i];
     kp.pt.x = mat.at<float>(i, 0);
     kp.pt.y = mat.at<float>(i, 1);
@@ -913,17 +913,18 @@ void Frame::ComputeStereoMatches() {
   mvDepth = vector<float>(N, -1.0f);
 
   const int thOrbDist = (ORBmatcher::TH_HIGH + ORBmatcher::TH_LOW) / 2;
-
-  const int nRows = mpORBextractorLeft->mvImagePyramid[0].rows;
+  const size_t nRows = mpORBextractorLeft->mvImagePyramid[0].rows;
 
   // Assign keypoints to row table
   vector<vector<size_t>> vRowIndices(nRows, vector<size_t>());
 
-  for (int i = 0; i < nRows; i++) vRowIndices[i].reserve(200);
+  for (size_t i = 0; i < nRows; i++) vRowIndices[i].reserve(200);
 
-  const int Nr = mvKeysRight.size();
+  const size_t Nr = mvKeysRight.size();
 
-  for (int iR = 0; iR < Nr; iR++) {
+  spdlog::trace("Checking {} left and {} right keypoints", N, Nr);
+
+  for (size_t iR = 0; iR < Nr; iR++) {
     const cv::KeyPoint &kp = mvKeysRight[iR];
     const float &kpY = kp.pt.y;
     const float r = 2.0f * mvScaleFactors[mvKeysRight[iR].octave];
@@ -942,7 +943,7 @@ void Frame::ComputeStereoMatches() {
   vector<pair<int, int>> vDistIdx;
   vDistIdx.reserve(N);
 
-  for (int iL = 0; iL < N; iL++) {
+  for (size_t iL = 0; iL < static_cast<size_t>(N); iL++) {
     const cv::KeyPoint &kpL = mvKeys[iL];
     const int &levelL = kpL.octave;
     const float &vL = kpL.pt.y;
@@ -1050,6 +1051,9 @@ void Frame::ComputeStereoMatches() {
         }
         mvDepth[iL] = mbf / disparity;
         mvuRight[iL] = bestuR;
+
+        // Save a list of the lowest correlation distance seen for each left
+        // feature
         vDistIdx.push_back(pair<int, int>(bestDist, iL));
       }
     }
@@ -1057,9 +1061,11 @@ void Frame::ComputeStereoMatches() {
 
   sort(vDistIdx.begin(), vDistIdx.end());
   const float median = vDistIdx[vDistIdx.size() / 2].first;
-  const float thDist = 1.5f * 1.4f * median;
+  const float thDist = 1.5f * 1.4f * median;  //?
 
-  for (int i = vDistIdx.size() - 1; i >= 0; i--) {
+  // Discard any depths where the correlation distance was greater than
+  // some threshold from the median correlation distance.
+  for (int i = static_cast<int>(vDistIdx.size() - 1); i >= 0; i--) {
     if (vDistIdx[i].first < thDist) {
       break;
     } else {
@@ -1067,13 +1073,21 @@ void Frame::ComputeStereoMatches() {
       mvDepth[vDistIdx[i].second] = -1;
     }
   }
+
+  int keptCount = 0;
+  for (auto d : mvDepth) {
+    if (d > 0) keptCount++;
+  }
+
+  spdlog::trace("Frame {}.  Kept {} stereo matches of {} features", mnId,
+                keptCount, vDistIdx.size());
 }
 
 void Frame::ComputeStereoFromRGBD(const cv::Mat &imDepth) {
   mvuRight = vector<float>(N, -1);
   mvDepth = vector<float>(N, -1);
 
-  for (int i = 0; i < N; i++) {
+  for (size_t i = 0; i < N; i++) {
     const cv::KeyPoint &kp = mvKeys[i];
     const cv::KeyPoint &kpU = mvKeysUn[i];
 

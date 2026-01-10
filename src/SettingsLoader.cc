@@ -133,15 +133,17 @@ cv::Mat SettingsLoader::readParameter<cv::Mat>(cv::FileStorage& fSettings,
 }
 
 SettingsLoader::Expected SettingsLoader::load(const std::string& configFile,
-                                              const SensorType sensor) {
+                                              const SensorType sensor,
+                                              const std::string& vocabFile) {
   SettingsLoader loader(sensor);
-  return loader.load(configFile);
+  return loader.load(configFile, vocabFile);
 }
 
 SettingsLoader::SettingsLoader(const SensorType sensor)
     : settings_(std::make_shared<Settings>(sensor)) {}
 
-SettingsLoader::Expected SettingsLoader::load(const std::string& configFile) {
+SettingsLoader::Expected SettingsLoader::load(const std::string& configFile,
+                                              const std::string& vocabFile) {
   // Open settings file
   cv::FileStorage fSettings(configFile, cv::FileStorage::READ);
   if (!fSettings.isOpened()) {
@@ -188,12 +190,16 @@ SettingsLoader::Expected SettingsLoader::load(const std::string& configFile) {
   readOtherParameters(fSettings);
   spdlog::info("\t-Loaded misc parameters");
 
+  spdlog::info("----------------------------------");
+
+  if (vocabFile.size() > 0) {
+    settings_->strVocFile_ = vocabFile;
+  }
+
   if (settings_->bNeedToRectify_) {
     settings_->precomputeRectificationMaps();
     spdlog::info("\t-Computed rectification maps");
   }
-
-  spdlog::info("----------------------------------");
 
   if (settings_->validate()) {
     return settings_;
@@ -357,7 +363,7 @@ void SettingsLoader::readImageInfo(cv::FileStorage& fSettings) {
   int originalRows = readParameter<int>(fSettings, "Camera.height", found);
   int originalCols = readParameter<int>(fSettings, "Camera.width", found);
 
-  settings_->setImageSize(originalRows, originalCols);
+  settings_->setImageSize(originalCols, originalRows);
 
   // Disable image resizing for now...
 

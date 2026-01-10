@@ -157,33 +157,46 @@ double calcDeviation(vector<int> v_values, double average) {
 
 void Tracking::LocalMapStats2File() {
   ofstream f;
-  f.open("LocalMapTimeStats.txt");
-  f << fixed << setprecision(6);
-  f << "#Stereo rect[ms], MP culling[ms], MP creation[ms], LBA[ms], KF "
-       "culling[ms], Total[ms]"
-    << endl;
-  for (int i = 0; i < mpLocalMapper->vdLMTotal_ms.size(); ++i) {
-    f << mpLocalMapper->vdKFInsert_ms[i] << ","
-      << mpLocalMapper->vdMPCulling_ms[i] << ","
-      << mpLocalMapper->vdMPCreation_ms[i] << ","
-      << mpLocalMapper->vdLBASync_ms[i] << ","
-      << mpLocalMapper->vdKFCullingSync_ms[i] << ","
-      << mpLocalMapper->vdLMTotal_ms[i] << endl;
-  }
 
-  f.close();
-
-  f.open("LBA_Stats.txt");
-  f << fixed << setprecision(6);
-  f << "#LBA time[ms], KF opt[#], KF fixed[#], MP[#], Edges[#]" << endl;
-  for (int i = 0; i < mpLocalMapper->vdLBASync_ms.size(); ++i) {
-    f << mpLocalMapper->vdLBASync_ms[i] << "," << mpLocalMapper->vnLBA_KFopt[i]
-      << "," << mpLocalMapper->vnLBA_KFfixed[i] << ","
-      << mpLocalMapper->vnLBA_MPs[i] << "," << mpLocalMapper->vnLBA_edges[i]
+  try {
+    f.open("LocalMapTimeStats.txt");
+    f << fixed << setprecision(6);
+    f << "#Stereo rect[ms], MP culling[ms], MP creation[ms], LBA[ms], KF "
+         "culling[ms], Total[ms]"
       << endl;
+    for (size_t i = 0; i < mpLocalMapper->vdLMTotal_ms.size(); ++i) {
+      f << mpLocalMapper->vdKFInsert_ms.at(i) << ","
+        << mpLocalMapper->vdMPCulling_ms.at(i) << ","
+        << mpLocalMapper->vdMPCreation_ms.at(i) << ","
+        << mpLocalMapper->vdLBASync_ms.at(i) << ","
+        << mpLocalMapper->vdKFCullingSync_ms.at(i) << ","
+        << mpLocalMapper->vdLMTotal_ms.at(i) << endl;
+
+      f.close();
+    }
+  } catch (const std::out_of_range& ex) {
+    spdlog::error("[Tracking::LocalMapStats2File] Caught exception: {}",
+                  ex.what());
+    f.close();
   }
 
-  f.close();
+  try {
+    f.open("LBA_Stats.txt");
+    f << fixed << setprecision(6);
+    f << "#LBA time[ms], KF opt[#], KF fixed[#], MP[#], Edges[#]" << endl;
+    for (size_t i = 0; i < mpLocalMapper->vdLBASync_ms.size(); ++i) {
+      f << mpLocalMapper->vdLBASync_ms.at(i) << ","
+        << mpLocalMapper->vnLBA_KFopt.at(i) << ","
+        << mpLocalMapper->vnLBA_KFfixed.at(i) << ","
+        << mpLocalMapper->vnLBA_MPs.at(i) << ","
+        << mpLocalMapper->vnLBA_edges.at(i) << endl;
+    }
+    f.close();
+  } catch (const std::out_of_range& ex) {
+    spdlog::error("[Tracking::LocalMapStats2File] Caught exception: {}",
+                  ex.what());
+    f.close();
+  }
 }
 
 void Tracking::TrackStats2File() {
@@ -225,10 +238,15 @@ void Tracking::TrackStats2File() {
       imu_preint = vdIMUInteg_ms[i];
     }
 
-    f << stereo_rect << "," << resize_image << "," << vdORBExtract_ms[i] << ","
-      << stereo_match << "," << imu_preint << "," << vdPosePred_ms[i] << ","
-      << vdLMTrack_ms[i] << "," << vdNewKF_ms[i] << "," << vdTrackTotal_ms[i]
-      << endl;
+    try {
+      f << stereo_rect << "," << resize_image << "," << vdORBExtract_ms.at(i)
+        << "," << stereo_match << "," << imu_preint << ","
+        << vdPosePred_ms.at(i) << "," << vdLMTrack_ms.at(i) << ","
+        << vdNewKF_ms.at(i) << "," << vdTrackTotal_ms.at(i) << endl;
+    } catch (const std::out_of_range& ex) {
+      spdlog::error("[Tracking::TrackStats2File] Caught exception: {}",
+                    ex.what());
+    }
   }
 
   f.close();
@@ -315,7 +333,7 @@ void Tracking::PrintTimeStats() {
   f << "Total Tracking: " << average << " +/- " << deviation << std::endl;
 
   // Local Mapping time stats
-  std::cout << std::endl << std::endl << std::endl;
+  std::cout << std::endl << std::endl;
   std::cout << "Local Mapping" << std::endl << std::endl;
   f << std::endl << "Local Mapping" << std::endl << std::endl;
 
@@ -403,9 +421,9 @@ void Tracking::PrintTimeStats() {
   f << "MPs in map: " << pBestMap->GetAllMapPoints().size() << std::endl;
 
   f << "---------------------------" << std::endl;
-  f << std::endl << "Place Recognition (mean +/- std)" << std::endl;
+  f << std::endl << "## Place Recognition (mean +/- std)" << std::endl;
   std::cout << "---------------------------" << std::endl;
-  std::cout << std::endl << "Place Recognition (mean +/- std)" << std::endl;
+  std::cout << std::endl << "## Place Recognition (mean +/- std)" << std::endl;
   average = calcAverage(mpLoopClosing->vdDataQuery_ms);
   deviation = calcDeviation(mpLoopClosing->vdDataQuery_ms, average);
   f << "Database Query: " << average << " +/- " << deviation << std::endl;
@@ -425,8 +443,8 @@ void Tracking::PrintTimeStats() {
             << std::endl
             << std::endl;
 
-  f << std::endl << "Loop Closing (mean +/- std)" << std::endl;
-  std::cout << std::endl << "Loop Closing (mean +/- std)" << std::endl;
+  f << std::endl << "## Loop Closing (mean +/- std)" << std::endl;
+  std::cout << std::endl << "## Loop Closing (mean +/- std)" << std::endl;
   average = calcAverage(mpLoopClosing->vdLoopFusion_ms);
   deviation = calcDeviation(mpLoopClosing->vdLoopFusion_ms, average);
   f << "Loop Fusion: " << average << " +/- " << deviation << std::endl;
@@ -452,8 +470,8 @@ void Tracking::PrintTimeStats() {
   std::cout << "Number of KFs: " << average << " +/- " << deviation
             << std::endl;
 
-  f << std::endl << "Map Merging (mean +/- std)" << std::endl;
-  std::cout << std::endl << "Map Merging (mean +/- std)" << std::endl;
+  f << std::endl << "## Map Merging (mean +/- std)" << std::endl;
+  std::cout << std::endl << "## Map Merging (mean +/- std)" << std::endl;
   average = calcAverage(mpLoopClosing->vdMergeMaps_ms);
   deviation = calcDeviation(mpLoopClosing->vdMergeMaps_ms, average);
   f << "Merge Maps: " << average << " +/- " << deviation << std::endl;
@@ -488,8 +506,8 @@ void Tracking::PrintTimeStats() {
   std::cout << "Number of MPs: " << average << " +/- " << deviation
             << std::endl;
 
-  f << std::endl << "Full GBA (mean +/- std)" << std::endl;
-  std::cout << std::endl << "Full GBA (mean +/- std)" << std::endl;
+  f << std::endl << "## Full GBA (mean +/- std)" << std::endl;
+  std::cout << std::endl << "## Full GBA (mean +/- std)" << std::endl;
   average = calcAverage(mpLoopClosing->vdGBA_ms);
   deviation = calcDeviation(mpLoopClosing->vdGBA_ms, average);
   f << "GBA: " << average << " +/- " << deviation << std::endl;
@@ -582,6 +600,8 @@ void Tracking::newParameterLoader(const std::shared_ptr<Settings>& settings) {
   mMinFrames = 0;
   mMaxFrames = settings->fps();
   mbRGB = settings->rgb();
+
+  mnFramesToResetIMU = mMaxFrames;
 
   {
     // ORB parameters
@@ -993,7 +1013,7 @@ void Tracking::Track() {
     return;
   }
 
-  std::shared_ptr<Map> pCurrentMap = mpAtlas->GetCurrentMap();
+  auto pCurrentMap = mpAtlas->GetCurrentMap();
   if (!pCurrentMap) {
     spdlog::error("ERROR: There is not an active map in the atlas");
   }
@@ -1312,7 +1332,7 @@ void Tracking::Track() {
     } else if (mState == OK) {
       spdlog::info("[Tracking::Track] TrackLocalMap() not OK");
       if (mSensor.isImu()) {
-        spdlog::info("Track lost for less than one second...");
+        spdlog::info("Track lost for less than one tick...");
         if (!pCurrentMap->isImuInitialized() ||
             !pCurrentMap->GetInertialBA2()) {
           spdlog::info(
@@ -1501,7 +1521,13 @@ void Tracking::Track() {
 }
 
 void Tracking::StereoInitialization() {
+  spdlog::info("[Tracking::StereoInitialization]");
+
   if (mCurrentFrame->N > 500) {
+    spdlog::info(
+        "[Tracking::StereoInitialization] Initializing map with {} points",
+        mCurrentFrame->N);
+
     if (mSensor == SensorType::IMU_STEREO || mSensor == SensorType::IMU_RGBD) {
       if (!mCurrentFrame->mpImuPreintegrated ||
           !mLastFrame->mpImuPreintegrated) {
@@ -1541,8 +1567,12 @@ void Tracking::StereoInitialization() {
 
     // Create MapPoints and asscoiate to KeyFrame
     if (!mpCamera2) {
+      spdlog::debug(
+          "[Tracking::StereoInitialization] No camera2, checking {} points",
+          mCurrentFrame->N);
+
       for (int i = 0; i < mCurrentFrame->N; i++) {
-        float z = mCurrentFrame->mvDepth[i];
+        const float z = mCurrentFrame->mvDepth[i];
         if (z > 0) {
           Eigen::Vector3f x3D;
           mCurrentFrame->UnprojectStereo(i, x3D);
@@ -1558,8 +1588,12 @@ void Tracking::StereoInitialization() {
         }
       }
     } else {
+      spdlog::info(
+          "[Tracking::StereoInitialization] Have camera2, checking {} points",
+          mCurrentFrame->Nleft);
       for (int i = 0; i < mCurrentFrame->Nleft; i++) {
         int rightIndex = mCurrentFrame->mvLeftToRightMatch[i];
+        spdlog::info("{} {}", i, rightIndex);
         if (rightIndex != -1) {
           Eigen::Vector3f x3D = mCurrentFrame->mvStereo3Dpoints[i];
 
@@ -1583,9 +1617,10 @@ void Tracking::StereoInitialization() {
       }
     }
 
-    Verbose::PrintMess("New Map created with " +
-                           to_string(mpAtlas->MapPointsInMap()) + " points",
-                       Verbose::VERBOSITY_QUIET);
+    Verbose::PrintMess(
+        "[Tracking::StereoInitialization] New Map created with " +
+            to_string(mpAtlas->MapPointsInMap()) + " points",
+        Verbose::VERBOSITY_QUIET);
 
     // cout << "Active map: " << mpAtlas->GetCurrentMap()->GetId() << endl;
 
@@ -1608,6 +1643,10 @@ void Tracking::StereoInitialization() {
     mpMapDrawer->SetCurrentCameraPose(mCurrentFrame->GetPose());
 
     mState = OK;
+  } else {
+    spdlog::info(
+        "[Tracking::StereoInitialization] Frame has {} points, not enough to "
+        "initialize map");
   }
 }
 
@@ -2120,6 +2159,8 @@ bool Tracking::TrackLocalMap() {
 
   int inliers;
   if (!mpAtlas->isImuInitialized()) {
+    spdlog::trace(
+        "[Tracking::TrackLocalMap] No IMU, conventional optimization");
     Optimizer::PoseOptimization(mCurrentFrame);
   } else {
     if (mCurrentFrame->mnId <= mnLastRelocFrameId + mnFramesToResetIMU) {
@@ -2277,9 +2318,9 @@ bool Tracking::NeedNewKeyFrame() {
   int nTrackedClose = 0;
 
   if (!mSensor.isMonocular()) {
-    const int N =
+    const size_t N =
         (mCurrentFrame->Nleft == -1) ? mCurrentFrame->N : mCurrentFrame->Nleft;
-    for (int i = 0; i < N; i++) {
+    for (size_t i = 0; i < N; i++) {
       if (mCurrentFrame->mvDepth[i] > 0 &&
           mCurrentFrame->mvDepth[i] < mThDepth) {
         if (mCurrentFrame->mvpMapPoints[i] && !mCurrentFrame->mvbOutlier[i])
@@ -2321,7 +2362,7 @@ bool Tracking::NeedNewKeyFrame() {
       thRefRatio = 0.90f;
   }
 
-  spdlog::debug(
+  spdlog::info(
       "[Tracking::NeedNewKeyFrame] mnMatchesInliers: {}; nRefMatches: {}; "
       "thRefRatio: {}",
       mnMatchesInliers, nRefMatches, thRefRatio);
@@ -2371,7 +2412,7 @@ bool Tracking::NeedNewKeyFrame() {
   else
     c4 = false;
 
-  spdlog::info(
+  spdlog::debug(
       "[Tracking::NeedNewKeyFrame] c1a={}; c1b={}; c1c={}; c2={}; c3={}; c4={}",
       c1a, c1b, c1c, c2, c3, c4);
 
@@ -2622,7 +2663,7 @@ void Tracking::UpdateLocalKeyFrames() {
 
   if (!mpAtlas->isImuInitialized() ||
       (mCurrentFrame->mnId < mnLastRelocFrameId + 2)) {
-    for (int i = 0; i < mCurrentFrame->N; i++) {
+    for (size_t i = 0; i < mCurrentFrame->N; i++) {
       MapPoint* pMP = mCurrentFrame->mvpMapPoints[i];
       if (pMP) {
         if (!pMP->isBad()) {
@@ -2638,7 +2679,7 @@ void Tracking::UpdateLocalKeyFrames() {
       }
     }
   } else {
-    for (int i = 0; i < mLastFrame->N; i++) {
+    for (size_t i = 0; i < mLastFrame->N; i++) {
       // Using lastframe since current frame has not matches yet
       if (mLastFrame->mvpMapPoints[i]) {
         MapPoint* pMP = mLastFrame->mvpMapPoints[i];
@@ -2849,7 +2890,7 @@ bool Tracking::Relocalization() {
 
         if (nGood < 10) continue;
 
-        for (int io = 0; io < mCurrentFrame->N; io++)
+        for (size_t io = 0; io < mCurrentFrame->N; io++)
           if (mCurrentFrame->mvbOutlier[io])
             mCurrentFrame->mvpMapPoints[io] = static_cast<MapPoint*>(NULL);
 
@@ -2867,7 +2908,7 @@ bool Tracking::Relocalization() {
             // many points
             if (nGood > 30 && nGood < 50) {
               sFound.clear();
-              for (int ip = 0; ip < mCurrentFrame->N; ip++) {
+              for (size_t ip = 0; ip < mCurrentFrame->N; ip++) {
                 if (mCurrentFrame->mvpMapPoints[ip])
                   sFound.insert(mCurrentFrame->mvpMapPoints[ip]);
               }
@@ -2879,7 +2920,7 @@ bool Tracking::Relocalization() {
               if (nGood + nadditional >= 50) {
                 nGood = Optimizer::PoseOptimization(mCurrentFrame);
 
-                for (int io = 0; io < mCurrentFrame->N; io++) {
+                for (size_t io = 0; io < mCurrentFrame->N; io++) {
                   if (mCurrentFrame->mvbOutlier[io])
                     mCurrentFrame->mvpMapPoints[io] = NULL;
                 }
