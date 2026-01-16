@@ -198,8 +198,7 @@ class KeyFrame : public std::enable_shared_from_this<KeyFrame> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-  KeyFrame() = delete;
-
+  KeyFrame() = default;
   KeyFrame(const std::shared_ptr<Frame>& F, const std::shared_ptr<Map>& pMap,
            const std::shared_ptr<KeyFrameDatabase>& pKFDB);
 
@@ -320,15 +319,15 @@ class KeyFrame : public std::enable_shared_from_this<KeyFrame> {
  public:
   static unsigned long int nNextId;
   unsigned long int mnId;
-  const unsigned long int mnFrameId;
+  unsigned long int mnFrameId;
 
-  const double mTimeStamp;
+  double mTimeStamp;
 
   // Grid (to speed up feature matching)
-  const int mnGridCols;
-  const int mnGridRows;
-  const float mfGridElementWidthInv;
-  const float mfGridElementHeightInv;
+  int mnGridCols;
+  int mnGridRows;
+  float mfGridElementWidthInv;
+  float mfGridElementHeightInv;
 
   // Variables used by the tracking
   unsigned long int mnTrackReferenceForFrame;
@@ -380,18 +379,18 @@ class KeyFrame : public std::enable_shared_from_this<KeyFrame> {
   float mfScale;
 
   // Calibration parameters
-  const float fx, fy, cx, cy, invfx, invfy, mbf, mb, mThDepth;
+  float fx, fy, cx, cy, invfx, invfy, mbf, mb, mThDepth;
   cv::Mat mDistCoef;
 
   // Number of KeyPoints
-  const int N;
+  int N;
 
   // KeyPoints, stereo coordinate and descriptors (all associated by an index)
-  const std::vector<cv::KeyPoint> mvKeys;
-  const std::vector<cv::KeyPoint> mvKeysUn;
-  const std::vector<float> mvuRight;  // negative value for monocular points
-  const std::vector<float> mvDepth;   // negative value for monocular points
-  const cv::Mat mDescriptors;
+  std::vector<cv::KeyPoint> mvKeys;
+  std::vector<cv::KeyPoint> mvKeysUn;
+  std::vector<float> mvuRight;  // negative value for monocular points
+  std::vector<float> mvDepth;   // negative value for monocular points
+  cv::Mat mDescriptors;
 
   // BoW
   DBoW2::BowVector mBowVec;
@@ -401,18 +400,18 @@ class KeyFrame : public std::enable_shared_from_this<KeyFrame> {
   Sophus::SE3f mTcp;
 
   // Scale
-  const int mnScaleLevels;
-  const float mfScaleFactor;
-  const float mfLogScaleFactor;
-  const std::vector<float> mvScaleFactors;
-  const std::vector<float> mvLevelSigma2;
-  const std::vector<float> mvInvLevelSigma2;
+  int mnScaleLevels;
+  float mfScaleFactor;
+  float mfLogScaleFactor;
+  std::vector<float> mvScaleFactors;
+  std::vector<float> mvLevelSigma2;
+  std::vector<float> mvInvLevelSigma2;
 
   // Image bounds and calibration
-  const int mnMinX;
-  const int mnMinY;
-  const int mnMaxX;
-  const int mnMaxY;
+  int mnMinX;
+  int mnMinY;
+  int mnMaxX;
+  int mnMaxY;
 
   // Preintegrated IMU measurements from previous keyframe
   std::shared_ptr<KeyFrame> mPrevKF;
@@ -521,9 +520,9 @@ class KeyFrame : public std::enable_shared_from_this<KeyFrame> {
   Sophus::SE3f GetRelativePoseTlr();
 
   // KeyPoints in the right image (for stereo fisheye, coordinates are needed)
-  const std::vector<cv::KeyPoint> mvKeysRight;
+  std::vector<cv::KeyPoint> mvKeysRight;
 
-  const int NLeft, NRight;
+  int NLeft, NRight;
 
   std::vector<std::vector<std::vector<size_t>>> mGridRight;
 
