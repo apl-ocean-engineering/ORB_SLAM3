@@ -85,7 +85,7 @@ void Settings::setMonoCamera(CameraType type, const std::vector<float>& k,
     vPinHoleDistorsion1_ = dist;
 
     // Check if we need to correct distortion from the images
-    if (vPinHoleDistorsion1_.size() != 0) {
+    if (sensor_.isMonocular() && vPinHoleDistorsion1_.size() != 0) {
       bNeedToUndistort_ = true;
     }
   } else if (cameraType_ == Rectified) {

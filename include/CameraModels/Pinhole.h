@@ -23,6 +23,7 @@
 
 #include <assert.h>
 
+#include <boost/serialization/shared_ptr.hpp>
 #include <memory>
 #include <vector>
 

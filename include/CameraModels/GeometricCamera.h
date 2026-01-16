@@ -27,6 +27,7 @@
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/export.hpp>
 #include <boost/serialization/serialization.hpp>
+#include <boost/serialization/shared_ptr.hpp>
 #include <boost/serialization/vector.hpp>
 #include <memory>
 #include <opencv2/core/core.hpp>

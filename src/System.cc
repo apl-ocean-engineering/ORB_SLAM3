@@ -32,8 +32,10 @@
 #include <boost/archive/xml_iarchive.hpp>
 #include <boost/archive/xml_oarchive.hpp>
 #include <boost/serialization/base_object.hpp>
+#include <boost/serialization/shared_ptr.hpp>
 #include <boost/serialization/string.hpp>
 #include <cstdio>
+#include <exception>
 #include <iomanip>
 #include <iostream>
 #include <list>
@@ -502,19 +504,22 @@ void System::Shutdown() {
   while (!mpLocalMapper->isFinished() || !mpLoopCloser->isFinished() ||
          mpLoopCloser->isRunningGBA()) {
     if (!mpLocalMapper->isFinished()) {
-      cout << "mpLocalMapper is not finished" << endl;
+      spdlog::warn("mpLocalMapper is not finished");
     }
 
     if (!mpLoopCloser->isFinished()) {
-      cout << "mpLoopCloser is not finished" << endl;
+      spdlog::warn("mpLoopCloser is not finished");
     }
+
     if (mpLoopCloser->isRunningGBA()) {
-      cout << "mpLoopCloser is running GBA" << endl;
-      cout << "break anyway..." << endl;
-      break;
+      spdlog::warn("mpLoopCloser is running GBA");
     }
+
+    spdlog::warn(" .... waiting");
     usleep(5000);
   }
+
+  spdlog::warn("All threads finished");
 
   const string mStrSaveAtlasToFile = settings_->atlasSaveFile();
   if (!mStrSaveAtlasToFile.empty()) {
@@ -751,8 +756,6 @@ void System::SaveTrajectoryEuRoC(const string &filename,
       cerr << "ERROR: SaveTrajectoryEuRoC cannot be used for monocular." <<
   endl; return;
   }*/
-
-  int numMaxKFs = 0;
 
   auto vpKFs = pMap->GetAllKeyFrames();
   sort(vpKFs.begin(), vpKFs.end(), KeyFrame::lId);
@@ -1406,7 +1409,7 @@ void System::SaveAtlas(int type) {
 
       oa << strVocabularyName;
       oa << strVocabularyChecksum;
-      // oa << *mpAtlas;
+      oa << mpAtlas;
       cout << "End to write the save text file" << endl;
     } else if (type == BINARY_FILE) {
       // File binary
@@ -1417,7 +1420,7 @@ void System::SaveAtlas(int type) {
       boost::archive::binary_oarchive oa(ofs);
       oa << strVocabularyName;
       oa << strVocabularyChecksum;
-      // oa << *mpAtlas;
+      oa << mpAtlas;
       cout << "End to write save binary file" << endl;
     }
   }
@@ -1445,7 +1448,8 @@ bool System::LoadAtlas(int type) {
     boost::archive::text_iarchive ia(ifs);
     ia >> strFileVoc;
     ia >> strVocChecksum;
-    // ia >> (*mpAtlas);
+    ia >> mpAtlas;
+
     cout << "Finished loading the saved text file " << endl;
     isRead = true;
   } else if (type == BINARY_FILE) {
@@ -1459,9 +1463,14 @@ bool System::LoadAtlas(int type) {
     boost::archive::binary_iarchive ia(ifs);
     ia >> strFileVoc;
     ia >> strVocChecksum;
-    // ia >> (*mpAtlas);
+    ia >> mpAtlas;
+
     cout << "Finished loading the saved binary file" << endl;
     isRead = true;
+  }
+
+  if (!mpAtlas) {
+    throw std::runtime_error("mpAtlas not initialized when it should be");
   }
 
   if (isRead) {

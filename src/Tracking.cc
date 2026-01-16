@@ -404,6 +404,7 @@ void Tracking::PrintTimeStats() {
   // Map complexity
   std::cout << "---------------------------" << std::endl;
   std::cout << std::endl << "Map complexity" << std::endl;
+  std::cout << "Num maps  : " << mpAtlas->CountMaps() << std::endl;
   std::cout << "KFs in map: " << mpAtlas->GetAllKeyFrames().size() << std::endl;
   std::cout << "MPs in map: " << mpAtlas->GetAllMapPoints().size() << std::endl;
   f << "---------------------------" << std::endl;
@@ -554,6 +555,8 @@ void Tracking::newParameterLoader(const std::shared_ptr<Settings>& settings) {
 
   if (settings->needToUndistort()) {
     mDistCoef = settings->camera1DistortionCoef();
+
+    // std::cout << "[Tracking::newParameterLoader] " << mDistCoef << endl;
   } else {
     mDistCoef = cv::Mat::zeros(4, 1, CV_32F);
   }
@@ -1321,7 +1324,7 @@ void Tracking::Track() {
 
 #ifdef REGISTER_TIMES
     spdlog::info(
-        "[Tracking::Track] TrackLocalMap  {} ms ",
+        "[Tracking::Track] TrackLocalMap took {} ms ",
         std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(
             std::chrono::steady_clock::now() - time_StartLMTrack)
             .count());
@@ -2041,10 +2044,10 @@ bool Tracking::TrackWithMotionModel() {
   // Project points seen in previous frame
   int th;
 
-  // if(mSensor==SensorType::STEREO)
-  //     th=7;
-  // else
-  th = 15;
+  if (mSensor == SensorType::STEREO)
+    th = 7;
+  else
+    th = 15;
 
   int nmatches = matcher.SearchByProjection(mCurrentFrame, mLastFrame, th,
                                             mSensor.isMonocular());
@@ -2157,6 +2160,8 @@ bool Tracking::TrackLocalMap() {
     }
   }
 
+  spdlog::info("Before optimization, {} map points, {} outliers", aux1, aux2);
+
   int inliers;
   if (!mpAtlas->isImuInitialized()) {
     spdlog::trace(
@@ -2197,6 +2202,8 @@ bool Tracking::TrackLocalMap() {
     }
   }
 
+  spdlog::info("After optimization, {} map points, {} outliers", aux1, aux2);
+
   mnMatchesInliers = 0;
 
   // Update MapPoints Statistics
@@ -2205,6 +2212,10 @@ bool Tracking::TrackLocalMap() {
       if (!mCurrentFrame->mvbOutlier[i]) {
         mCurrentFrame->mvpMapPoints[i]->IncreaseFound();
         if (!mbOnlyTracking) {
+          // if( i < 10 )
+          // spdlog::debug("{}, observations {}", i ,
+          // mCurrentFrame->mvpMapPoints[i]->Observations() );
+
           if (mCurrentFrame->mvpMapPoints[i]->Observations() > 0) {
             mnMatchesInliers++;
           }
@@ -2602,9 +2613,11 @@ void Tracking::SearchLocalPoints() {
     }
   }
 
+  spdlog::info("nToMatch {}", nToMatch);
+
   if (nToMatch > 0) {
     ORBmatcher matcher(0.8);
-    int th = 10;
+    int th = 1;
     if (mSensor == SensorType::RGBD || mSensor == SensorType::IMU_RGBD) th = 3;
     if (mpAtlas->isImuInitialized()) {
       if (mpAtlas->GetCurrentMap()->GetInertialBA2())
@@ -3225,7 +3238,7 @@ bool Tracking::Stop() {
   unique_lock<mutex> lock(mMutexStop);
   if (mbStopRequested && !mbNotStop) {
     mbStopped = true;
-    cout << "Tracking STOP" << endl;
+    spdlog::info("Tracking STOP");
     return true;
   }
 

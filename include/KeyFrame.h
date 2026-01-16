@@ -23,6 +23,7 @@
 
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/map.hpp>
+#include <boost/serialization/shared_ptr.hpp>
 #include <boost/serialization/vector.hpp>
 #include <cstdint>
 #include <iostream>
@@ -184,7 +185,7 @@ class KeyFrame : public std::enable_shared_from_this<KeyFrame> {
 
     // Inertial variables
     ar & mImuBias;
-    ar&(*mpBackupImuPreintegrated);
+    ar & mpBackupImuPreintegrated;
     ar & mImuCalib;
     ar & mBackupPrevKFId;
     ar & mBackupNextKFId;
