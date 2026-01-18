@@ -116,10 +116,10 @@ void LoopClosing::SetLocalMapper(
 void LoopClosing::Run() {
   mbFinished = false;
 
-  while (1) {
+  while (true) {
     // NEW LOOP AND MERGE DETECTION ALGORITHM
     //----------------------------
-    // spdlog::debug("@@ LoopClosing: loop running...");
+    spdlog::debug("@@ LoopClosing: loop running...");
 
     if (CheckNewKeyFrames()) {
       spdlog::info("LoopClosing: Have new frames to check");
@@ -350,7 +350,7 @@ bool LoopClosing::CheckNewKeyFrames() {
 }
 
 bool LoopClosing::NewDetectCommonRegions() {
-  // To deactivate placerecognition. No loopclosing nor merging will be
+  // To deactivate place recognition. No loop closing nor merging will be
   // performed
   if (!mbActiveLC) {
     return false;
@@ -665,7 +665,7 @@ bool LoopClosing::DetectCommonRegionsFromBoW(
   // Verbose::PrintMess("BoW candidates: There are " +
   // to_string(vpBowCand.size()) + " possible candidates ",
   // Verbose::VERBOSITY_DEBUG);
-  for (auto pKFi : vpBowCand) {
+  for (auto const& pKFi : vpBowCand) {
     if (!pKFi || pKFi->isBad()) continue;
 
     // std::cout << "KF candidate: " << pKFi->mnId << std::endl;
@@ -968,7 +968,7 @@ bool LoopClosing::DetectCommonRegionsFromLastKF(
   nNumProjMatches = FindMatchesByProjection(
       pCurrentKF, pMatchedKF, gScw, spAlreadyMatchedMPs, vpMPs, vpMatchedMPs);
 
-  int nProjMatches = 30;
+  const int nProjMatches = 30;
   if (nNumProjMatches >= nProjMatches) {
     return true;
   }
@@ -1134,9 +1134,7 @@ void LoopClosing::CorrectLoop() {
 
     // Correct all MapPoints obsrved by current keyframe and neighbors, so that
     // they align with the other side of the loop
-    for (auto mit : CorrectedSim3) {
-      auto pKFi = mit.first;
-      g2o::Sim3 g2oCorrectedSiw = mit.second;
+    for (auto const& [pKFi, g2oCorrectedSiw] : CorrectedSim3) {
       g2o::Sim3 g2oCorrectedSwi = g2oCorrectedSiw.inverse();
 
       g2o::Sim3 g2oSiw = NonCorrectedSim3[pKFi];

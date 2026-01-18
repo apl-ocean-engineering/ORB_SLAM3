@@ -367,6 +367,7 @@ Frame::Frame(const cv::Mat &imGray, const cv::Mat &imDepth,
   }
 
   mb = mbf / fx;
+  spdlog::trace("Frame {}, mb {} = mbf {} / fx {}", mnId, mb, mbf, fx);
 
   if (pPrevF) {
     if (pPrevF->HasVelocity()) SetVelocity(pPrevF->GetVelocity());
@@ -939,6 +940,8 @@ void Frame::ComputeStereoMatches() {
   const float minD = 0;
   const float maxD = mbf / minZ;
 
+  spdlog::trace("minZ {} minD {} maxD {}", minZ, minD, maxD);
+
   // For each left keypoint search a match in the right image
   vector<pair<int, int>> vDistIdx;
   vDistIdx.reserve(N);
@@ -1079,7 +1082,7 @@ void Frame::ComputeStereoMatches() {
     if (d > 0) keptCount++;
   }
 
-  spdlog::trace("Frame {}.  Kept {} stereo matches of {} features", mnId,
+  spdlog::debug("Frame {}.  Kept {} stereo matches of {} features", mnId,
                 keptCount, vDistIdx.size());
 }
 
