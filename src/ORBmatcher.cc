@@ -66,12 +66,18 @@ int ORBmatcher::SearchByProjection(const std::shared_ptr<Frame> &F,
 
       if (bFactor) r *= th;
 
+      // if(iMP < 10)  spdlog::info("{} mbTrackinView() ({},{}) {} {}", iMP,
+      // pMP->mTrackProjX, pMP->mTrackProjY, nPredictedLevel, r );
+
       const vector<size_t> vIndices =
           F->GetFeaturesInArea(pMP->mTrackProjX, pMP->mTrackProjY,
                                r * F->mvScaleFactors[nPredictedLevel],
                                nPredictedLevel - 1, nPredictedLevel);
 
       if (!vIndices.empty()) {
+        // if(iMP < 10)
+        //   spdlog::info("{} found {} feature", iMP, vIndices.size() );
+
         const cv::Mat MPdescriptor = pMP->GetDescriptor();
 
         int bestDist = 256;
@@ -115,6 +121,9 @@ int ORBmatcher::SearchByProjection(const std::shared_ptr<Frame> &F,
             bestDist2 = dist;
           }
         }
+
+        //         if(iMP < 10)
+        // spdlog::info("best dist {} best dist2 {}", bestDist, bestDist2);
 
         // Apply ratio to second match (only if best and second are in the same
         // scale level)

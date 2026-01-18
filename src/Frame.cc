@@ -225,6 +225,9 @@ Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight,
   if (mbInitialComputations) {
     ComputeImageBounds(imLeft);
 
+    // std::cout << "mbInitialComputations " << mnMaxX << "-" << mnMinX << "   "
+    // << mnMaxY << "-" << mnMinY << endl;
+
     mfGridElementWidthInv =
         static_cast<float>(FRAME_GRID_COLS) / (mnMaxX - mnMinX);
     mfGridElementHeightInv =
@@ -241,6 +244,7 @@ Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight,
   }
 
   mb = mbf / fx;
+  // spdlog::trace("Frame {}, mb {} = mbf {} / fx {}", mnId, mb, mbf, fx);
 
   if (pPrevF) {
     if (pPrevF->HasVelocity()) SetVelocity(pPrevF->GetVelocity());
@@ -350,6 +354,9 @@ Frame::Frame(const cv::Mat &imGray, const cv::Mat &imDepth,
   // calibration)
   if (mbInitialComputations) {
     ComputeImageBounds(imGray);
+
+    // std::cout << "mbInitialComputations " << mnMaxX << "-" << mnMinX << "   "
+    // << mnMaxY << "-" << mnMinY << endl;
 
     mfGridElementWidthInv = static_cast<float>(FRAME_GRID_COLS) /
                             static_cast<float>(mnMaxX - mnMinX);
@@ -765,6 +772,10 @@ vector<size_t> Frame::GetFeaturesInArea(const float &x, const float &y,
   float factorX = r;
   float factorY = r;
 
+  // std::cout << x << "," << y << " " << r << " " << mnMinX << " " << mnMinY <<
+  // endl; std::cout << mfGridElementWidthInv << " " << mfGridElementHeightInv
+  // << endl;
+
   const int nMinCellX = max(0, static_cast<int>(floor((x - mnMinX - factorX) *
                                                       mfGridElementWidthInv)));
   if (nMinCellX >= FRAME_GRID_COLS) {
@@ -792,6 +803,9 @@ vector<size_t> Frame::GetFeaturesInArea(const float &x, const float &y,
   }
 
   const bool bCheckLevels = (minLevel > 0) || (maxLevel >= 0);
+
+  // std::cout << nMinCellX << ", " << nMaxCellX << " -- " <<  nMinCellY << ", "
+  // << nMaxCellY << endl;
 
   for (int ix = nMinCellX; ix <= nMaxCellX; ix++) {
     for (int iy = nMinCellY; iy <= nMaxCellY; iy++) {
@@ -954,10 +968,17 @@ void Frame::ComputeStereoMatches() {
 
     const vector<size_t> &vCandidates = vRowIndices[vL];
 
+    if (iL < 10)
+      spdlog::trace("Pt at ({},{})  {} candidates", uL, vL, vCandidates.size());
+
     if (vCandidates.empty()) continue;
 
     const float minU = uL - maxD;
     const float maxU = uL - minD;
+
+    if (iL < 10)
+      spdlog::trace("uL {} maxD {} minD {} maxU {} minU {}", uL, maxD, minD,
+                    maxU, minU);
 
     if (maxU < 0) continue;
 

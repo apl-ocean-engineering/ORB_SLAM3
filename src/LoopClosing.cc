@@ -119,7 +119,7 @@ void LoopClosing::Run() {
   while (true) {
     // NEW LOOP AND MERGE DETECTION ALGORITHM
     //----------------------------
-    spdlog::debug("@@ LoopClosing: loop running...");
+    spdlog::trace("@@ LoopClosing: loop running...");
 
     if (CheckNewKeyFrames()) {
       spdlog::info("LoopClosing: Have new frames to check");
@@ -989,11 +989,13 @@ int LoopClosing::FindMatchesByProjection(
   set<std::shared_ptr<KeyFrame>> spCheckKFs(vpCovKFm.begin(), vpCovKFm.end());
   set<std::shared_ptr<KeyFrame>> spCurrentCovisbles =
       pCurrentKF->GetConnectedKeyFrames();
+
   if (nInitialCov < nNumCovisibles) {
     for (int i = 0; i < nInitialCov; ++i) {
       vector<std::shared_ptr<KeyFrame>> vpKFs =
           vpCovKFm[i]->GetBestCovisibilityKeyFrames(nNumCovisibles);
       int nInserted = 0;
+
       size_t j = 0;
       while (j < vpKFs.size() && nInserted < nNumCovisibles) {
         if (spCheckKFs.find(vpKFs[j]) == spCheckKFs.end() &&

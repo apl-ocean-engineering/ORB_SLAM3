@@ -27,63 +27,52 @@
 #include <iostream>
 #include <opencv2/core/core.hpp>
 
-using namespace std;
+#include "euroc_common.h"
 
-void LoadImages(const string &strImagePath, const string &strPathTimes,
-                vector<string> &vstrImages, vector<double> &vTimeStamps);
+using namespace std;
 
 int main(int argc, char **argv) {
   if (argc < 5) {
-    cerr
-        << endl
-        << "Usage: ./mono_euroc path_to_vocabulary path_to_settings "
-           "path_to_sequence_folder_1 path_to_times_file_1 "
-           "(path_to_image_folder_2 path_to_times_file_2 ... "
-           "path_to_image_folder_N path_to_times_file_N) (trajectory_file_name)"
-        << endl;
+    cerr << endl
+         << "Usage: ./mono_euroc path_to_vocabulary path_to_settings "
+         << std::endl
+         << "path_to_image_folder_1 path_to_times_file_1 " << std::endl
+         << "[path_to_image_folder_2 path_to_times_file_2] ... " << std::endl
+         << "[path_to_image_folder_N path_to_times_file_N] "
+            "[trajectory_file_name]"
+         << endl;
     return 1;
   }
 
   const int num_seq = (argc - 3) / 2;
   cout << "num_seq = " << num_seq << endl;
+
   bool bFileName = (((argc - 3) % 2) == 1);
-  string file_name;
+  string trajFileName;
   if (bFileName) {
-    file_name = string(argv[argc - 1]);
-    cout << "file name: " << file_name << endl;
+    trajFileName = string(argv[argc - 1]);
+    cout << "file name: " << trajFileName << endl;
   }
 
   // Load all sequences:
   int seq;
-  vector<vector<string> > vstrImageFilenames;
-  vector<vector<double> > vTimestampsCam;
-  vector<int> nImages;
-
-  vstrImageFilenames.resize(num_seq);
-  vTimestampsCam.resize(num_seq);
-  nImages.resize(num_seq);
-
-  int tot_images = 0;
+  vector<EuRoCData::SequencePaths> imagePaths;
   for (seq = 0; seq < num_seq; seq++) {
-    cout << "Loading images for sequence " << seq << "...";
-    LoadImages(string(argv[(2 * seq) + 3]) + "/mav0/cam0/data",
-               string(argv[(2 * seq) + 4]), vstrImageFilenames[seq],
-               vTimestampsCam[seq]);
-    cout << "LOADED!" << endl;
+    cout << "Loading images for sequence " << seq << "..." << endl;
 
-    nImages[seq] = vstrImageFilenames[seq].size();
-    tot_images += nImages[seq];
+    const string pathSeq(argv[(2 * seq) + 3]);
+    const string pathTimeStamps(argv[(2 * seq) + 4]);
+
+    imagePaths.emplace_back(pathSeq, pathTimeStamps);
   }
+
+  auto eurocData = EuRoCData::LoadSequences(imagePaths);
 
   // Vector for tracking time statistics
   vector<float> vTimesTrack;
-  vTimesTrack.resize(tot_images);
 
   cout << endl << "-------" << endl;
   cout.precision(17);
-
-  int fps = 20;
-  // float dT = 1.f / fps;
 
   // Create SLAM system. It initializes all system threads and gets ready to
   // process frames.
@@ -102,21 +91,22 @@ int main(int argc, char **argv) {
   double t_resize = 0.f;
   double t_track = 0.f;
 
-  for (seq = 0; seq < num_seq; seq++) {
+  int nseq = 0;
+  for (auto const &seq : eurocData.mvSequences) {
     // Main loop
     cv::Mat im;
-    int proccIm = 0;
-    for (int ni = 0; ni < nImages[seq]; ni++, proccIm++) {
+    int ni = 0;
+    for (auto const &imgSet : seq.mvImageSets) {
+      cout << "=== Processing image " << ni << " of " << seq.size() << " at "
+           << imgSet.mTimestamp << " ===" << endl;
+
       // Read image from file
-      im = cv::imread(vstrImageFilenames[seq][ni],
-                      cv::IMREAD_UNCHANGED);  //,CV_LOAD_IMAGE_UNCHANGED);
-      double tframe = vTimestampsCam[seq][ni];
+      im = imgSet.leftImage();
 
       if (im.empty()) {
         cerr << endl
-             << "Failed to load image at: " << vstrImageFilenames[seq][ni]
-             << endl;
-        return 1;
+             << "Failed to load image at: " << imgSet.mTimestamp << endl;
+        exit(-1);
       }
 
       if (imageScale != 1.f) {
@@ -144,7 +134,8 @@ int main(int argc, char **argv) {
 
       // Pass the image to the SLAM system
       // cout << "tframe = " << tframe << endl;
-      SLAM->TrackMonocular(im, tframe);  // TODO change to monocular_inertial
+      SLAM->TrackMonocular(
+          im, imgSet.mTimestamp);  // TODO change to monocular_inertial
 
       std::chrono::steady_clock::time_point t2 =
           std::chrono::steady_clock::now();
@@ -163,42 +154,29 @@ int main(int argc, char **argv) {
 
       vTimesTrack[ni] = ttrack;
 
-      // Wait to load the next frame
-      double T = 0;
-      if (ni < nImages[seq] - 1)
-        T = vTimestampsCam[seq][ni + 1] - tframe;
-      else if (ni > 0)
-        T = tframe - vTimestampsCam[seq][ni - 1];
-
-      // std::cout << "T: " << T << std::endl;
-      // std::cout << "ttrack: " << ttrack << std::endl;
-
-      if (ttrack < T) {
-        // std::cout << "usleep: " << (dT-ttrack) << std::endl;
-        usleep((T - ttrack) * 1e6);  // 1e6
-      }
+      const double dt = seq.dt();
+      if (ttrack < dt) usleep((dt - ttrack) * 1e6);
     }
 
-    if (seq < num_seq - 1) {
-      string kf_file_submap =
-          "./SubMaps/kf_SubMap_" + std::to_string(seq) + ".txt";
-      string f_file_submap =
-          "./SubMaps/f_SubMap_" + std::to_string(seq) + ".txt";
-      SLAM->SaveTrajectoryEuRoC(f_file_submap);
-      SLAM->SaveKeyFrameTrajectoryEuRoC(kf_file_submap);
+    string kf_file_submap =
+        "./SubMaps/kf_SubMap_" + std::to_string(nseq) + ".txt";
+    string f_file_submap =
+        "./SubMaps/f_SubMap_" + std::to_string(nseq) + ".txt";
+    SLAM->SaveTrajectoryEuRoC(f_file_submap);
+    SLAM->SaveKeyFrameTrajectoryEuRoC(kf_file_submap);
 
-      cout << "Changing the dataset" << endl;
+    cout << "Changing the dataset" << endl;
+    nseq++;
 
-      SLAM->ChangeDataset();
-    }
+    SLAM->ChangeDataset();
   }
   // Stop all threads
   SLAM->Shutdown();
 
   // Save camera trajectory
   if (bFileName) {
-    const string kf_file = "kf_" + string(argv[argc - 1]) + ".txt";
-    const string f_file = "f_" + string(argv[argc - 1]) + ".txt";
+    const string kf_file = "kf_" + trajFileName + ".txt";
+    const string f_file = "f_" + trajFileName + ".txt";
     SLAM->SaveTrajectoryEuRoC(f_file);
     SLAM->SaveKeyFrameTrajectoryEuRoC(kf_file);
   } else {
@@ -207,24 +185,4 @@ int main(int argc, char **argv) {
   }
 
   return 0;
-}
-
-void LoadImages(const string &strImagePath, const string &strPathTimes,
-                vector<string> &vstrImages, vector<double> &vTimeStamps) {
-  ifstream fTimes;
-  fTimes.open(strPathTimes.c_str());
-  vTimeStamps.reserve(5000);
-  vstrImages.reserve(5000);
-  while (!fTimes.eof()) {
-    string s;
-    getline(fTimes, s);
-    if (!s.empty()) {
-      stringstream ss;
-      ss << s;
-      vstrImages.push_back(strImagePath + "/" + ss.str() + ".png");
-      double t;
-      ss >> t;
-      vTimeStamps.push_back(t * 1e-9);
-    }
-  }
 }
