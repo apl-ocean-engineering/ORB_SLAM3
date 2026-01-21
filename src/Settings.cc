@@ -172,7 +172,7 @@ void Settings::setStereoRectifiedCamera(const std::vector<float>& k,
 
 //===
 
-void Settings::setImageSize(int width, int height) {
+void Settings::setOriginalImageSize(int width, int height) {
   // Read original and desired image dimensions
   int originalRows = height;
   int originalCols = width;
@@ -181,10 +181,69 @@ void Settings::setImageSize(int width, int height) {
   originalImSize_.height = originalRows;
 
   newImSize_ = originalImSize_;
+}
 
-  // For now...
-  fps_ = 10;
-  bRGB_ = false;
+void Settings::setResizeImageSize(int width, int height) {
+  if (!calibration1_) {
+    throw std::runtime_error(
+        "setResizeImageSize() must be called after loading camera parameters");
+  }
+
+  if (height != originalImSize_.height) {
+    bNeedToResize1_ = true;
+    newImSize_.height = height;
+
+    if (!bNeedToRectify_) {
+      // Update calibration
+      float scaleRowFactor = static_cast<float>(newImSize_.height) /
+                             static_cast<float>(originalImSize_.height);
+      calibration1_->setParameter(
+          calibration1_->getParameter(1) * scaleRowFactor, 1);
+      calibration1_->setParameter(
+          calibration1_->getParameter(3) * scaleRowFactor, 3);
+
+      if ((sensor_.isStereo()) && cameraType_ != Rectified) {
+        calibration2_->setParameter(
+            calibration2_->getParameter(1) * scaleRowFactor, 1);
+        calibration2_->setParameter(
+            calibration2_->getParameter(3) * scaleRowFactor, 3);
+      }
+    }
+  }
+
+  if (width != originalImSize_.width) {
+    bNeedToResize1_ = true;
+    newImSize_.width = width;
+
+    if (!bNeedToRectify_) {
+      // Update calibration
+      float scaleColFactor = static_cast<float>(newImSize_.width) /
+                             static_cast<float>(originalImSize_.width);
+      calibration1_->setParameter(
+          calibration1_->getParameter(0) * scaleColFactor, 0);
+      calibration1_->setParameter(
+          calibration1_->getParameter(2) * scaleColFactor, 2);
+
+      if ((sensor_.isStereo()) && cameraType_ != Rectified) {
+        calibration2_->setParameter(
+            calibration2_->getParameter(0) * scaleColFactor, 0);
+        calibration2_->setParameter(
+            calibration2_->getParameter(2) * scaleColFactor, 2);
+
+        if (cameraType_ == KannalaBrandt) {
+          dynamic_cast<KannalaBrandt8*>(calibration1_.get())
+              ->mvLappingArea[0] *= scaleColFactor;
+          dynamic_cast<KannalaBrandt8*>(calibration1_.get())
+              ->mvLappingArea[1] *= scaleColFactor;
+
+          dynamic_cast<KannalaBrandt8*>(calibration2_.get())
+              ->mvLappingArea[0] *= scaleColFactor;
+          dynamic_cast<KannalaBrandt8*>(calibration2_.get())
+              ->mvLappingArea[1] *= scaleColFactor;
+        }
+      }
+    }
+  }
 }
 
 void Settings::precomputeRectificationMaps() {

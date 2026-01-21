@@ -197,7 +197,9 @@ class Settings {
   void setStereoRectifiedCamera(const std::vector<float>& k, float baseline,
                                 float thDepth);
 
-  void setImageSize(int width, int height);
+  void setOriginalImageSize(int width, int height);
+  void setResizeImageSize(int width, int height);
+
   void precomputeRectificationMaps();
 
   SensorType sensor_;

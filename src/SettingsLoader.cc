@@ -363,72 +363,21 @@ void SettingsLoader::readImageInfo(cv::FileStorage& fSettings) {
   int originalRows = readParameter<int>(fSettings, "Camera.height", found);
   int originalCols = readParameter<int>(fSettings, "Camera.width", found);
 
-  settings_->setImageSize(originalCols, originalRows);
+  settings_->setOriginalImageSize(originalCols, originalRows);
 
-  // Disable image resizing for now...
+  bool resizeHeightFound = false, resizeWidthFound = false;
+  int resizeHeight = originalRows, resizeWidth = originalCols;
 
-  // int newHeigh =
-  //     readParameter<int>(fSettings, "Camera.newHeight", found, false);
-  // if (found) {
-  //   bNeedToResize1_ = true;
-  //   newImSize_.height = newHeigh;
+  auto h = readParameter<int>(fSettings, "Camera.newHeight", resizeHeightFound,
+                              false);
+  if (resizeHeightFound) resizeHeight = h;
 
-  //   if (!bNeedToRectify_) {
-  //     // Update calibration
-  //     float scaleRowFactor = static_cast<float>(newImSize_.height) /
-  //                            static_cast<float>(originalImSize_.height);
-  //     calibration1_->setParameter(
-  //         calibration1_->getParameter(1) * scaleRowFactor, 1);
-  //     calibration1_->setParameter(
-  //         calibration1_->getParameter(3) * scaleRowFactor, 3);
+  auto w =
+      readParameter<int>(fSettings, "Camera.newWidth", resizeWidthFound, false);
+  if (resizeWidthFound) resizeWidth = w;
 
-  //     if ((sensor_ == SensorType::STEREO ||
-  //          sensor_ == SensorType::IMU_STEREO) &&
-  //         cameraType_ != Rectified) {
-  //       calibration2_->setParameter(
-  //           calibration2_->getParameter(1) * scaleRowFactor, 1);
-  //       calibration2_->setParameter(
-  //           calibration2_->getParameter(3) * scaleRowFactor, 3);
-  //     }
-  //   }
-  // }
-
-  // int newWidth = readParameter<int>(fSettings, "Camera.newWidth", found,
-  // false); if (found) {
-  //   bNeedToResize1_ = true;
-  //   newImSize_.width = newWidth;
-
-  //   if (!bNeedToRectify_) {
-  //     // Update calibration
-  //     float scaleColFactor = static_cast<float>(newImSize_.width) /
-  //                            static_cast<float>(originalImSize_.width);
-  //     calibration1_->setParameter(
-  //         calibration1_->getParameter(0) * scaleColFactor, 0);
-  //     calibration1_->setParameter(
-  //         calibration1_->getParameter(2) * scaleColFactor, 2);
-
-  //     if ((sensor_ == SensorType::STEREO ||
-  //          sensor_ == SensorType::IMU_STEREO) &&
-  //         cameraType_ != Rectified) {
-  //       calibration2_->setParameter(
-  //           calibration2_->getParameter(0) * scaleColFactor, 0);
-  //       calibration2_->setParameter(
-  //           calibration2_->getParameter(2) * scaleColFactor, 2);
-
-  //       if (cameraType_ == KannalaBrandt) {
-  //         dynamic_cast<KannalaBrandt8*>(calibration1_.get())
-  //             ->mvLappingArea[0] *= scaleColFactor;
-  //         dynamic_cast<KannalaBrandt8*>(calibration1_.get())
-  //             ->mvLappingArea[1] *= scaleColFactor;
-
-  //         dynamic_cast<KannalaBrandt8*>(calibration2_.get())
-  //             ->mvLappingArea[0] *= scaleColFactor;
-  //         dynamic_cast<KannalaBrandt8*>(calibration2_.get())
-  //             ->mvLappingArea[1] *= scaleColFactor;
-  //       }
-  //     }
-  //   }
-  // }
+  if (resizeHeightFound || resizeWidthFound)
+    settings_->setResizeImageSize(resizeWidth, resizeHeight);
 
   settings_->fps_ = readParameter<int>(fSettings, "Camera.fps", found);
   settings_->bRGB_ =

@@ -51,11 +51,10 @@ struct EuRoCSequence {
   EuRoCSequence(const string &leftPath, const string &rightPath,
                 const string &timestampPath, const string &imuPath = "");
 
-  void loadImu(const string &imuPath);
+  void loadImu(const string &imuPath, double startTime = 0.0);
 
   vector<ImageSet> mvImageSets;
-  vector<double> vTimestampsImu;
-  vector<cv::Point3f> vAcc, vGyro;
+  vector<ORB_SLAM3::IMU::Point> vImu;
 
   size_t size() const { return mvImageSets.size(); }
 
@@ -83,7 +82,8 @@ class EuRoCData {
 
   EuRoCData() = default;
 
-  static EuRoCData LoadSequences(const std::vector<SequencePaths> &seqPaths);
+  static EuRoCData LoadSequences(const std::vector<SequencePaths> &seqPaths,
+                                 bool loadImu = false);
 
   size_t totalImages() const {
     size_t count = 0;

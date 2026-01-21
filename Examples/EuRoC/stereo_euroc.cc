@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
          << "[path_to_image_folder_N path_to_times_file_N] "
             "[trajectory_file_name]"
          << endl;
-    return 1;
+    exit(-1);
   }
 
   const int num_seq = (argc - 3) / 2;
@@ -59,7 +59,6 @@ int main(int argc, char **argv) {
 
   // Load all sequences:
   int seq;
-
   vector<EuRoCData::SequencePaths> imagePaths;
   for (seq = 0; seq < num_seq; seq++) {
     cout << "Loading images for sequence " << seq << "..." << endl;

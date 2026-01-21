@@ -99,37 +99,6 @@ SystemFactory::Expected SystemFactory::create(const std::string &configFile,
 
 //===================================================================
 
-// System::System(const string &strVocFile, const string &strSettingsFile,
-//                const SensorType sensor, bool initFr, const string
-//                &strSequence)
-//     : mpViewer(nullptr),
-//       mbReset(false),
-//       mbResetActiveMap(false),
-//       mbActivateLocalizationMode(false),
-//       mbDeactivateLocalizationMode(false),
-//       mbShutDown(false) {
-//   // Check settings file
-//   cv::FileStorage fsSettings(strSettingsFile.c_str(), cv::FileStorage::READ);
-//   if (!fsSettings.isOpened()) {
-//     cerr << "Failed to open settings file at: " << strSettingsFile << endl;
-//     exit(-1);
-//   }
-
-//   cv::FileNode node = fsSettings["File.version"];
-//   if (node.empty() || (node.isString() && node.string() != "1.0")) {
-//     std::cerr << "UNABLE TO LOAD CONFIG FILE THAT IS NOT VERSION 1.0"
-//               << std::endl;
-//   }
-
-//   settings_ = std::make_shared<Settings>(strSettingsFile, sensor);
-
-//   // This is currently not loaded from the settings file
-//   settings_->strVocFile_ = strVocFile;
-
-//   printBanner();
-//   initialize(initFr, strSequence);
-// }
-
 System::System(const std::shared_ptr<Settings> &settings, bool initFr,
                const string &strSequence)
     : enable_shared_from_this<System>(),
@@ -244,7 +213,6 @@ bool System::initialize(bool initFr, const string &strSequence) {
       std::make_unique<thread>(&ORB_SLAM3::LocalMapping::Run, mpLocalMapper);
 
   // Initialize the Loop Closing thread and launch
-  //  sensorType()!=MONOCULAR && sensorType()!=IMU_MONOCULAR
   mpLoopCloser = std::make_shared<LoopClosing>(
       mpAtlas, mpKeyFrameDatabase, mpVocabulary,
       sensorType() != SensorType::MONOCULAR, activeLC);
@@ -305,13 +273,7 @@ Sophus::SE3f System::TrackStereo(const cv::Mat &imLeft, const cv::Mat &imRight,
     imRightToFeed = imRight.clone();
   }
 
-  cv::imwrite("/tmp/left.png", imLeftToFeed);
-  cv::imwrite("/tmp/right.png", imRightToFeed);
-
-  // Check mode change
   processLocalizationModeChange();
-
-  // Check reset
   processReset();
 
   if (sensorType().isImu()) {
@@ -387,7 +349,6 @@ Sophus::SE3f System::TrackMonocular(const cv::Mat &im, const double &timestamp,
     imToFeed = resizedIm;
   }
 
-  // Check mode change
   processLocalizationModeChange();
   processReset();
 

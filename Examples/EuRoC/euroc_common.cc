@@ -24,6 +24,7 @@
 #include <algorithm>
 #include <chrono>
 #include <ctime>
+#include <filesystem>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -34,15 +35,28 @@
 
 using namespace std;
 
-EuRoCData EuRoCData::LoadSequences(const std::vector<SequencePaths> &seqPaths) {
+namespace fs = std::filesystem;
+
+EuRoCData EuRoCData::LoadSequences(const std::vector<SequencePaths> &seqPaths,
+                                   bool loadImu) {
   EuRoCData data;
 
   for (auto const &seq : seqPaths) {
     const string pathCam0 = seq.mImagePath + "/mav0/cam0/data";
     const string pathCam1 = seq.mImagePath + "/mav0/cam1/data";
 
-    if (seq.mImuPath.size() > 0) {
-      const string pathImu = seq.mImuPath + "/mav0/imu0/data.csv";
+    if (!fs::exists(pathCam0) || !fs::exists(pathCam1)) {
+      throw runtime_error("Canot find the image data");
+    }
+
+    if (loadImu) {
+      // For now, load the IMU data directly from the EuRoC dataset
+      const string pathImu = seq.mImagePath + "/mav0/imu0/data.csv";
+
+      if (!fs::exists(pathImu)) {
+        throw std::runtime_error("Cannot find IMU data");
+      }
+
       data.mvSequences.emplace_back(pathCam0, pathCam1, seq.mTimestampPath,
                                     pathImu);
     } else {
@@ -75,21 +89,22 @@ EuRoCSequence::EuRoCSequence(const string &leftPath, const string &rightPath,
     }
   }
 
-  if (imuPath.size() > 0) {
-    loadImu(imuPath);
+  if ((imuPath.size() > 0) && (mvImageSets.size() > 0)) {
+    loadImu(imuPath, mvImageSets.begin()->mTimestamp);
   }
 }
 
-void EuRoCSequence::loadImu(const string &imuPath) {
+void EuRoCSequence::loadImu(const string &imuPath, double startTime) {
   ifstream fImu;
+
+  cout << "Loading IMU data from " << imuPath << endl;
+
   fImu.open(imuPath.c_str());
-  vTimestampsImu.reserve(5000);
-  vAcc.reserve(5000);
-  vGyro.reserve(5000);
 
   while (!fImu.eof()) {
     string s;
     getline(fImu, s);
+
     if (s[0] == '#') continue;
 
     if (!s.empty()) {
@@ -105,9 +120,13 @@ void EuRoCSequence::loadImu(const string &imuPath) {
       item = s.substr(0, pos);
       data[6] = stod(item);
 
-      vTimestampsImu.push_back(data[0] / 1e9);
-      vAcc.push_back(cv::Point3f(data[4], data[5], data[6]));
-      vGyro.push_back(cv::Point3f(data[1], data[2], data[3]));
+      const double t = data[0] / 1e9;
+
+      // Ignore data before startTime
+      if (t <= startTime) continue;
+
+      vImu.emplace_back(data[4], data[5], data[6], data[1], data[2], data[3],
+                        t);
     }
   }
 }
