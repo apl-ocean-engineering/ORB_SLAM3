@@ -1,41 +1,38 @@
 version: '3'
 
 vars:
+  # This needs to be updates before you run `task convert`
   BAGFILES_PATH: /home/aaron/workspace/aquarium_nano_data/2025_05_23_aquarium_test
+
   BAGFILES: [ 'rosbag2_2025_05_23-08_27_30', 'rosbag2_2025_05_23-08_50_46', 'rosbag2_2025_05_23-09_29_11' ]
 
-  BUILD_TYPE: Debug
+  BUILD_TYPE: Release
+
   CONFIG_FILE: aquarium_resize.yaml
 
-  BUILD_DIR: ../EuRoC
-  BUILD_PREFIX: euroc
+  BIN_DIR: ../EuRoC
+  BIN_SUFFIX: euroc
 
   VOCAB_FILE: ../../Vocabulary/ORBvoc.txt
 
 tasks:
 
-  # Run data in stereo mode
-  make_stereo_tasks:
-    internal: true
-    deps:
-      - for:
-          var: BAGFILES
-        task: stereo:{{.ITEM}}
-
+  # Process one bag using stereo_euroc
   stereo:*:
     vars:
       BAG: '{{index .MATCH 0}}'
-      BINARY: '{{.BUILD_DIR}}/{{.BUILD_TYPE}}/stereo_{{.BUILD_PREFIX}}'
+      BINARY: '{{.BIN_DIR}}/{{.BUILD_TYPE}}/stereo_{{.BIN_SUFFIX}}'
     cmds:
       - '{{.BINARY}} {{.CONFIG_FILE}} {{.VOCAB_FILE}} aquarium_data/{{.BAG}} aquarium_data/{{.BAG}}/mav0/cam0/data.csv 2>&1 | tee {{.BAG}}_stereo.txt'
 
-  ## Convert aquarium ros2 bags to EuRoC format
+  # Convert all three aquarium ros2 bags to EuRoC format
   convert:
     deps:
       - for:
           var: BAGFILES
         task: convert:{{.ITEM}}
 
+  # Convert one bag to EuRoC format
   convert:*:
     vars:
       BAG: '{{index .MATCH 0}}'
