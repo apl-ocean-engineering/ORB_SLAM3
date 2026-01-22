@@ -77,6 +77,8 @@ EuRoCSequence::EuRoCSequence(const string &leftPath, const string &rightPath,
     string s;
     getline(fTimes, s);
     if (!s.empty()) {
+      if (s[0] == '#') continue;
+
       stringstream ss;
       ss << s;
       const string leftImg = leftPath + "/" + ss.str() + ".png";
@@ -132,9 +134,11 @@ void EuRoCSequence::loadImu(const string &imuPath, double startTime) {
 }
 
 cv::Mat ImageSet::leftImage() const {
+  cout << "Loading left image " << mLeftImage << endl;
   return cv::imread(mLeftImage, cv::IMREAD_UNCHANGED);
 }
 
 cv::Mat ImageSet::rightImage() const {
+  cout << "Loading right image " << mRightImage << endl;
   return cv::imread(mRightImage, cv::IMREAD_UNCHANGED);
 }

@@ -144,9 +144,6 @@ int main(int argc, char **argv) {
 
       const double dt = seq.dt();
       if (ttrack < dt) usleep((dt - ttrack) * 1e6);
-
-      if (ni > 250) break;
-
       ni++;
     }
 
