@@ -1,0 +1,154 @@
+%YAML:1.0
+
+# ORBSLAM3 settings file, passed to the node via the "path_yaml_settings" param
+#
+# Contains values specific to the odometry nano _in water_
+#
+
+#--------------------------------------------------------------------------------------------
+# Camera Parameters. Adjust them!
+#--------------------------------------------------------------------------------------------
+File.version: "1.0"
+
+#--------------------------------------------------------------------------------------------
+# PARAMETERS RETURNED BY MATLAB CALIBRATION HERE
+Camera.type: "PinHole"
+
+Camera.width: 1440
+Camera.height: 1080
+
+Camera1.fx: 1061.90838
+Camera1.fy: 1065.08245
+Camera1.cx: 778.19368
+Camera1.cy: 553.85699
+
+Camera1.k1: -0.259389
+Camera1.k2: 0.203687
+Camera1.p1: 0.00066
+Camera1.p2: 0.003063
+
+Camera2.fx: 1060.22456
+Camera2.fy: 1063.51251
+Camera2.cx: 782.09116
+Camera2.cy: 582.52751
+
+Camera2.k1: -0.263264
+Camera2.k2: 0.215493
+Camera2.p1: -0.003977
+Camera2.p2: 0.000629
+
+# Taken from Kalibr calibration _after_ aquarium but before APL pier test
+#   This is T_cn_cnm1 inverted
+Stereo.T_c1_c2: !!opencv-matrix
+  rows: 4
+  cols: 4
+  dt: f
+  data: [ 9.99724649e-01, -1.97948923e-02,  1.26011608e-02,5.52256532e-02,
+        2.02534145e-02,  9.99096454e-01, -3.73640900e-02, -5.09111677e-04,
+       -1.18501570e-02,  3.76090183e-02,  9.99222265e-01, 1.32659033e-03,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00, 1.00000000e+00]
+
+
+# Stereo.T_c1_c2: !!opencv-matrix
+#   rows: 4
+#   cols: 4
+#   dt: f
+#   data: [0.9997246485823932, 0.020253414453953025, -0.011850156951119623, -0.055184415137663416,
+#         -0.019794892340568693, 0.9990964537932159, 0.03760901826749862, 0.001551945769490056,
+#         0.012601160820934586, -0.03736408998993763, 0.9992222653269832, -0.0020404884227846246,
+#         0.0, 0.0, 0.0, 1]
+
+
+# END OF MATLAB PARAMETERS
+#--------------------------------------------------------------------------------------------
+
+# Distance in meters of the two cameras
+Stereo.b: 0.0551
+
+# Camera frames per second
+Camera.fps: 10
+
+# Color order of the images (0: BGR, 1: RGB. It is ignored if images are grayscale)
+Camera.RGB: 0
+
+#--------------------------------------------------------------------------------------------
+# IMU Configuration
+#
+# These values can be calculated using Kalibr for the Odometry package
+# as of the 05/2025 Aquarium test
+#--------------------------------------------------------------------------------------------
+
+IMU.NoiseGyro: 7.517733962919085e-05
+IMU.NoiseAcc: 0.0017589640490284241
+
+IMU.GyroWalk: 1.4038949648227517e-06
+IMU.AccWalk:  0.00013163674505969203
+
+IMU.Frequency: 200.0
+
+# This should be "Relative pose between IMU andCamera1
+# (i.e. the transformation that takes a point from Camera1 to IMU)."
+#
+# In Kalibr this is T_ic
+IMU.T_b_c1: !!opencv-matrix
+  rows: 4
+  cols: 4
+  dt: f
+  data: [ 0.00203293,  0.99981545,  0.01910319, -0.00115045,
+         -0.00217095,  0.0191076,  -0.99981508, -0.12428361,
+        -0.99999558,  0.00199109,  0.00220939,  0.06095187,
+        0.0,         0.0,          0.0,          1.0        ]
+
+    # data: [ 0.00203293, -0.00217095, -0.99999558,  0.06068413,
+    #     0.99981545,  0.0191076,   0.00199109,  0.00340364,
+    #     0.01910319, -0.99981508,  0.00220939, -0.12437331,
+    #     0.0,          0.0,          0.0,         1.0 ]
+
+
+IMU.InsertKFsWhenLost: 0
+
+
+#--------------------------------------------------------------------------------------------
+# Start to change values from here
+
+System.thFarPoints: 20.0
+System.loopClosing: 1
+
+# Close/Far threshold. Baseline times.
+Stereo.ThDepth: 5.0
+
+# ORB Extractor: Number of features per image
+ORBextractor.nFeatures: 4000
+
+#--------------------------------------------------------------------------------------------
+# The changing of the following parameters should not infect the result too much
+#--------------------------------------------------------------------------------------------
+
+# ORB Extractor: Scale factor between levels in the scale pyramid
+ORBextractor.scaleFactor: 1.2
+
+# ORB Extractor: Number of levels in the scale pyramid
+ORBextractor.nLevels: 9
+
+# ORB Extractor: Fast threshold
+# Image is divided in a grid. At each cell FAST are extracted imposing a minimum response.
+# Firstly we impose iniThFAST. If no corners are detected we impose a lower value minThFAST
+# You can lower these values if your images have low contrast
+ORBextractor.iniThFAST: 5
+ORBextractor.minThFAST: 2
+
+#--------------------------------------------------------------------------------------------
+# Viewer Parameters
+#--------------------------------------------------------------------------------------------
+Viewer.KeyFrameSize: 0.05
+Viewer.KeyFrameLineWidth: 1.0
+Viewer.GraphLineWidth: 0.9
+Viewer.PointSize: 2.0
+Viewer.CameraSize: 0.08
+Viewer.CameraLineWidth: 3.0
+Viewer.ViewpointX: 0.0
+Viewer.ViewpointY: -0.7
+Viewer.ViewpointZ: -3.5
+Viewer.ViewpointF: 500.0
+
+Viewer.Enable: 1

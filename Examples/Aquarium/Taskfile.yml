@@ -1,0 +1,44 @@
+version: '3'
+
+vars:
+  BAGFILES_PATH: /home/aaron/workspace/aquarium_nano_data/2025_05_23_aquarium_test
+  BAGFILES: [ 'rosbag2_2025_05_23-08_27_30', 'rosbag2_2025_05_23-08_50_46', 'rosbag2_2025_05_23-09_29_11' ]
+
+  BUILD_TYPE: Debug
+  CONFIG_FILE: aquarium_resize.yaml
+
+  BUILD_DIR: ../EuRoC
+  BUILD_PREFIX: euroc
+
+  VOCAB_FILE: ../../Vocabulary/ORBvoc.txt
+
+tasks:
+
+  # Run data in stereo mode
+  make_stereo_tasks:
+    internal: true
+    deps:
+      - for:
+          var: BAGFILES
+        task: stereo:{{.ITEM}}
+
+  stereo:*:
+    vars:
+      BAG: '{{index .MATCH 0}}'
+      BINARY: '{{.BUILD_DIR}}/{{.BUILD_TYPE}}/stereo_{{.BUILD_PREFIX}}'
+    cmds:
+      - '{{.BINARY}} {{.CONFIG_FILE}} {{.VOCAB_FILE}} aquarium_data/{{.BAG}} aquarium_data/{{.BAG}}/mav0/cam0/data.csv 2>&1 | tee {{.BAG}}_stereo.txt'
+
+  ## Convert aquarium ros2 bags to EuRoC format
+  convert:
+    deps:
+      - for:
+          var: BAGFILES
+        task: convert:{{.ITEM}}
+
+  convert:*:
+    vars:
+      BAG: '{{index .MATCH 0}}'
+    cmds:
+      - echo Converting bagfile {{.BAG}}
+      - ./rosbag_convert_euroc.py -o aquarium_data {{.BAGFILES_PATH}}/{{.BAG}}
