@@ -244,7 +244,7 @@ Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight,
   }
 
   mb = mbf / fx;
-  // spdlog::trace("Frame {}, mb {} = mbf {} / fx {}", mnId, mb, mbf, fx);
+  // oslog::trace("Frame {}, mb {} = mbf {} / fx {}", mnId, mb, mbf, fx);
 
   if (pPrevF) {
     if (pPrevF->HasVelocity()) SetVelocity(pPrevF->GetVelocity());
@@ -374,7 +374,7 @@ Frame::Frame(const cv::Mat &imGray, const cv::Mat &imDepth,
   }
 
   mb = mbf / fx;
-  spdlog::trace("Frame {}, mb {} = mbf {} / fx {}", mnId, mb, mbf, fx);
+  oslog::trace("Frame {}, mb {} = mbf {} / fx {}", mnId, mb, mbf, fx);
 
   if (pPrevF) {
     if (pPrevF->HasVelocity()) SetVelocity(pPrevF->GetVelocity());
@@ -713,7 +713,7 @@ bool Frame::ProjectPointDistort(MapPoint *pMP, cv::Point2f &kp, float &u,
 
   // Check positive depth
   if (PcZ < 0.0f) {
-    spdlog::warn("Negative depth: {PcZ}");
+    oslog::warn("Negative depth: {PcZ}");
     return false;
   }
 
@@ -850,13 +850,13 @@ bool Frame::PosInGrid(const cv::KeyPoint &kp, int &posX, int &posY) {
 
 void Frame::ComputeBoW() {
   if (mBowVec.empty()) {
-    spdlog::info("[Frame::ComputeBoW] Computing BoW for {} x {} descriptors",
-                 mDescriptors.size().height, mDescriptors.size().width);
+    oslog::info("[Frame::ComputeBoW] Computing BoW for {} x {} descriptors",
+                mDescriptors.size().height, mDescriptors.size().width);
 
     vector<cv::Mat> vCurrentDesc = Converter::toDescriptorVector(mDescriptors);
     mpORBvocabulary->transform(vCurrentDesc, mBowVec, mFeatVec, 4);
 
-    spdlog::info(
+    oslog::info(
         "[Frame::ComputeBoW]  ... BoW vector size {}, feature vector size {}",
         mBowVec.size(), mFeatVec.size());
   }
@@ -937,7 +937,7 @@ void Frame::ComputeStereoMatches() {
 
   const size_t Nr = mvKeysRight.size();
 
-  spdlog::trace("Checking {} left and {} right keypoints", N, Nr);
+  oslog::trace("Checking {} left and {} right keypoints", N, Nr);
 
   for (size_t iR = 0; iR < Nr; iR++) {
     const cv::KeyPoint &kp = mvKeysRight[iR];
@@ -954,7 +954,7 @@ void Frame::ComputeStereoMatches() {
   const float minD = 0;
   const float maxD = mbf / minZ;
 
-  spdlog::trace("minZ {} minD {} maxD {}", minZ, minD, maxD);
+  oslog::trace("minZ {} minD {} maxD {}", minZ, minD, maxD);
 
   // For each left keypoint search a match in the right image
   vector<pair<int, int>> vDistIdx;
@@ -969,7 +969,7 @@ void Frame::ComputeStereoMatches() {
     const vector<size_t> &vCandidates = vRowIndices[vL];
 
     if (iL < 10)
-      spdlog::trace("Pt at ({},{})  {} candidates", uL, vL, vCandidates.size());
+      oslog::trace("Pt at ({},{})  {} candidates", uL, vL, vCandidates.size());
 
     if (vCandidates.empty()) continue;
 
@@ -977,8 +977,8 @@ void Frame::ComputeStereoMatches() {
     const float maxU = uL - minD;
 
     if (iL < 10)
-      spdlog::trace("uL {} maxD {} minD {} maxU {} minU {}", uL, maxD, minD,
-                    maxU, minU);
+      oslog::trace("uL {} maxD {} minD {} maxU {} minU {}", uL, maxD, minD,
+                   maxU, minU);
 
     if (maxU < 0) continue;
 
@@ -1103,8 +1103,8 @@ void Frame::ComputeStereoMatches() {
     if (d > 0) keptCount++;
   }
 
-  spdlog::debug("Frame {}.  Kept {} stereo matches of {} features", mnId,
-                keptCount, vDistIdx.size());
+  oslog::debug("Frame {}.  Kept {} stereo matches of {} features", mnId,
+               keptCount, vDistIdx.size());
 }
 
 void Frame::ComputeStereoFromRGBD(const cv::Mat &imDepth) {

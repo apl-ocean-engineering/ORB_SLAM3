@@ -66,7 +66,7 @@ int ORBmatcher::SearchByProjection(const std::shared_ptr<Frame> &F,
 
       if (bFactor) r *= th;
 
-      // if(iMP < 10)  spdlog::info("{} mbTrackinView() ({},{}) {} {}", iMP,
+      // if(iMP < 10)  oslog::info("{} mbTrackinView() ({},{}) {} {}", iMP,
       // pMP->mTrackProjX, pMP->mTrackProjY, nPredictedLevel, r );
 
       const vector<size_t> vIndices =
@@ -76,7 +76,7 @@ int ORBmatcher::SearchByProjection(const std::shared_ptr<Frame> &F,
 
       if (!vIndices.empty()) {
         // if(iMP < 10)
-        //   spdlog::info("{} found {} feature", iMP, vIndices.size() );
+        //   oslog::info("{} found {} feature", iMP, vIndices.size() );
 
         const cv::Mat MPdescriptor = pMP->GetDescriptor();
 
@@ -123,7 +123,7 @@ int ORBmatcher::SearchByProjection(const std::shared_ptr<Frame> &F,
         }
 
         //         if(iMP < 10)
-        // spdlog::info("best dist {} best dist2 {}", bestDist, bestDist2);
+        // oslog::info("best dist {} best dist2 {}", bestDist, bestDist2);
 
         // Apply ratio to second match (only if best and second are in the same
         // scale level)
@@ -245,7 +245,7 @@ int ORBmatcher::SearchByBoW(const std::shared_ptr<KeyFrame> &pKF,
   DBoW2::FeatureVector::const_iterator KFend = pKF->mFeatVec.end();
   DBoW2::FeatureVector::const_iterator Fend = F->mFeatVec.end();
 
-  spdlog::info(
+  oslog::info(
       "[ORBmatcher::SearchByBoW] {} feature vector in Keyframe, {} in Frame",
       pKF->mFeatVec.size(), F->mFeatVec.size());
 
@@ -260,12 +260,12 @@ int ORBmatcher::SearchByBoW(const std::shared_ptr<KeyFrame> &pKF,
         MapPoint *pMP = vpMapPointsKF[realIdxKF];
 
         if (!pMP) {
-          // spdlog::warn("[ORBmatcher::SearchByBoW] Null map point, skipping");
+          // oslog::warn("[ORBmatcher::SearchByBoW] Null map point, skipping");
           continue;
         }
 
         if (pMP->isBad()) {
-          // spdlog::warn("[ORBmatcher::SearchByBoW] Bad map point, skipping");
+          // oslog::warn("[ORBmatcher::SearchByBoW] Bad map point, skipping");
           continue;
         }
 
@@ -414,8 +414,8 @@ int ORBmatcher::SearchByBoW(const std::shared_ptr<KeyFrame> &pKF,
     }
   }
 
-  spdlog::info("  Due to orientation check, {} matches -> {}",
-               nmatches_before_orientation_check, nmatches);
+  oslog::info("  Due to orientation check, {} matches -> {}",
+              nmatches_before_orientation_check, nmatches);
 
   return nmatches;
 }

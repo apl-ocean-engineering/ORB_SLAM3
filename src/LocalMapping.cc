@@ -94,7 +94,7 @@ void LocalMapping::Run() {
   mbFinished = false;
 
   while (true) {
-    spdlog::trace("@@ LocalMapping: loop running...");
+    oslog::trace("@@ LocalMapping: loop running...");
 
     // Tracking will see that Local Mapping is busy
     SetAcceptKeyFrames(false);
