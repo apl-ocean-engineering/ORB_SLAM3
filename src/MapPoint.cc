@@ -587,11 +587,11 @@ int MapPoint::PredictScale(const float& currentDist,
 }
 
 void MapPoint::PrintObservations() {
-  spdlog::debug("MP_OBS: MP {}", mnId);
+  oslog::debug("MP_OBS: MP {}", mnId);
   for (auto const& [pKFi, indexes] : mObservations) {
     // int leftIndex = get<0>(indexes), rightIndex = get<1>(indexes);
-    spdlog::debug("--OBS in KF {} in map {}", pKFi->mnId,
-                  pKFi->GetMap()->GetId());
+    oslog::debug("--OBS in KF {} in map {}", pKFi->mnId,
+                 pKFi->GetMap()->GetId());
   }
 }
 

@@ -544,8 +544,8 @@ class KeyFrame : public std::enable_shared_from_this<KeyFrame> {
           right++;
       }
     }
-    spdlog::debug("Point distribution in KeyFrame: left-> {} --- right-> {}",
-                  left, right);
+    oslog::debug("Point distribution in KeyFrame: left-> {} --- right-> {}",
+                 left, right);
   }
 };
 

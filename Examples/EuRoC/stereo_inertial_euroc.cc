@@ -20,6 +20,8 @@
  */
 
 #include <System.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/spdlog.h>
 
 #include <algorithm>
 #include <chrono>
@@ -28,13 +30,18 @@
 #include <iomanip>
 #include <iostream>
 #include <opencv2/core/core.hpp>
-#include <sstream>
 
 #include "euroc_common.h"
 
 using namespace std;
 
 int main(int argc, char **argv) {
+  auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+
+  ORB_SLAM3::Logger::add_sink(stdout_sink);
+  spdlog::set_default_logger(
+      std::make_shared<spdlog::logger>("euroc", stdout_sink));
+
   if (argc < 5) {
     cerr << endl
          << "Usage: ./stereo_euroc path_to_vocabulary path_to_settings "

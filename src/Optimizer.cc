@@ -2729,7 +2729,7 @@ void Optimizer::LocalInertialBA(const shared_ptr<KeyFrame>& pKF,
   // TODO: Some convergence problems have been detected here
   // bGN)
   if ((2 * err < err_end || isnan(err) || isnan(err_end)) && !bLarge) {
-    spdlog::error("FAIL LOCAL-INERTIAL BA!!!!");
+    oslog::error("FAIL LOCAL-INERTIAL BA!!!!");
     return;
   }
 
