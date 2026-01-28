@@ -45,19 +45,19 @@ Atlas::~Atlas() { mspMaps.clear(); }
 
 void Atlas::CreateNewMap() {
   unique_lock<mutex> lock(mMutexAtlas);
-  spdlog::info("Creation of new map with id: {}", Map::nNextId);
+  oslog::info("Creation of new map with id: {}", Map::nNextId);
   if (mpCurrentMap) {
     if (!mspMaps.empty() && mnLastInitKFidMap < mpCurrentMap->GetMaxKFid())
       mnLastInitKFidMap = mpCurrentMap->GetMaxKFid() +
                           1;  // The init KF is the next of current maximum
 
     mpCurrentMap->SetStoredMap();
-    spdlog::info("Stored map with ID: {}", mpCurrentMap->GetId());
+    oslog::info("Stored map with ID: {}", mpCurrentMap->GetId());
 
     // if(mpViewer)
     //     mpViewer->AddMapToCreateThumbnail(mpCurrentMap);
   }
-  spdlog::info("Creation of new map with last KF id: {}", mnLastInitKFidMap);
+  oslog::info("Creation of new map with last KF id: {}", mnLastInitKFidMap);
 
   mpCurrentMap = std::make_shared<Map>(mnLastInitKFidMap);
   mpCurrentMap->SetCurrentMap();
@@ -66,7 +66,7 @@ void Atlas::CreateNewMap() {
 
 void Atlas::ChangeMap(const std::shared_ptr<Map> &pMap) {
   unique_lock<mutex> lock(mMutexAtlas);
-  spdlog::info("Change to map with id: {}", pMap->GetId());
+  oslog::info("Change to map with id: {}", pMap->GetId());
   if (mpCurrentMap) {
     mpCurrentMap->SetStoredMap();
   }

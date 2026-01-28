@@ -389,8 +389,8 @@ class Frame : public std::enable_shared_from_this<Frame> {
           right++;
       }
     }
-    spdlog::debug("Point distribution in Frame: left-> {} --- right-> {}", left,
-                  right);
+    oslog::debug("Point distribution in Frame: left-> {} --- right-> {}", left,
+                 right);
   }
 
   Sophus::SE3<double> T_test;

@@ -154,43 +154,43 @@ SettingsLoader::Expected SettingsLoader::load(const std::string& configFile,
     return tl::make_unexpected(
         ExpectedError::fmt("Unable to open configuration file {}", configFile));
   } else {
-    spdlog::info("Loading settings from {}", configFile);
+    oslog::info("Loading settings from {}", configFile);
   }
 
   // Read first camera
   readCamera1(fSettings);
-  spdlog::info("\t-Loaded camera 1");
+  oslog::info("\t-Loaded camera 1");
 
   // Read second camera if stereo (not rectified)
   if (settings_->sensor_.isStereo()) {
     readCamera2(fSettings);
-    spdlog::info("\t-Loaded camera 2");
+    oslog::info("\t-Loaded camera 2");
   }
 
   // Read image info
   readImageInfo(fSettings);
-  spdlog::info("\t-Loaded image info");
+  oslog::info("\t-Loaded image info");
 
   if (settings_->sensor_.isImu()) {
     readIMU(fSettings);
-    spdlog::info("\t-Loaded IMU calibration");
+    oslog::info("\t-Loaded IMU calibration");
   }
 
   if (settings_->sensor_.isRGBD()) {
     readRGBD(fSettings);
-    spdlog::info("\t-Loaded RGB-D calibration");
+    oslog::info("\t-Loaded RGB-D calibration");
   }
 
   readORB(fSettings);
-  spdlog::info("\t-Loaded ORB settings");
+  oslog::info("\t-Loaded ORB settings");
   readViewer(fSettings);
-  spdlog::info("\t-Loaded viewer settings");
+  oslog::info("\t-Loaded viewer settings");
   readLoadAndSave(fSettings);
-  spdlog::info("\t-Loaded Atlas settings");
+  oslog::info("\t-Loaded Atlas settings");
   readOtherParameters(fSettings);
-  spdlog::info("\t-Loaded misc parameters");
+  oslog::info("\t-Loaded misc parameters");
 
-  spdlog::info("----------------------------------");
+  oslog::info("----------------------------------");
 
   if (vocabFile.size() > 0) {
     settings_->strVocFile_ = vocabFile;
@@ -198,7 +198,7 @@ SettingsLoader::Expected SettingsLoader::load(const std::string& configFile,
 
   if (settings_->bNeedToRectify_) {
     settings_->precomputeRectificationMaps();
-    spdlog::info("\t-Computed rectification maps");
+    oslog::info("\t-Computed rectification maps");
   }
 
   if (settings_->validate()) {

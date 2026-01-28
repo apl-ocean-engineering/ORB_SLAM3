@@ -62,10 +62,10 @@ bool Settings::validate(void) {
   if (originalImSize_.height == 0) return false;
 
   if (strVocFile_.size() == 0) {
-    spdlog::warn("Vocab file not specified");
+    oslog::warn("Vocab file not specified");
     return false;
   } else if (!std::filesystem::exists(strVocFile_)) {
-    spdlog::warn("Vocab file {} does not exist.", strVocFile_);
+    oslog::warn("Vocab file {} does not exist.", strVocFile_);
     return false;
   }
 
@@ -95,7 +95,7 @@ void Settings::setMonoCamera(CameraType type, const std::vector<float>& k,
     // Rectified images are assumed to be ideal PinHole images (no distortion)
   } else if (cameraType_ == KannalaBrandt) {
     if (k.size() != 8) {
-      spdlog::error("Incorrect number of params for KannalaBrandt");
+      oslog::error("Incorrect number of params for KannalaBrandt");
       return;
     }
 
@@ -115,7 +115,7 @@ void Settings::setMonoCamera(CameraType type, const std::vector<float>& k,
     //       vOverlapping;
     // }
   } else {
-    spdlog::error("Error: {} not known", static_cast<int>(type));
+    oslog::error("Error: {} not known", static_cast<int>(type));
     exit(-1);
   }
 }
@@ -247,7 +247,7 @@ void Settings::setResizeImageSize(int width, int height) {
 }
 
 void Settings::precomputeRectificationMaps() {
-  spdlog::trace(
+  oslog::trace(
       "[Settings::precomputeRectificationMaps] Precomputing rectification "
       "maps");
 

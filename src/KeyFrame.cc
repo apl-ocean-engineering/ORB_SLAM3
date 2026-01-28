@@ -124,7 +124,7 @@ KeyFrame::KeyFrame(const std::shared_ptr<Frame> &F,
       mbHasVelocity(false) {
   mnId = nNextId++;
 
-  spdlog::trace("New kF; map {}", mpMap ? "(exists)" : "NULL");
+  oslog::trace("New kF; map {}", mpMap ? "(exists)" : "NULL");
 
   mGrid.resize(mnGridCols);
   if (F->Nleft != -1) mGridRight.resize(mnGridCols);
@@ -822,7 +822,7 @@ std::shared_ptr<Map> KeyFrame::GetMap() {
 
 void KeyFrame::UpdateMap(const std::shared_ptr<Map> &pMap) {
   unique_lock<mutex> lock(mMutexMap);
-  spdlog::trace("Updating mpMap to {}", pMap ? "(exists)" : "NULL");
+  oslog::trace("Updating mpMap to {}", pMap ? "(exists)" : "NULL");
   mpMap = pMap;
 }
 

@@ -119,10 +119,10 @@ void LoopClosing::Run() {
   while (true) {
     // NEW LOOP AND MERGE DETECTION ALGORITHM
     //----------------------------
-    spdlog::trace("@@ LoopClosing: loop running...");
+    oslog::trace("@@ LoopClosing: loop running...");
 
     if (CheckNewKeyFrames()) {
-      spdlog::info("LoopClosing: Have new frames to check");
+      oslog::info("LoopClosing: Have new frames to check");
 
       if (mpLastCurrentKF) {
         mpLastCurrentKF->mvpLoopCandKFs.clear();
@@ -339,8 +339,8 @@ void LoopClosing::InsertKeyFrame(const std::shared_ptr<KeyFrame>& pKF) {
   unique_lock<mutex> lock(mMutexLoopQueue);
   if (pKF->mnId != 0) {
     mlpLoopKeyFrameQueue.push_back(pKF);
-    spdlog::info("LoopClosing: Pushing KF {} into queue, which is length {}",
-                 pKF->mnId, mlpLoopKeyFrameQueue.size());
+    oslog::info("LoopClosing: Pushing KF {} into queue, which is length {}",
+                pKF->mnId, mlpLoopKeyFrameQueue.size());
   }
 }
 
@@ -376,7 +376,7 @@ bool LoopClosing::NewDetectCommonRegions() {
 
   if (mpTracker->mSensor == SensorType::STEREO &&
       mpLastMap->GetAllKeyFrames().size() < 5) {
-    spdlog::info(
+    oslog::info(
         "[LoopClosing::NewDetectCommonRegions] Stereo KF inserted without "
         "check: {}",
         mpCurrentKF->mnId);
@@ -386,7 +386,7 @@ bool LoopClosing::NewDetectCommonRegions() {
   }
 
   if (mpLastMap->GetAllKeyFrames().size() < 12) {
-    spdlog::info(
+    oslog::info(
         "[LoopClosing::NewDetectCommonRegions] Stereo KF inserted without "
         "check, map is small: {}",
         mpCurrentKF->mnId);
@@ -395,8 +395,8 @@ bool LoopClosing::NewDetectCommonRegions() {
     return false;
   }
 
-  spdlog::info("[LoopClosing::NewDetectCommonRegions] Checking KF: {}",
-               mpCurrentKF->mnId);
+  oslog::info("[LoopClosing::NewDetectCommonRegions] Checking KF: {}",
+              mpCurrentKF->mnId);
 
   // Check the last candidates with geometric validation
   //  Loop candidates
@@ -433,7 +433,7 @@ bool LoopClosing::NewDetectCommonRegions() {
       mnLoopNumNotFound = 0;
 
       if (!mbLoopDetected) {
-        spdlog::info("PR: Loop detected with Reffine Sim3");
+        oslog::info("PR: Loop detected with Reffine Sim3");
       }
     } else {
       bLoopDetectedInKF = false;

@@ -128,7 +128,7 @@ void System::printBanner() {
        << "under certain conditions. See LICENSE.txt." << endl
        << endl;
 
-  spdlog::info("Input sensor was set to: {}", sensorType().toString());
+  oslog::info("Input sensor was set to: {}", sensorType().toString());
 }
 
 bool System::initialize(bool initFr, const string &strSequence) {
@@ -140,7 +140,7 @@ bool System::initialize(bool initFr, const string &strSequence) {
   const string vocabularyFilePath = settings_->strVocFile_;
 
   // Load ORB Vocabulary
-  spdlog::info("Loading ORB Vocabulary. This could take a while...");
+  oslog::info("Loading ORB Vocabulary. This could take a while...");
 
   mpVocabulary = std::make_shared<ORBVocabulary>();
   bool bVocLoad = mpVocabulary->loadFromTextFile(vocabularyFilePath);
@@ -149,23 +149,23 @@ bool System::initialize(bool initFr, const string &strSequence) {
     cerr << "Falied to open at: " << vocabularyFilePath << endl;
     return false;
   }
-  spdlog::info("Vocabulary loaded!");
+  oslog::info("Vocabulary loaded!");
 
   // Create KeyFrame Database
   mpKeyFrameDatabase = std::make_shared<KeyFrameDatabase>(mpVocabulary);
 
   if (mStrLoadAtlasFromFile.empty()) {
     // Create the Atlas
-    spdlog::info("Initializing Atlas from scratch ");
+    oslog::info("Initializing Atlas from scratch ");
     mpAtlas = std::make_shared<Atlas>(0);
   } else {
     // Load the file with an earlier session
     // clock_t start = clock();
-    spdlog::info("Initializing Atlas from file: {}", mStrLoadAtlasFromFile);
+    oslog::info("Initializing Atlas from file: {}", mStrLoadAtlasFromFile);
     bool isRead = LoadAtlas(FileType::BINARY_FILE);
 
     if (!isRead) {
-      spdlog::error(
+      oslog::error(
           "Unable to load Atlas file, please try with other session file or "
           "vocabulary file");
       return false;
@@ -186,7 +186,7 @@ bool System::initialize(bool initFr, const string &strSequence) {
   // Initialize the Tracking thread
   // (it will live in the main thread of execution, the one that called this
   // constructor)
-  spdlog::info("Seq. Name: {}", strSequence);
+  oslog::info("Seq. Name: {}", strSequence);
   mpTracker = std::make_shared<Tracking>(
       shared_from_this(), mpVocabulary, mpFrameDrawer, mpMapDrawer, mpAtlas,
       mpKeyFrameDatabase, settings_, strSequence);
@@ -199,13 +199,13 @@ bool System::initialize(bool initFr, const string &strSequence) {
   mpLocalMapper->mThFarPoints = settings_->thFarPoints();
 
   if (mpLocalMapper->mThFarPoints != 0) {
-    spdlog::info(
+    oslog::info(
         "LocalMapping will discard points further than {} m from current "
         "camera",
         mpLocalMapper->mThFarPoints);
     mpLocalMapper->mbFarPoints = true;
   } else {
-    spdlog::info("LocalMapping will _not_ discard far points");
+    oslog::info("LocalMapping will _not_ discard far points");
     mpLocalMapper->mbFarPoints = false;
   }
 
@@ -250,7 +250,7 @@ Sophus::SE3f System::TrackStereo(const cv::Mat &imLeft, const cv::Mat &imRight,
                                  const vector<IMU::Point> &vImuMeas,
                                  string filename) {
   if (!sensorType().isStereo()) {
-    spdlog::error(
+    oslog::error(
         "ERROR: you called TrackStereo but input sensor was not set to "
         "Stereo nor Stereo-Inertial.");
     exit(-1);
@@ -465,22 +465,22 @@ void System::Shutdown() {
   while (!mpLocalMapper->isFinished() || !mpLoopCloser->isFinished() ||
          mpLoopCloser->isRunningGBA()) {
     if (!mpLocalMapper->isFinished()) {
-      spdlog::warn("mpLocalMapper is not finished");
+      oslog::warn("mpLocalMapper is not finished");
     }
 
     if (!mpLoopCloser->isFinished()) {
-      spdlog::warn("mpLoopCloser is not finished");
+      oslog::warn("mpLoopCloser is not finished");
     }
 
     if (mpLoopCloser->isRunningGBA()) {
-      spdlog::warn("mpLoopCloser is running GBA");
+      oslog::warn("mpLoopCloser is running GBA");
     }
 
-    spdlog::warn(" .... waiting");
+    oslog::warn(" .... waiting");
     usleep(5000);
   }
 
-  spdlog::warn("All threads finished");
+  oslog::warn("All threads finished");
 
   const string mStrSaveAtlasToFile = settings_->atlasSaveFile();
   if (!mStrSaveAtlasToFile.empty()) {
