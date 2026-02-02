@@ -259,7 +259,8 @@ Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight,
   Nright = -1;
   mvLeftToRightMatch = vector<int>(0);
   mvRightToLeftMatch = vector<int>(0);
-  mvStereo3Dpoints = vector<Eigen::Vector3f>(0);
+  mvStereo3Dpoints =
+      vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>(0);
   monoLeft = -1;
   monoRight = -1;
 
@@ -389,7 +390,8 @@ Frame::Frame(const cv::Mat &imGray, const cv::Mat &imDepth,
   Nright = -1;
   mvLeftToRightMatch = vector<int>(0);
   mvRightToLeftMatch = vector<int>(0);
-  mvStereo3Dpoints = vector<Eigen::Vector3f>(0);
+  mvStereo3Dpoints =
+      vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>(0);
   monoLeft = -1;
   monoRight = -1;
 
@@ -502,7 +504,8 @@ Frame::Frame(const cv::Mat &imGray, const double &timeStamp,
   Nright = -1;
   mvLeftToRightMatch = vector<int>(0);
   mvRightToLeftMatch = vector<int>(0);
-  mvStereo3Dpoints = vector<Eigen::Vector3f>(0);
+  mvStereo3Dpoints =
+      vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>(0);
   monoLeft = -1;
   monoRight = -1;
 
@@ -576,7 +579,7 @@ void Frame::SetNewBias(const IMU::Bias &b) {
   if (mpImuPreintegrated) mpImuPreintegrated->SetNewBias(b);
 }
 
-void Frame::SetVelocity(Eigen::Vector3f Vwb) {
+void Frame::SetVelocity(const Eigen::Vector3f &Vwb) {
   mVw = Vwb;
   mbHasVelocity = true;
 }
@@ -1297,7 +1300,8 @@ void Frame::ComputeStereoFishEyeMatches() {
   mvRightToLeftMatch = vector<int>(Nright, -1);
   mvDepth = vector<float>(Nleft, -1.0f);
   mvuRight = vector<float>(Nleft, -1);
-  mvStereo3Dpoints = vector<Eigen::Vector3f>(Nleft);
+  mvStereo3Dpoints =
+      vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>(Nleft);
   mnCloseMPs = 0;
 
   // Perform a brute force between Keypoint in the left and right image

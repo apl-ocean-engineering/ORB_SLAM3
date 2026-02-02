@@ -62,19 +62,13 @@ cv::Point2f Pinhole::project(const cv::Point3f &p3D) {
 }
 
 Eigen::Vector2d Pinhole::project(const Eigen::Vector3d &v3D) {
-  Eigen::Vector2d res;
-  res[0] = mvParameters[0] * v3D[0] / v3D[2] + mvParameters[2];
-  res[1] = mvParameters[1] * v3D[1] / v3D[2] + mvParameters[3];
-
-  return res;
+  return Eigen::Vector2d(mvParameters[0] * v3D[0] / v3D[2] + mvParameters[2],
+                         mvParameters[1] * v3D[1] / v3D[2] + mvParameters[3]);
 }
 
 Eigen::Vector2f Pinhole::project(const Eigen::Vector3f &v3D) {
-  Eigen::Vector2f res;
-  res[0] = mvParameters[0] * v3D[0] / v3D[2] + mvParameters[2];
-  res[1] = mvParameters[1] * v3D[1] / v3D[2] + mvParameters[3];
-
-  return res;
+  return Eigen::Vector2f(mvParameters[0] * v3D[0] / v3D[2] + mvParameters[2],
+                         mvParameters[1] * v3D[1] / v3D[2] + mvParameters[3]);
 }
 
 Eigen::Vector2f Pinhole::projectMat(const cv::Point3f &p3D) {
@@ -98,12 +92,9 @@ cv::Point3f Pinhole::unproject(const cv::Point2f &p2D) {
 
 Eigen::Matrix<double, 2, 3> Pinhole::projectJac(const Eigen::Vector3d &v3D) {
   Eigen::Matrix<double, 2, 3> Jac;
-  Jac(0, 0) = mvParameters[0] / v3D[2];
-  Jac(0, 1) = 0.f;
-  Jac(0, 2) = -mvParameters[0] * v3D[0] / (v3D[2] * v3D[2]);
-  Jac(1, 0) = 0.f;
-  Jac(1, 1) = mvParameters[1] / v3D[2];
-  Jac(1, 2) = -mvParameters[1] * v3D[1] / (v3D[2] * v3D[2]);
+  Jac << mvParameters[0] / v3D[2], 0.f,
+      -mvParameters[0] * v3D[0] / (v3D[2] * v3D[2]), 0.f,
+      mvParameters[1] / v3D[2], -mvParameters[1] * v3D[1] / (v3D[2] * v3D[2]);
 
   return Jac;
 }

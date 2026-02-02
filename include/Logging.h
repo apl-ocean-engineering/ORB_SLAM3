@@ -64,7 +64,7 @@ class Logger {
   explicit Logger(const std::shared_ptr<spdlog::logger> &l = nullptr)
       : logger_(l) {
     if (!logger_) {
-      logger_ = std::make_shared<spdlog::logger>("liboculus");
+      logger_ = std::make_shared<spdlog::logger>("orbslam3");
       spdlog::register_logger(logger_);
     }
   }

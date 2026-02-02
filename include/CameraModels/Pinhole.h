@@ -32,6 +32,8 @@
 
 namespace ORB_SLAM3 {
 class Pinhole : public GeometricCamera {
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
   friend class boost::serialization::access;
 
   template <class Archive>

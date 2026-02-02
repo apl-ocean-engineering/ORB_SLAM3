@@ -21,43 +21,32 @@
 
 #pragma once
 
+#include <g2o/core/base_unary_edge.h>
+#include <g2o/core/eigen_types.h>
 #include <g2o/types/sba/types_six_dof_expmap.h>
+#include <g2o/types/sba/vertex_se3_expmap.h>
 #include <g2o/types/sim3/sim3.h>
 #include <include/CameraModels/GeometricCamera.h>
 
 #include <Eigen/Geometry>
+// #include <Eigen/Version>   // This file only exists in current versions of
+// Eigen...
 #include <memory>
-
-#include "g2o/core/base_unary_edge.h"
 
 namespace ORB_SLAM3 {
 class EdgeSE3ProjectXYZOnlyPose
-    : public g2o::BaseUnaryEdge<2, Eigen::Vector2d, g2o::VertexSE3Expmap> {
+    : public g2o::BaseUnaryEdge<2, g2o::Vector2, g2o::VertexSE3Expmap> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-  EdgeSE3ProjectXYZOnlyPose() {}
-
   bool read(std::istream& is);
-
   bool write(std::ostream& os) const;
+  void computeError();
+  bool isDepthPositive();
 
-  void computeError() {
-    const g2o::VertexSE3Expmap* v1 =
-        static_cast<const g2o::VertexSE3Expmap*>(_vertices[0]);
-    Eigen::Vector2d obs(_measurement);
-    _error = obs - pCamera->project(v1->estimate().map(Xw));
-  }
+  void linearizeOplus() override;
 
-  bool isDepthPositive() {
-    const g2o::VertexSE3Expmap* v1 =
-        static_cast<const g2o::VertexSE3Expmap*>(_vertices[0]);
-    return (v1->estimate().map(Xw))(2) > 0.0;
-  }
-
-  virtual void linearizeOplus();
-
-  Eigen::Vector3d Xw;
+  g2o::Vector3 Xw;
   std::shared_ptr<GeometricCamera> pCamera;
 };
 
@@ -67,25 +56,17 @@ class EdgeSE3ProjectXYZOnlyPoseToBody
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
   EdgeSE3ProjectXYZOnlyPoseToBody() {}
+  virtual ~EdgeSE3ProjectXYZOnlyPoseToBody() {}
 
   bool read(std::istream& is);
 
   bool write(std::ostream& os) const;
 
-  void computeError() {
-    const g2o::VertexSE3Expmap* v1 =
-        static_cast<const g2o::VertexSE3Expmap*>(_vertices[0]);
-    Eigen::Vector2d obs(_measurement);
-    _error = obs - pCamera->project((mTrl * v1->estimate()).map(Xw));
-  }
+  void computeError();
 
-  bool isDepthPositive() {
-    const g2o::VertexSE3Expmap* v1 =
-        static_cast<const g2o::VertexSE3Expmap*>(_vertices[0]);
-    return ((mTrl * v1->estimate()).map(Xw))(2) > 0.0;
-  }
+  bool isDepthPositive();
 
-  virtual void linearizeOplus();
+  void linearizeOplus() override;
 
   Eigen::Vector3d Xw;
   std::shared_ptr<GeometricCamera> pCamera;

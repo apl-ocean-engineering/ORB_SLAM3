@@ -230,6 +230,7 @@ bool System::initialize(bool initFr, const string &strSequence) {
   mpLoopCloser->SetLocalMapper(mpLocalMapper);
 
   // Initialize the Viewer thread and launch
+  oslog::info("Viewer enabled: {}", settings_->useViewer_ ? "YES" : "NO");
   if (settings_->useViewer_) {
     mpViewer = std::make_shared<Viewer>(this, mpFrameDrawer, mpMapDrawer,
                                         mpTracker, settings_);
