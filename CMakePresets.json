@@ -12,26 +12,29 @@
       "description": "Configure with vcpkg toolchain and generate Ninja project files for all configurations",
       "binaryDir": "${sourceDir}/builds/${presetName}",
       "generator": "Ninja Multi-Config",
-      "toolchainFile": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake"
+      "toolchainFile": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake",
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": "x64-linux-dynamic"
+      }
     }
   ],
   "buildPresets": [
     {
-      "name": "ninja-vcpkg-debug",
+      "name": "ninja-vcpkg-Debug",
       "configurePreset": "ninja-multi-vcpkg",
       "displayName": "Build (Debug)",
       "description": "Build with Ninja/vcpkg (Debug)",
       "configuration": "Debug"
     },
     {
-      "name": "ninja-vcpkg-rel-with-deb-info",
+      "name": "ninja-vcpkg-RelWithDebInfo",
       "configurePreset": "ninja-multi-vcpkg",
       "displayName": "Build (RelWithDebInfo)",
       "description": "Build with Ninja/vcpkg (RelWithDebInfo)",
       "configuration": "RelWithDebInfo"
     },
     {
-      "name": "ninja-vcpkg-release",
+      "name": "ninja-vcpkg-Release",
       "configurePreset": "ninja-multi-vcpkg",
       "displayName": "Build (Release)",
       "description": "Build with Ninja/vcpkg (Release)",

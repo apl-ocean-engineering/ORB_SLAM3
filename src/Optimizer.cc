@@ -47,6 +47,7 @@
 #include "g2o/solvers/dense/linear_solver_dense.h"
 #include "g2o/solvers/eigen/linear_solver_eigen.h"
 #include "g2o/types/sba/types_six_dof_expmap.h"
+#include "g2o/types/sba/vertex_se3_expmap.h"
 
 namespace ORB_SLAM3 {
 bool sortByVal(const pair<MapPoint*, int>& a, const pair<MapPoint*, int>& b) {
@@ -741,9 +742,13 @@ void Optimizer::FullInertialBA(const std::shared_ptr<Map>& pMap, int its,
 
 int Optimizer::PoseOptimization(const std::shared_ptr<Frame>& pFrame) {
   g2o::SparseOptimizer optimizer;
+  optimizer.setVerbose(true);
+  oslog::info("Enter PoseOptimization");
 
-  auto linearSolver = std::make_unique<
-      g2o::LinearSolverDense<g2o::BlockSolver_6_3::PoseMatrixType>>();
+  std::unique_ptr<g2o::LinearSolverDense<g2o::BlockSolver_6_3::PoseMatrixType>>
+      linearSolver(
+          std::make_unique<
+              g2o::LinearSolverDense<g2o::BlockSolver_6_3::PoseMatrixType>>());
   g2o::OptimizationAlgorithmLevenberg* solver =
       new g2o::OptimizationAlgorithmLevenberg(
           std::make_unique<g2o::BlockSolver_6_3>(std::move(linearSolver)));
@@ -754,9 +759,11 @@ int Optimizer::PoseOptimization(const std::shared_ptr<Frame>& pFrame) {
 
   // Set Frame vertex
   g2o::VertexSE3Expmap* vSE3 = new g2o::VertexSE3Expmap();
-  Sophus::SE3<float> Tcw = pFrame->GetPose();
-  vSE3->setEstimate(g2o::SE3Quat(Tcw.unit_quaternion().cast<double>(),
-                                 Tcw.translation().cast<double>()));
+  {
+    const Sophus::SE3<float> Tcw = pFrame->GetPose();
+    vSE3->setEstimate(g2o::SE3Quat(Tcw.unit_quaternion().cast<double>(),
+                                   Tcw.translation().cast<double>()));
+  }
   vSE3->setId(0);
   vSE3->setFixed(false);
   optimizer.addVertex(vSE3);
@@ -928,6 +935,8 @@ int Optimizer::PoseOptimization(const std::shared_ptr<Frame>& pFrame) {
 
   if (nInitialCorrespondences < 3) return 0;
 
+  oslog::info("   ... starting PoseOptimization");
+
   // We perform 4 optimizations, after each optimization we classify observation
   // as inlier/outlier At the next optimization, outliers are not included, but
   // at the end they can be classified as inliers again.
@@ -937,9 +946,14 @@ int Optimizer::PoseOptimization(const std::shared_ptr<Frame>& pFrame) {
 
   int nBad = 0;
   for (int iter = 0; iter < 4; iter++) {
-    Tcw = pFrame->GetPose();
-    vSE3->setEstimate(g2o::SE3Quat(Tcw.unit_quaternion().cast<double>(),
-                                   Tcw.translation().cast<double>()));
+    oslog::info("   ... Iter {}", iter);
+
+    {
+      const Sophus::SE3<float> Tcw = pFrame->GetPose();
+      g2o::SE3Quat est = g2o::SE3Quat(Tcw.unit_quaternion().cast<double>(),
+                                      Tcw.translation().cast<double>());
+      vSE3->setEstimate(est);
+    }
 
     optimizer.initializeOptimization(0);
     optimizer.optimize(iterations[iter]);
@@ -1018,13 +1032,14 @@ int Optimizer::PoseOptimization(const std::shared_ptr<Frame>& pFrame) {
   }
 
   // Recover optimized pose and return number of inliers
-  g2o::VertexSE3Expmap* vSE3_recov =
-      static_cast<g2o::VertexSE3Expmap*>(optimizer.vertex(0));
-  g2o::SE3Quat SE3quat_recov = vSE3_recov->estimate();
-  Sophus::SE3<float> pose(SE3quat_recov.rotation().cast<float>(),
-                          SE3quat_recov.translation().cast<float>());
+  const g2o::VertexSE3Expmap* vSE3_recov =
+      static_cast<const g2o::VertexSE3Expmap*>(optimizer.vertex(0));
+  const g2o::SE3Quat SE3quat_recov = vSE3_recov->estimate();
+  const Sophus::SE3<float> pose(SE3quat_recov.rotation().cast<float>(),
+                                SE3quat_recov.translation().cast<float>());
   pFrame->SetPose(pose);
 
+  oslog::info(" Exit PoseOptimization");
   return nInitialCorrespondences - nBad;
 }
 
@@ -1118,9 +1133,11 @@ void Optimizer::LocalBundleAdjustment(const shared_ptr<KeyFrame>& pKF,
   // Set Local KeyFrame vertices
   for (auto pKFi : lLocalKeyFrames) {
     g2o::VertexSE3Expmap* vSE3 = new g2o::VertexSE3Expmap();
-    Sophus::SE3<float> Tcw = pKFi->GetPose();
-    vSE3->setEstimate(g2o::SE3Quat(Tcw.unit_quaternion().cast<double>(),
-                                   Tcw.translation().cast<double>()));
+    {
+      const Sophus::SE3<float> Tcw = pKFi->GetPose();
+      vSE3->setEstimate(g2o::SE3Quat(Tcw.unit_quaternion().cast<double>(),
+                                     Tcw.translation().cast<double>()));
+    }
     vSE3->setId(pKFi->mnId);
     vSE3->setFixed(pKFi->mnId == pMap->GetInitKFid());
     optimizer.addVertex(vSE3);
@@ -1417,7 +1434,8 @@ void Optimizer::OptimizeEssentialGraph(
       nMaxKFid + 1);
   vector<g2o::VertexSim3Expmap*> vpVertices(nMaxKFid + 1);
 
-  vector<Eigen::Vector3d> vZvectors(nMaxKFid + 1);  // For debugging
+  vector<Eigen::Vector3d, Eigen::aligned_allocator<Eigen::Vector3d>> vZvectors(
+      nMaxKFid + 1);  // For debugging
   Eigen::Vector3d z_vec;
   z_vec << 0.0, 0.0, 1.0;
 
