@@ -71,7 +71,8 @@ add_library(${PROJECT_NAME} SHARED
         src/Converter.cc
         src/Frame.cc
         src/FrameDrawer.cc
-        src/G2oTypes.cc
+        src/G2OTypes/Edges.cc
+        src/G2OTypes/Vertices.cc
         src/GeometricTools.cc
         src/ImuTypes.cc
         src/KeyFrame.cc

@@ -742,8 +742,8 @@ void Optimizer::FullInertialBA(const std::shared_ptr<Map>& pMap, int its,
 
 int Optimizer::PoseOptimization(const std::shared_ptr<Frame>& pFrame) {
   g2o::SparseOptimizer optimizer;
-  optimizer.setVerbose(true);
-  oslog::info("Enter PoseOptimization");
+  optimizer.setVerbose(false);
+  oslog::trace("Enter PoseOptimization");
 
   std::unique_ptr<g2o::LinearSolverDense<g2o::BlockSolver_6_3::PoseMatrixType>>
       linearSolver(
@@ -935,7 +935,7 @@ int Optimizer::PoseOptimization(const std::shared_ptr<Frame>& pFrame) {
 
   if (nInitialCorrespondences < 3) return 0;
 
-  oslog::info("   ... starting PoseOptimization");
+  oslog::trace("   ... starting PoseOptimization");
 
   // We perform 4 optimizations, after each optimization we classify observation
   // as inlier/outlier At the next optimization, outliers are not included, but
@@ -946,7 +946,7 @@ int Optimizer::PoseOptimization(const std::shared_ptr<Frame>& pFrame) {
 
   int nBad = 0;
   for (int iter = 0; iter < 4; iter++) {
-    oslog::info("   ... Iter {}", iter);
+    oslog::trace("   ... Iter {}", iter);
 
     {
       const Sophus::SE3<float> Tcw = pFrame->GetPose();
@@ -1039,7 +1039,7 @@ int Optimizer::PoseOptimization(const std::shared_ptr<Frame>& pFrame) {
                                 SE3quat_recov.translation().cast<float>());
   pFrame->SetPose(pose);
 
-  oslog::info(" Exit PoseOptimization");
+  oslog::trace(" Exit PoseOptimization");
   return nInitialCorrespondences - nBad;
 }
 
