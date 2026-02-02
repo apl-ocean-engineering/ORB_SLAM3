@@ -1,0 +1,17 @@
+
+# This needs to be updates before you run `task convert`
+BAGFILES_PATH:="/home/aaron/workspace/aquarium_nano_data/2025_05_23_aquarium_test"
+BUILD_TYPE:='RelWithDebInfo'
+CONFIG_FILE:='aquarium_resize.yaml'
+BIN_DIR:="../EuRoC"
+BIN_SUFFIX:='euroc'
+VOCAB_FILE:="../../Vocabulary/ORBvoc.txt"
+
+stereo bagfile:
+  {{BIN_DIR}}/{{BUILD_TYPE}}/stereo_{{BIN_SUFFIX}} {{CONFIG_FILE}} {{VOCAB_FILE}} aquarium_data/{{bagfile}} aquarium_data/{{bagfile}}/mav0/cam0/data.csv 2>&1 | tee {{bagfile}}_stereo.txt
+
+
+
+convert bagfile:
+  echo Converting bagfile {{bagfile}}
+  ./rosbag_convert_euroc.py -o aquarium_data {{BAGFILES_PATH}}/{{bagfile}}

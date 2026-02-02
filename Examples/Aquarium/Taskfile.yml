@@ -6,7 +6,7 @@ vars:
 
   BAGFILES: [ 'rosbag2_2025_05_23-08_27_30', 'rosbag2_2025_05_23-08_50_46', 'rosbag2_2025_05_23-09_29_11' ]
 
-  BUILD_TYPE: Release
+  BUILD_TYPE: RelWithDebInfo
 
   CONFIG_FILE: aquarium_resize.yaml
 
