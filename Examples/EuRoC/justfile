@@ -1,0 +1,42 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+
+
+build_type:='RelWithDebInfo'
+
+orbslam_dir:=parent_directory(parent_directory(justfile_directory()))
+euroc_dir:= orbslam_dir + "/Examples/EuRoC/"
+
+bin_dir:=euroc_dir + build_type
+
+vocab_file:=orbslam_dir + '/Vocabulary/ORBvoc.txt'
+settings_file:=euroc_dir + 'EuRoC.yaml'
+resize_settings_file:= euroc_dir + 'EuRoC_resize.yaml'
+
+stereo euroc_set:
+    mkdir  -p stereo_euroc
+    cd stereo_euroc && \
+        {{bin_dir}}/stereo_euroc \
+                {{resize_settings_file}} \
+                {{vocab_file}}  \
+                ../EuRoC_datasets/machine_hall/{{euroc_set}}/  \
+                ../EuRoC_TimeStamps/{{euroc_set}}.txt 2>&1 | tee stereo_euroc.txt
+
+stereo-mh01:
+    just stereo MH_01_easy
+
+
+# stereo-mh01:
+# cmds:
+#     - ../../{{.build_type}}/stereo_euroc
+#         {{.RESIZE_SETTINGS_FILE}}
+#         {{.VOCAB_FILE}}
+#         ../../EuRoC_datasets/machine_hall/MH_01_easy/
+#         ../../EuRoC_TimeStamps/MH01.txt 2>&1 | tee stereo_output.txt
+
+# stereo-inertial-mh01:
+# cmds:
+#     - ../../{{.build_type}}/stereo_inertial_euroc
+#         {{.RESIZE_SETTINGS_FILE}}
+#         {{.VOCAB_FILE}}
+#         ../../EuRoC_datasets/machine_hall/MH_01_easy/
+#         ../../EuRoC_TimeStamps/MH01.txt 2>&1 | tee stereo_inertial_output.txt

@@ -20,8 +20,6 @@
  */
 
 #include <System.h>
-#include <spdlog/sinks/stdout_color_sinks.h>
-#include <spdlog/spdlog.h>
 
 #include <algorithm>
 #include <chrono>
@@ -36,11 +34,8 @@
 using namespace std;
 
 int main(int argc, char **argv) {
-  auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-
-  ORB_SLAM3::Logger::add_sink(stdout_sink);
-  spdlog::set_default_logger(
-      std::make_shared<spdlog::logger>("euroc", stdout_sink));
+  setupEurocCommonLogger();
+  spdlog::set_level(spdlog::level::info);
 
   if (argc < 5) {
     cerr << endl
