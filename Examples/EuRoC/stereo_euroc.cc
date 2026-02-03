@@ -40,6 +40,7 @@ int main(int argc, char **argv) {
   ORB_SLAM3::Logger::add_sink(stdout_sink);
   spdlog::set_default_logger(
       std::make_shared<spdlog::logger>("euroc", stdout_sink));
+  spdlog::set_pattern("%E [%-8n] [%6!l] %v");
 
   spdlog::set_level(spdlog::level::debug);
 
@@ -56,20 +57,20 @@ int main(int argc, char **argv) {
   }
 
   const int num_seq = (argc - 3) / 2;
-  cout << "num_seq = " << num_seq << endl;
+  spdlog::info("Loading {} sequences", num_seq);
 
   bool bFileName = (((argc - 3) % 2) == 1);
   string trajFileName;
   if (bFileName) {
     trajFileName = string(argv[argc - 1]);
-    cout << "Saving outputs to: " << trajFileName << endl;
+    spdlog::info("Saving outputs to: {}", trajFileName);
   }
 
   // Load all sequences:
   int seq;
   vector<EuRoCData::SequencePaths> imagePaths;
   for (seq = 0; seq < num_seq; seq++) {
-    cout << "Loading images for sequence " << seq << "..." << endl;
+    spdlog::info("Loading images for sequence {} ....", seq);
 
     const string pathSeq(argv[(2 * seq) + 3]);
     const string pathTimeStamps(argv[(2 * seq) + 4]);
@@ -83,8 +84,7 @@ int main(int argc, char **argv) {
   vector<float> vTimesTrack;
   vTimesTrack.resize(eurocData.totalImages());
 
-  cout << endl << "-------" << endl;
-  cout.precision(17);
+  spdlog::info("------");
 
   // Create SLAM system. It initializes all system threads and gets ready to
   // process frames.
@@ -92,14 +92,21 @@ int main(int argc, char **argv) {
       argv[1], argv[2], ORB_SLAM3::SensorType::STEREO, true);
 
   if (!exSLAM) {
-    cerr << "Failed to initialize ORBSLAM3: " << exSLAM.error().msg() << endl;
+    spdlog::error("Failed to initialize ORBSLAM3: {}", exSLAM.error().msg());
     exit(-1);
   }
 
   auto SLAM = exSLAM.value();
 
   cv::Mat imLeft, imRight;
+  bool first = true;
   for (auto const &seq : eurocData.mvSequences) {
+    if (!first) {
+      spdlog::info("Changing dataset");
+      SLAM->ChangeDataset();
+    }
+    first = false;
+
     // Seq loop
     double t_resize = 0;
     double t_rect = 0;
@@ -107,22 +114,20 @@ int main(int argc, char **argv) {
     int ni = 0;
 
     for (auto const &imgSet : seq.mvImageSets) {
-      cout << "=== Processing image " << ni << " of " << seq.size() << " at "
-           << imgSet.mTimestamp << " ===" << endl;
+      spdlog::info("=== Processing image {} of {} at {:.9}", ni, seq.size(),
+                   imgSet.mTimestamp);
 
       // Read left and right images from file
       imLeft = imgSet.leftImage();
       imRight = imgSet.rightImage();
 
       if (imLeft.empty()) {
-        cerr << endl
-             << "Failed to load left image at: " << imgSet.mTimestamp << endl;
+        spdlog::error("Failed to load left image at: {}", imgSet.mTimestamp);
         exit(-1);
       }
 
       if (imRight.empty()) {
-        cerr << endl
-             << "Failed to load right image at: " << imgSet.mTimestamp << endl;
+        spdlog::error("Failed to load righ timage at: {}", imgSet.mTimestamp);
         exit(-1);
       }
 
@@ -154,10 +159,6 @@ int main(int argc, char **argv) {
       if (ttrack < dt) usleep((dt - ttrack) * 1e6);
       ni++;
     }
-
-    cout << "Changing dataset" << endl;
-
-    SLAM->ChangeDataset();
   }
   // Stop all threads
   SLAM->Shutdown();
