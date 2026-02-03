@@ -724,6 +724,7 @@ class EdgePriorPoseImu : public g2o::BaseMultiEdge<15, Vector15d> {
     J.block<15, 3>(0, 6) = _jacobianOplus[3];
     return J.transpose() * information() * J;
   }
+
   Eigen::Matrix3d Rwb;
   Eigen::Vector3d twb, vwb;
   Eigen::Vector3d bg, ba;
@@ -794,19 +795,9 @@ class Edge4DoF
   virtual bool read(std::istream& is) { return false; }
   virtual bool write(std::ostream& os) const { return false; }
 
-  void computeError() {
-    const VertexPose4DoF* VPi =
-        static_cast<const VertexPose4DoF*>(_vertices[0]);
-    const VertexPose4DoF* VPj =
-        static_cast<const VertexPose4DoF*>(_vertices[1]);
-    _error << LogSO3(VPi->estimate().Rcw[0] *
-                     VPj->estimate().Rcw[0].transpose() * dRij.transpose()),
-        VPi->estimate().Rcw[0] *
-                (-VPj->estimate().Rcw[0].transpose() * VPj->estimate().tcw[0]) +
-            VPi->estimate().tcw[0] - dtij;
-  }
+  void computeError();
 
-  // virtual void linearizeOplus(); // numerical implementation
+  // virtual void linearizeOplus(); //  Use numerical implementation
 
   Eigen::Matrix4d dTij;
   Eigen::Matrix3d dRij;

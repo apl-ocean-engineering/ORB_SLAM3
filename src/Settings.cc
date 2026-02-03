@@ -195,8 +195,8 @@ void Settings::setResizeImageSize(int width, int height) {
 
     if (!bNeedToRectify_) {
       // Update calibration
-      float scaleRowFactor = static_cast<float>(newImSize_.height) /
-                             static_cast<float>(originalImSize_.height);
+      const float scaleRowFactor = static_cast<float>(newImSize_.height) /
+                                   static_cast<float>(originalImSize_.height);
       calibration1_->setParameter(
           calibration1_->getParameter(1) * scaleRowFactor, 1);
       calibration1_->setParameter(
@@ -217,8 +217,8 @@ void Settings::setResizeImageSize(int width, int height) {
 
     if (!bNeedToRectify_) {
       // Update calibration
-      float scaleColFactor = static_cast<float>(newImSize_.width) /
-                             static_cast<float>(originalImSize_.width);
+      const float scaleColFactor = static_cast<float>(newImSize_.width) /
+                                   static_cast<float>(originalImSize_.width);
       calibration1_->setParameter(
           calibration1_->getParameter(0) * scaleColFactor, 0);
       calibration1_->setParameter(
@@ -268,7 +268,7 @@ void Settings::precomputeRectificationMaps() {
   cv::Mat P1, P2, Q;
 
   cv::stereoRectify(K1, camera1DistortionCoef(), K2, camera2DistortionCoef(),
-                    newImSize_, R12, t12, R_r1_u1, R_r2_u2, P1, P2, Q,
+                    originalImSize_, R12, t12, R_r1_u1, R_r2_u2, P1, P2, Q,
                     cv::CALIB_ZERO_DISPARITY, -1, newImSize_);
   cv::initUndistortRectifyMap(K1, camera1DistortionCoef(), R_r1_u1,
                               P1.rowRange(0, 3).colRange(0, 3), newImSize_,

@@ -130,7 +130,7 @@ class Settings {
   }
   cv::Mat camera2DistortionCoef() {
     return cv::Mat(vPinHoleDistorsion2_.size(), 1, CV_32F,
-                   vPinHoleDistorsion1_.data());
+                   vPinHoleDistorsion2_.data());
   }
 
   Sophus::SE3f Tlr() { return Tlr_; }
