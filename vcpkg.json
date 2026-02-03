@@ -7,9 +7,6 @@
       "baseline": "6d7bf7ef2193e2d1c5798a5ff8811d533104c861",
       "repository": "https://github.com/Microsoft/vcpkg"
     },
-    "triplets": [
-      "x64-linux-dynamic"
-    ],
     "overlay-ports": [
       "vcpkg_overlay"
     ]
@@ -22,11 +19,5 @@
       "features": []
     },
     "eigen3"
-  ],
-  "overrides": [
-    {
-      "name": "eigen3",
-      "version": "3.4.0#5"
-    }
   ]
 }
