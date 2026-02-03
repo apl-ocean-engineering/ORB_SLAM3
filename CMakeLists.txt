@@ -133,6 +133,12 @@ add_executable(stereo_euroc
         Examples/EuRoC/euroc_common.cc)
 target_link_libraries(stereo_euroc ${PROJECT_NAME})
 
+# Not ported yet...
+# add_executable(stereo_inertial_euroc
+#         Examples/EuRoC/stereo_inertial_euroc.cc
+#         Examples/EuRoC/euroc_common.cc)
+# target_link_libraries(stereo_inertial_euroc ${PROJECT_NAME})
+
 add_executable(mono_euroc
         Examples/EuRoC/mono_euroc.cc
         Examples/EuRoC/euroc_common.cc)
@@ -142,10 +148,6 @@ add_executable(mono_inertial_euroc
         Examples/EuRoC/mono_inertial_euroc.cc
         Examples/EuRoC/euroc_common.cc)
 target_link_libraries(mono_inertial_euroc ${PROJECT_NAME})
-
-# add_executable(stereo_inertial_euroc
-# Examples/Stereo-Inertial/stereo_inertial_euroc.cc)
-# target_link_libraries(stereo_inertial_euroc ${PROJECT_NAME})
 
 # ===============================================
 # RGB-D examples

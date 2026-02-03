@@ -1,6 +1,7 @@
 # yaml-language-server: $schema=https://taskfile.dev/schema.json
 
 
+launch_prefix:=''
 build_type:='RelWithDebInfo'
 
 orbslam_dir:=parent_directory(parent_directory(justfile_directory()))
@@ -12,10 +13,36 @@ vocab_file:=orbslam_dir + '/Vocabulary/ORBvoc.txt'
 settings_file:=euroc_dir + 'EuRoC.yaml'
 resize_settings_file:= euroc_dir + 'EuRoC_resize.yaml'
 
+## Must be possible to reduce repetition
+
+mono euroc_set:
+    mkdir  -p mono_euroc
+    cd mono_euroc && \
+        {{launch_prefix}} {{bin_dir}}/mono_euroc \
+                {{resize_settings_file}} \
+                {{vocab_file}}  \
+                ../EuRoC_datasets/machine_hall/{{euroc_set}}/  \
+                ../EuRoC_TimeStamps/{{euroc_set}}.txt 2>&1 | tee mono_euroc.txt
+
+mono-mh01:
+    just mono MH_01_easy
+
+mono_inertial euroc_set:
+    mkdir  -p mono_inertial_euroc
+    cd mono_inertial_euroc && \
+        {{launch_prefix}} {{bin_dir}}/mono_inertial_euroc \
+                {{resize_settings_file}} \
+                {{vocab_file}}  \
+                ../EuRoC_datasets/machine_hall/{{euroc_set}}/  \
+                ../EuRoC_TimeStamps/{{euroc_set}}.txt 2>&1 | tee mono_inertial_euroc.txt
+
+mono-inertial-mh01:
+    just mono_inertial MH_01_easy
+
 stereo euroc_set:
     mkdir  -p stereo_euroc
     cd stereo_euroc && \
-        {{bin_dir}}/stereo_euroc \
+        {{launch_prefix}} {{bin_dir}}/stereo_euroc \
                 {{resize_settings_file}} \
                 {{vocab_file}}  \
                 ../EuRoC_datasets/machine_hall/{{euroc_set}}/  \
@@ -25,18 +52,14 @@ stereo-mh01:
     just stereo MH_01_easy
 
 
-# stereo-mh01:
-# cmds:
-#     - ../../{{.build_type}}/stereo_euroc
-#         {{.RESIZE_SETTINGS_FILE}}
-#         {{.VOCAB_FILE}}
-#         ../../EuRoC_datasets/machine_hall/MH_01_easy/
-#         ../../EuRoC_TimeStamps/MH01.txt 2>&1 | tee stereo_output.txt
+stereo_inertial euroc_set:
+    mkdir  -p stereo_inertial_euroc
+    cd stereo_inertial_euroc && \
+        {{launch_prefix}} {{bin_dir}}/stereo_inertial_euroc \
+                {{resize_settings_file}} \
+                {{vocab_file}}  \
+                ../EuRoC_datasets/machine_hall/{{euroc_set}}/  \
+                ../EuRoC_TimeStamps/{{euroc_set}}.txt 2>&1 | tee stereo_inertial_euroc.txt
 
-# stereo-inertial-mh01:
-# cmds:
-#     - ../../{{.build_type}}/stereo_inertial_euroc
-#         {{.RESIZE_SETTINGS_FILE}}
-#         {{.VOCAB_FILE}}
-#         ../../EuRoC_datasets/machine_hall/MH_01_easy/
-#         ../../EuRoC_TimeStamps/MH01.txt 2>&1 | tee stereo_inertial_output.txt
+stereo-inertial-mh01:
+    just stereo_inertial MH_01_easy
