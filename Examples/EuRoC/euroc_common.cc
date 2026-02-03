@@ -99,8 +99,6 @@ EuRoCSequence::EuRoCSequence(const string &leftPath, const string &rightPath,
 void EuRoCSequence::loadImu(const string &imuPath, double startTime) {
   ifstream fImu;
 
-  cout << "Loading IMU data from " << imuPath << endl;
-
   fImu.open(imuPath.c_str());
 
   while (!fImu.eof()) {
@@ -134,11 +132,9 @@ void EuRoCSequence::loadImu(const string &imuPath, double startTime) {
 }
 
 cv::Mat ImageSet::leftImage() const {
-  cout << "Loading left image " << mLeftImage << endl;
   return cv::imread(mLeftImage, cv::IMREAD_UNCHANGED);
 }
 
 cv::Mat ImageSet::rightImage() const {
-  cout << "Loading right image " << mRightImage << endl;
   return cv::imread(mRightImage, cv::IMREAD_UNCHANGED);
 }

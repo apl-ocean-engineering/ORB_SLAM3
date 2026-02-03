@@ -503,13 +503,19 @@ bool System::isShutDown() {
 }
 
 void System::SaveTrajectoryTUM(const string &filename) {
+  vector<std::shared_ptr<KeyFrame>> vpKFs = mpAtlas->GetAllKeyFrames();
+
+  if (vpKFs.size() == 0) {
+    oslog::error("Cannot save TUM trajectory, there are no Keyframes");
+    return;
+  }
+
   cout << endl << "Saving camera trajectory to " << filename << " ..." << endl;
   if (sensorType() == SensorType::MONOCULAR) {
     cerr << "ERROR: SaveTrajectoryTUM cannot be used for monocular." << endl;
     return;
   }
 
-  vector<std::shared_ptr<KeyFrame>> vpKFs = mpAtlas->GetAllKeyFrames();
   sort(vpKFs.begin(), vpKFs.end(), KeyFrame::lId);
 
   // Transform all keyframes so that the first keyframe is at the origin.
@@ -592,7 +598,8 @@ void System::SaveKeyFrameTrajectoryTUM(const string &filename) {
 }
 
 void System::SaveTrajectoryEuRoC(const string &filename) {
-  cout << endl << "Saving trajectory to " << filename << " ..." << endl;
+  oslog::info("Saving trajectory to {} ...", filename);
+
   /*if(sensorType()==MONOCULAR)
   {
       cerr << "ERROR: SaveTrajectoryEuRoC cannot be used for monocular." <<
@@ -615,6 +622,11 @@ void System::SaveTrajectoryEuRoC(const string &filename) {
   }
 
   auto vpKFs = pBiggerMap->GetAllKeyFrames();
+  if (vpKFs.size() == 0) {
+    oslog::error("Cannot save EUROC trajectory, there are no Keyframes");
+    return;
+  }
+
   sort(vpKFs.begin(), vpKFs.end(), KeyFrame::lId);
 
   // Transform all keyframes so that the first keyframe is at the origin.
