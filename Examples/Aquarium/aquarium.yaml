@@ -26,6 +26,7 @@ Camera1.k1: -0.259389
 Camera1.k2: 0.203687
 Camera1.p1: 0.00066
 Camera1.p2: 0.003063
+Camera1.k3: -0.0845
 
 Camera2.fx: 1060.22456
 Camera2.fy: 1063.51251
@@ -36,6 +37,7 @@ Camera2.k1: -0.263264
 Camera2.k2: 0.215493
 Camera2.p1: -0.003977
 Camera2.p2: 0.000629
+Camera2.k3: -0.0902
 
 # Taken from Kalibr calibration _after_ aquarium but before APL pier test
 #   This is T_cn_cnm1 inverted
