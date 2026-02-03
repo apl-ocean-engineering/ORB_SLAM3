@@ -25,7 +25,10 @@
 #include "Converter.h"
 #include "G2oTypes.h"
 #include "ImuTypes.h"
+
 namespace ORB_SLAM3 {
+
+//-------------------------------------------------------------------
 
 void EdgeMono::linearizeOplus() {
   const VertexPose* VPose = static_cast<const VertexPose*>(_vertices[1]);
@@ -53,6 +56,8 @@ void EdgeMono::linearizeOplus() {
 
   _jacobianOplusXj = proj_jac * Rcb * SE3deriv;  // TODO optimize this product
 }
+
+//-------------------------------------------------------------------
 
 void EdgeMonoOnlyPose::linearizeOplus() {
   const VertexPose* VPose = static_cast<const VertexPose*>(_vertices[0]);
@@ -137,6 +142,8 @@ void EdgeStereoOnlyPose::linearizeOplus() {
   _jacobianOplusXi = proj_jac * Rcb * SE3deriv;
 }
 
+//-------------------------------------------------------------------
+
 VertexVelocity::VertexVelocity(const std::shared_ptr<KeyFrame>& pKF) {
   setEstimate(pKF->GetVelocity().cast<double>());
 }
@@ -164,6 +171,8 @@ VertexAccBias::VertexAccBias(const std::shared_ptr<Frame>& pF) {
   ba << pF->mImuBias.bax, pF->mImuBias.bay, pF->mImuBias.baz;
   setEstimate(ba);
 }
+
+//-------------------------------------------------------------------
 
 EdgeInertial::EdgeInertial(const std::shared_ptr<IMU::Preintegrated>& pInt)
     : JRg(pInt->JRg.cast<double>()),
@@ -279,6 +288,8 @@ void EdgeInertial::linearizeOplus() {
   _jacobianOplus[5].setZero();
   _jacobianOplus[5].block<3, 3>(3, 0) = Rbw1;  // OK
 }
+
+//-------------------------------------------------------------------
 
 EdgeInertialGS::EdgeInertialGS(const std::shared_ptr<IMU::Preintegrated>& pInt)
     : JRg(pInt->JRg.cast<double>()),
@@ -422,6 +433,8 @@ void EdgeInertialGS::linearizeOplus() {
       Rbw1 * (VP2->estimate().twb - VP1->estimate().twb - VV1->estimate() * dt);
 }
 
+//-------------------------------------------------------------------
+
 EdgePriorPoseImu::EdgePriorPoseImu(ConstraintPoseImu* c) {
   resize(4);
   Rwb = c->Rwb;
@@ -470,6 +483,20 @@ void EdgePriorGyro::linearizeOplus() {
   // Jacobian wrt bias
   _jacobianOplusXi.block<3, 3>(0, 0) = Eigen::Matrix3d::Identity();
 }
+
+//-------------------------------------------------------------------
+
+void Edge4DoF::computeError() {
+  const VertexPose4DoF* VPi = static_cast<const VertexPose4DoF*>(_vertices[0]);
+  const VertexPose4DoF* VPj = static_cast<const VertexPose4DoF*>(_vertices[1]);
+  _error << LogSO3(VPi->estimate().Rcw[0] * VPj->estimate().Rcw[0].transpose() *
+                   dRij.transpose()),
+      VPi->estimate().Rcw[0] *
+              (-VPj->estimate().Rcw[0].transpose() * VPj->estimate().tcw[0]) +
+          VPi->estimate().tcw[0] - dtij;
+}
+
+//-------------------------------------------------------------------
 
 // SO3 FUNCTIONS
 Eigen::Matrix3d ExpSO3(const Eigen::Vector3d& w) {
