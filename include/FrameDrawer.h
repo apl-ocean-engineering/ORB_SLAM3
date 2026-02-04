@@ -59,7 +59,6 @@ class FrameDrawer {
 
   // Info of the frame to be drawn
   cv::Mat mIm, mImRight;
-  int N;
   vector<cv::KeyPoint> mvCurrentKeys, mvCurrentKeysRight;
   vector<bool> mvbMap, mvbVO;
   bool mbOnlyTracking;

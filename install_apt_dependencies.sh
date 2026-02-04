@@ -11,7 +11,6 @@ APT_DEPENDENCIES="cmake \
                   libboost-serialization-dev \
                   libc++-dev \
                   libegl1-mesa-dev \
-                  libeigen3-dev \
                   libepoxy-dev \
                   libfmt-dev \
                   libgl1-mesa-dev \

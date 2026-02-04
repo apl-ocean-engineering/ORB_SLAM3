@@ -41,40 +41,23 @@ Atlas::Atlas(int initKFid)
   CreateNewMap();
 }
 
-Atlas::~Atlas() {
-  mspMaps.clear();
-
-  // for( it = mspMaps.begin(), end = mspMaps.end(); it != end;)
-  // {
-  //     std::shared_ptr<Map> pMi( *it );
-
-  //     if(*it)
-  //     {
-  //         (*it).clear();
-  //         it = mspMaps.erase(it);
-  //     }
-  //     else {
-  //         ++it;
-  //     }
-
-  // }
-}
+Atlas::~Atlas() { mspMaps.clear(); }
 
 void Atlas::CreateNewMap() {
   unique_lock<mutex> lock(mMutexAtlas);
-  spdlog::info("Creation of new map with id: {}", Map::nNextId);
+  oslog::info("Creation of new map with id: {}", Map::nNextId);
   if (mpCurrentMap) {
     if (!mspMaps.empty() && mnLastInitKFidMap < mpCurrentMap->GetMaxKFid())
       mnLastInitKFidMap = mpCurrentMap->GetMaxKFid() +
                           1;  // The init KF is the next of current maximum
 
     mpCurrentMap->SetStoredMap();
-    spdlog::info("Stored map with ID: {}", mpCurrentMap->GetId());
+    oslog::info("Stored map with ID: {}", mpCurrentMap->GetId());
 
     // if(mpViewer)
     //     mpViewer->AddMapToCreateThumbnail(mpCurrentMap);
   }
-  spdlog::info("Creation of new map with last KF id: {}", mnLastInitKFidMap);
+  oslog::info("Creation of new map with last KF id: {}", mnLastInitKFidMap);
 
   mpCurrentMap = std::make_shared<Map>(mnLastInitKFidMap);
   mpCurrentMap->SetCurrentMap();
@@ -83,7 +66,7 @@ void Atlas::CreateNewMap() {
 
 void Atlas::ChangeMap(const std::shared_ptr<Map> &pMap) {
   unique_lock<mutex> lock(mMutexAtlas);
-  spdlog::info("Change to map with id: {}", pMap->GetId());
+  oslog::info("Change to map with id: {}", pMap->GetId());
   if (mpCurrentMap) {
     mpCurrentMap->SetStoredMap();
   }
@@ -113,36 +96,13 @@ void Atlas::AddMapPoint(MapPoint *pMP) {
 
 std::shared_ptr<GeometricCamera> Atlas::AddCamera(
     const std::shared_ptr<GeometricCamera> &pCam) {
-  // Check if the camera already exists
-  bool bAlreadyInMap = false;
-  int index_cam = -1;
-  for (size_t i = 0; i < mvpCameras.size(); ++i) {
-    std::shared_ptr<GeometricCamera> pCam_i = mvpCameras[i];
-
-    if (!pCam) std::cout << "Not pCam" << std::endl;
-    if (!pCam_i) std::cout << "Not pCam_i" << std::endl;
-
-    if (pCam->GetType() != pCam_i->GetType()) continue;
-
-    if (pCam->GetType() == GeometricCamera::CAM_PINHOLE) {
-      if ((dynamic_cast<Pinhole *>(pCam_i.get()))->IsEqual(pCam)) {
-        bAlreadyInMap = true;
-        index_cam = i;
-      }
-    } else if (pCam->GetType() == GeometricCamera::CAM_FISHEYE) {
-      if ((dynamic_cast<KannalaBrandt8 *>(pCam_i.get()))->IsEqual(pCam)) {
-        bAlreadyInMap = true;
-        index_cam = i;
-      }
-    }
+  auto const it = std::find(mvpCameras.begin(), mvpCameras.end(), pCam);
+  if (it != mvpCameras.end()) {
+    return *it;
   }
 
-  if (bAlreadyInMap) {
-    return mvpCameras[index_cam];
-  } else {
-    mvpCameras.push_back(pCam);
-    return pCam;
-  }
+  mvpCameras.push_back(pCam);
+  return pCam;
 }
 
 std::vector<std::shared_ptr<GeometricCamera>> Atlas::GetAllCameras() {
@@ -240,14 +200,7 @@ void Atlas::SetMapBad(const std::shared_ptr<Map> &pMap) {
   mspBadMaps.insert(pMap);
 }
 
-void Atlas::RemoveBadMaps() {
-  /*for(Map* pMap : mspBadMaps)
-  {
-      delete pMap;
-      pMap = static_cast<Map*>(NULL);
-  }*/
-  mspBadMaps.clear();
-}
+void Atlas::RemoveBadMaps() { mspBadMaps.clear(); }
 
 bool Atlas::isInertial() {
   unique_lock<mutex> lock(mMutexAtlas);
@@ -359,7 +312,7 @@ map<long unsigned int, std::shared_ptr<KeyFrame>> Atlas::GetAtlasKeyframes() {
   for (auto const &pMap_i : mvpBackupMaps) {
     vector<std::shared_ptr<KeyFrame>> vpKFs_Mi = pMap_i->GetAllKeyFrames();
 
-    for (auto pKF_j_Mi : vpKFs_Mi) {
+    for (auto const &pKF_j_Mi : vpKFs_Mi) {
       mpIdKFs[pKF_j_Mi->mnId] = pKF_j_Mi;
     }
   }

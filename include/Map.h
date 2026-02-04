@@ -24,6 +24,8 @@
 #include <pangolin/pangolin.h>
 
 #include <boost/serialization/base_object.hpp>
+#include <boost/serialization/set.hpp>
+#include <boost/serialization/shared_ptr.hpp>
 #include <cstdint>
 #include <list>
 #include <memory>
@@ -54,8 +56,8 @@ class Map : public std::enable_shared_from_this<Map> {
 
     // Save/load a set structure, the set structure is broken in libboost 1.58
     // for ubuntu 16.04, a vector is serializated
-    // ar & mspKeyFrames;
-    // ar & mspMapPoints;
+    ar & mspKeyFrames;
+    ar & mspMapPoints;
     ar & mvpBackupKeyFrames;
     ar & mvpBackupMapPoints;
 
@@ -182,8 +184,8 @@ class Map : public std::enable_shared_from_this<Map> {
   std::shared_ptr<KeyFrame> mpKFinitial;
   std::shared_ptr<KeyFrame> mpKFlowerID;
 
-  unsigned long int mnBackupKFinitialID;
-  unsigned long int mnBackupKFlowerID;
+  long int mnBackupKFinitialID;
+  long int mnBackupKFlowerID;
 
   std::vector<MapPoint*> mvpReferenceMapPoints;
 

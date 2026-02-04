@@ -40,68 +40,6 @@ namespace ORB_SLAM3 {
 
 unsigned long int KeyFrame::nNextId = 0;
 
-// KeyFrame::KeyFrame()
-//     : mnFrameId(0),
-//       mTimeStamp(0),
-//       mnGridCols(FRAME_GRID_COLS),
-//       mnGridRows(FRAME_GRID_ROWS),
-//       mfGridElementWidthInv(0),
-//       mfGridElementHeightInv(0),
-//       mnTrackReferenceForFrame(0),
-//       mnFuseTargetForKF(0),
-//       mnBALocalForKF(0),
-//       mnBAFixedForKF(0),
-//       mnBALocalForMerge(0),
-//       mnLoopQuery(0),
-//       mnLoopWords(0),
-//       mnRelocQuery(0),
-//       mnRelocWords(0),
-//       mnMergeQuery(0),
-//       mnMergeWords(0),
-//       mnBAGlobalForKF(0),
-//       fx(0),
-//       fy(0),
-//       cx(0),
-//       cy(0),
-//       invfx(0),
-//       invfy(0),
-//       mnPlaceRecognitionQuery(0),
-//       mnPlaceRecognitionWords(0),
-//       mPlaceRecognitionScore(0),
-//       mbf(0),
-//       mb(0),
-//       mThDepth(0),
-//       N(0),
-//       mvKeys(),
-//       mvKeysUn(),
-//       mvuRight(),
-//       mvDepth(),
-//       mnScaleLevels(0),
-//       mfScaleFactor(0),
-//       mfLogScaleFactor(0),
-//       mvScaleFactors(0),
-//       mvLevelSigma2(0),
-//       mvInvLevelSigma2(0),
-//       mnMinX(0),
-//       mnMinY(0),
-//       mnMaxX(0),
-//       mnMaxY(0),
-//       mPrevKF(nullptr),
-//       mNextKF(nullptr),
-//       mbFirstConnection(true),
-//       mpBackupImuPreintegrated(std::make_shared<IMU::Preintegrated>()),
-//       mpParent(NULL),
-//       mbNotErase(false),
-//       mbToBeErased(false),
-//       mbBad(false),
-//       mHalfBaseline(0),
-//       mbCurrentPlaceRecognition(false),
-//       mnMergeCorrectedForKF(0),
-//       NLeft(0),
-//       NRight(0),
-//       mnNumberOfOpt(0),
-//       mbHasVelocity(false) {}
-
 KeyFrame::KeyFrame(const std::shared_ptr<Frame> &F,
                    const std::shared_ptr<Map> &pMap,
                    const std::shared_ptr<KeyFrameDatabase> &pKFDB)
@@ -186,7 +124,7 @@ KeyFrame::KeyFrame(const std::shared_ptr<Frame> &F,
       mbHasVelocity(false) {
   mnId = nNextId++;
 
-  spdlog::trace("New kF; map {}", mpMap ? "(exists)" : "NULL");
+  oslog::trace("New kF; map {}", mpMap ? "(exists)" : "NULL");
 
   mGrid.resize(mnGridCols);
   if (F->Nleft != -1) mGridRight.resize(mnGridCols);
@@ -884,7 +822,7 @@ std::shared_ptr<Map> KeyFrame::GetMap() {
 
 void KeyFrame::UpdateMap(const std::shared_ptr<Map> &pMap) {
   unique_lock<mutex> lock(mMutexMap);
-  spdlog::trace("Updating mpMap to {}", pMap ? "(exists)" : "NULL");
+  oslog::trace("Updating mpMap to {}", pMap ? "(exists)" : "NULL");
   mpMap = pMap;
 }
 

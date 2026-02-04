@@ -1,6 +1,25 @@
 > [!NOTE]
 > This is my personal "working" fork of ORBSLAM3, which is part of a larger effort to integrate ORBSLAM3 into ROS2.   This repo remains (distantly) related to the author's original upstream repo, and contains no ROS2-specific code.   The actual ROS2 integration is implemented in [orbslam3_ros2](https://gitlab.com/apl-ocean-engineering/orbslam3_ros2) which includes this repo as a submodule.
 
+## Building
+
+I am only testing on Ubuntu 24.04.
+
+As noted above, I prefer to use system packages as much as possible and use `vcpkg` for dependencies with no published binaries (outside of ROS).  To override this behavior and have vcpkg build additional packages from source, remove the relevant directories from the [`vcpkg_overlays/`](vcpkg_overlays/) directory.
+
+I've gone full koolaid and adopted `ninja` as a builder as well.
+
+To build in Ubuntu, use the convenience scripts:
+
+```
+./install_apt_dependencies.sh
+./build.sh
+```
+
+This will build a Release version the ORB_SLAM3 library and all of the `Examples`.  The binaries will be in the respective `Example/...` directories, in the `Release/` directory.
+
+## Code Changes
+
 As I dug further into the code, I got more opinionated and have made multiple stylistic changes.   My intention is to make only positive readability, portability and performance improvements but YMMV:
 
 * Started modernization, currently to C++17
@@ -18,22 +37,6 @@ As I dug further into the code, I got more opinionated and have made multiple st
    * Removed integrated Realsense support.    Realsense-enabled binaries should go in a separate package.
 
 
-## Building
-
-I am only testing on Ubuntu 24.04.
-
-As noted above, I prefer to use system packages as much as possible and use `vcpkg` for dependencies with no published binaries (outside of ROS).  To override this behavior and have vcpkg build additional packages from source, remove the relevant directories from the [`vcpkg_overlays/`](vcpkg_overlays/) directory.
-
-I've gone full koolaid and adopted `ninja` as a builder as well.
-
-To build in Ubuntu, use the convenience scripts:
-
-```
-./install_apt_dependencies.sh
-./build.sh
-```
-
-This will build Release versions the ORB_SLAM3 library and all of the `Examples`.
 
 -----
 -----

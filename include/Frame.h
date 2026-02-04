@@ -21,6 +21,8 @@
 
 #pragma once
 
+#include <Eigen/Core>
+#include <Eigen/StdVector>
 #include <iostream>
 #include <memory>
 #include <mutex>
@@ -29,7 +31,6 @@
 #include <vector>
 
 #include "Converter.h"
-#include "Eigen/Core"
 #include "ImuTypes.h"
 #include "Logging.h"
 #include "ORBVocabulary.h"
@@ -51,6 +52,8 @@ class ORBextractor;
 
 class Frame : public std::enable_shared_from_this<Frame> {
  public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
   Frame();
 
   // Copy constructor.
@@ -97,7 +100,7 @@ class Frame : public std::enable_shared_from_this<Frame> {
   void SetPose(const Sophus::SE3<float> &Tcw);
 
   // Set IMU velocity
-  void SetVelocity(Eigen::Vector3f Vw);
+  void SetVelocity(const Eigen::Vector3f &Vw);
 
   Eigen::Vector3f GetVelocity() const;
 
@@ -200,8 +203,6 @@ class Frame : public std::enable_shared_from_this<Frame> {
   bool mbHasVelocity;
 
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-
   // Vocabulary used for relocalization.
   std::shared_ptr<ORBVocabulary> mpORBvocabulary;
 
@@ -233,7 +234,7 @@ class Frame : public std::enable_shared_from_this<Frame> {
   float mThDepth;
 
   // Number of KeyPoints.
-  int N;
+  size_t N;
 
   // Vector of keypoints (original for visualization) and undistorted (actually
   // used by the system). In the stereo case, mvKeysUn is redundant as images
@@ -353,7 +354,8 @@ class Frame : public std::enable_shared_from_this<Frame> {
 
   // Triangulated stereo observations using as reference the left camera. These
   // are computed during ComputeStereoFishEyeMatches
-  std::vector<Eigen::Vector3f> mvStereo3Dpoints;
+  std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>
+      mvStereo3Dpoints;
 
   // Grid for the right image
   std::vector<std::size_t> mGridRight[FRAME_GRID_COLS][FRAME_GRID_ROWS];
@@ -380,8 +382,8 @@ class Frame : public std::enable_shared_from_this<Frame> {
 
   void PrintPointDistribution() {
     int left = 0, right = 0;
-    int Nlim = (Nleft != -1) ? Nleft : N;
-    for (int i = 0; i < N; i++) {
+    const size_t Nlim = (Nleft != -1) ? Nleft : N;
+    for (size_t i = 0; i < N; i++) {
       if (mvpMapPoints[i] && !mvbOutlier[i]) {
         if (i < Nlim)
           left++;
@@ -389,8 +391,8 @@ class Frame : public std::enable_shared_from_this<Frame> {
           right++;
       }
     }
-    spdlog::debug("Point distribution in Frame: left-> {} --- right-> {}", left,
-                  right);
+    oslog::debug("Point distribution in Frame: left-> {} --- right-> {}", left,
+                 right);
   }
 
   Sophus::SE3<double> T_test;

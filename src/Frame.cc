@@ -215,23 +215,6 @@ Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight,
   N = mvKeys.size();
   if (mvKeys.empty()) return;
 
-  UndistortKeyPoints();
-
-#ifdef REGISTER_TIMES
-  std::chrono::steady_clock::time_point time_StartStereoMatches =
-      std::chrono::steady_clock::now();
-#endif
-  ComputeStereoMatches();
-#ifdef REGISTER_TIMES
-  std::chrono::steady_clock::time_point time_EndStereoMatches =
-      std::chrono::steady_clock::now();
-
-  mTimeStereoMatch =
-      std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(
-          time_EndStereoMatches - time_StartStereoMatches)
-          .count();
-#endif
-
   mvpMapPoints = vector<MapPoint *>(N, static_cast<MapPoint *>(nullptr));
   mvbOutlier = vector<bool>(N, false);
   mmProjectPoints.clear();
@@ -241,6 +224,9 @@ Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight,
   // calibration)
   if (mbInitialComputations) {
     ComputeImageBounds(imLeft);
+
+    // std::cout << "mbInitialComputations " << mnMaxX << "-" << mnMinX << "   "
+    // << mnMaxY << "-" << mnMinY << endl;
 
     mfGridElementWidthInv =
         static_cast<float>(FRAME_GRID_COLS) / (mnMaxX - mnMinX);
@@ -258,6 +244,7 @@ Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight,
   }
 
   mb = mbf / fx;
+  // oslog::trace("Frame {}, mb {} = mbf {} / fx {}", mnId, mb, mbf, fx);
 
   if (pPrevF) {
     if (pPrevF->HasVelocity()) SetVelocity(pPrevF->GetVelocity());
@@ -272,9 +259,27 @@ Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight,
   Nright = -1;
   mvLeftToRightMatch = vector<int>(0);
   mvRightToLeftMatch = vector<int>(0);
-  mvStereo3Dpoints = vector<Eigen::Vector3f>(0);
+  mvStereo3Dpoints =
+      vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>(0);
   monoLeft = -1;
   monoRight = -1;
+
+  UndistortKeyPoints();
+
+#ifdef REGISTER_TIMES
+  std::chrono::steady_clock::time_point time_StartStereoMatches =
+      std::chrono::steady_clock::now();
+#endif
+  ComputeStereoMatches();
+#ifdef REGISTER_TIMES
+  std::chrono::steady_clock::time_point time_EndStereoMatches =
+      std::chrono::steady_clock::now();
+
+  mTimeStereoMatch =
+      std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(
+          time_EndStereoMatches - time_StartStereoMatches)
+          .count();
+#endif
 
   AssignFeaturesToGrid();
 }
@@ -339,10 +344,6 @@ Frame::Frame(const cv::Mat &imGray, const cv::Mat &imDepth,
 
   if (mvKeys.empty()) return;
 
-  UndistortKeyPoints();
-
-  ComputeStereoFromRGBD(imDepth);
-
   mvpMapPoints = vector<MapPoint *>(N, static_cast<MapPoint *>(nullptr));
 
   mmProjectPoints.clear();
@@ -354,6 +355,9 @@ Frame::Frame(const cv::Mat &imGray, const cv::Mat &imDepth,
   // calibration)
   if (mbInitialComputations) {
     ComputeImageBounds(imGray);
+
+    // std::cout << "mbInitialComputations " << mnMaxX << "-" << mnMinX << "   "
+    // << mnMaxY << "-" << mnMinY << endl;
 
     mfGridElementWidthInv = static_cast<float>(FRAME_GRID_COLS) /
                             static_cast<float>(mnMaxX - mnMinX);
@@ -371,6 +375,7 @@ Frame::Frame(const cv::Mat &imGray, const cv::Mat &imDepth,
   }
 
   mb = mbf / fx;
+  oslog::trace("Frame {}, mb {} = mbf {} / fx {}", mnId, mb, mbf, fx);
 
   if (pPrevF) {
     if (pPrevF->HasVelocity()) SetVelocity(pPrevF->GetVelocity());
@@ -385,9 +390,14 @@ Frame::Frame(const cv::Mat &imGray, const cv::Mat &imDepth,
   Nright = -1;
   mvLeftToRightMatch = vector<int>(0);
   mvRightToLeftMatch = vector<int>(0);
-  mvStereo3Dpoints = vector<Eigen::Vector3f>(0);
+  mvStereo3Dpoints =
+      vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>(0);
   monoLeft = -1;
   monoRight = -1;
+
+  UndistortKeyPoints();
+
+  ComputeStereoFromRGBD(imDepth);
 
   AssignFeaturesToGrid();
 }
@@ -494,7 +504,8 @@ Frame::Frame(const cv::Mat &imGray, const double &timeStamp,
   Nright = -1;
   mvLeftToRightMatch = vector<int>(0);
   mvRightToLeftMatch = vector<int>(0);
-  mvStereo3Dpoints = vector<Eigen::Vector3f>(0);
+  mvStereo3Dpoints =
+      vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>(0);
   monoLeft = -1;
   monoRight = -1;
 
@@ -527,7 +538,7 @@ void Frame::AssignFeaturesToGrid() {
       }
     }
 
-  for (int i = 0; i < N; i++) {
+  for (size_t i = 0; i < N; i++) {
     const cv::KeyPoint &kp = (Nleft == -1) ? mvKeysUn[i]
                              : (i < Nleft) ? mvKeys[i]
                                            : mvKeysRight[i - Nleft];
@@ -568,7 +579,7 @@ void Frame::SetNewBias(const IMU::Bias &b) {
   if (mpImuPreintegrated) mpImuPreintegrated->SetNewBias(b);
 }
 
-void Frame::SetVelocity(Eigen::Vector3f Vwb) {
+void Frame::SetVelocity(const Eigen::Vector3f &Vwb) {
   mVw = Vwb;
   mbHasVelocity = true;
 }
@@ -705,7 +716,7 @@ bool Frame::ProjectPointDistort(MapPoint *pMP, cv::Point2f &kp, float &u,
 
   // Check positive depth
   if (PcZ < 0.0f) {
-    spdlog::warn("Negative depth: {PcZ}");
+    oslog::warn("Negative depth: {PcZ}");
     return false;
   }
 
@@ -764,6 +775,10 @@ vector<size_t> Frame::GetFeaturesInArea(const float &x, const float &y,
   float factorX = r;
   float factorY = r;
 
+  // std::cout << x << "," << y << " " << r << " " << mnMinX << " " << mnMinY <<
+  // endl; std::cout << mfGridElementWidthInv << " " << mfGridElementHeightInv
+  // << endl;
+
   const int nMinCellX = max(0, static_cast<int>(floor((x - mnMinX - factorX) *
                                                       mfGridElementWidthInv)));
   if (nMinCellX >= FRAME_GRID_COLS) {
@@ -791,6 +806,9 @@ vector<size_t> Frame::GetFeaturesInArea(const float &x, const float &y,
   }
 
   const bool bCheckLevels = (minLevel > 0) || (maxLevel >= 0);
+
+  // std::cout << nMinCellX << ", " << nMaxCellX << " -- " <<  nMinCellY << ", "
+  // << nMaxCellY << endl;
 
   for (int ix = nMinCellX; ix <= nMaxCellX; ix++) {
     for (int iy = nMinCellY; iy <= nMaxCellY; iy++) {
@@ -835,13 +853,13 @@ bool Frame::PosInGrid(const cv::KeyPoint &kp, int &posX, int &posY) {
 
 void Frame::ComputeBoW() {
   if (mBowVec.empty()) {
-    spdlog::info("[Frame::ComputeBoW] Computing BoW for {} x {} descriptors",
-                 mDescriptors.size().height, mDescriptors.size().width);
+    oslog::info("[Frame::ComputeBoW] Computing BoW for {} x {} descriptors",
+                mDescriptors.size().height, mDescriptors.size().width);
 
     vector<cv::Mat> vCurrentDesc = Converter::toDescriptorVector(mDescriptors);
     mpORBvocabulary->transform(vCurrentDesc, mBowVec, mFeatVec, 4);
 
-    spdlog::info(
+    oslog::info(
         "[Frame::ComputeBoW]  ... BoW vector size {}, feature vector size {}",
         mBowVec.size(), mFeatVec.size());
   }
@@ -856,7 +874,7 @@ void Frame::UndistortKeyPoints() {
   // Fill matrix with points
   cv::Mat mat(N, 2, CV_32F);
 
-  for (int i = 0; i < N; i++) {
+  for (size_t i = 0; i < N; i++) {
     mat.at<float>(i, 0) = mvKeys[i].pt.x;
     mat.at<float>(i, 1) = mvKeys[i].pt.y;
   }
@@ -869,7 +887,7 @@ void Frame::UndistortKeyPoints() {
 
   // Fill undistorted keypoint vector
   mvKeysUn.resize(N);
-  for (int i = 0; i < N; i++) {
+  for (size_t i = 0; i < N; i++) {
     cv::KeyPoint kp = mvKeys[i];
     kp.pt.x = mat.at<float>(i, 0);
     kp.pt.y = mat.at<float>(i, 1);
@@ -913,17 +931,18 @@ void Frame::ComputeStereoMatches() {
   mvDepth = vector<float>(N, -1.0f);
 
   const int thOrbDist = (ORBmatcher::TH_HIGH + ORBmatcher::TH_LOW) / 2;
-
-  const int nRows = mpORBextractorLeft->mvImagePyramid[0].rows;
+  const size_t nRows = mpORBextractorLeft->mvImagePyramid[0].rows;
 
   // Assign keypoints to row table
   vector<vector<size_t>> vRowIndices(nRows, vector<size_t>());
 
-  for (int i = 0; i < nRows; i++) vRowIndices[i].reserve(200);
+  for (size_t i = 0; i < nRows; i++) vRowIndices[i].reserve(200);
 
-  const int Nr = mvKeysRight.size();
+  const size_t Nr = mvKeysRight.size();
 
-  for (int iR = 0; iR < Nr; iR++) {
+  oslog::trace("Checking {} left and {} right keypoints", N, Nr);
+
+  for (size_t iR = 0; iR < Nr; iR++) {
     const cv::KeyPoint &kp = mvKeysRight[iR];
     const float &kpY = kp.pt.y;
     const float r = 2.0f * mvScaleFactors[mvKeysRight[iR].octave];
@@ -938,11 +957,13 @@ void Frame::ComputeStereoMatches() {
   const float minD = 0;
   const float maxD = mbf / minZ;
 
+  oslog::trace("minZ {} minD {} maxD {}", minZ, minD, maxD);
+
   // For each left keypoint search a match in the right image
   vector<pair<int, int>> vDistIdx;
   vDistIdx.reserve(N);
 
-  for (int iL = 0; iL < N; iL++) {
+  for (size_t iL = 0; iL < static_cast<size_t>(N); iL++) {
     const cv::KeyPoint &kpL = mvKeys[iL];
     const int &levelL = kpL.octave;
     const float &vL = kpL.pt.y;
@@ -950,10 +971,17 @@ void Frame::ComputeStereoMatches() {
 
     const vector<size_t> &vCandidates = vRowIndices[vL];
 
+    if (iL < 10)
+      oslog::trace("Pt at ({},{})  {} candidates", uL, vL, vCandidates.size());
+
     if (vCandidates.empty()) continue;
 
     const float minU = uL - maxD;
     const float maxU = uL - minD;
+
+    if (iL < 10)
+      oslog::trace("uL {} maxD {} minD {} maxU {} minU {}", uL, maxD, minD,
+                   maxU, minU);
 
     if (maxU < 0) continue;
 
@@ -1050,6 +1078,9 @@ void Frame::ComputeStereoMatches() {
         }
         mvDepth[iL] = mbf / disparity;
         mvuRight[iL] = bestuR;
+
+        // Save a list of the lowest correlation distance seen for each left
+        // feature
         vDistIdx.push_back(pair<int, int>(bestDist, iL));
       }
     }
@@ -1057,9 +1088,11 @@ void Frame::ComputeStereoMatches() {
 
   sort(vDistIdx.begin(), vDistIdx.end());
   const float median = vDistIdx[vDistIdx.size() / 2].first;
-  const float thDist = 1.5f * 1.4f * median;
+  const float thDist = 1.5f * 1.4f * median;  //?
 
-  for (int i = vDistIdx.size() - 1; i >= 0; i--) {
+  // Discard any depths where the correlation distance was greater than
+  // some threshold from the median correlation distance.
+  for (int i = static_cast<int>(vDistIdx.size() - 1); i >= 0; i--) {
     if (vDistIdx[i].first < thDist) {
       break;
     } else {
@@ -1067,13 +1100,21 @@ void Frame::ComputeStereoMatches() {
       mvDepth[vDistIdx[i].second] = -1;
     }
   }
+
+  int keptCount = 0;
+  for (auto d : mvDepth) {
+    if (d > 0) keptCount++;
+  }
+
+  oslog::debug("Frame {}.  Kept {} stereo matches of {} features", mnId,
+               keptCount, vDistIdx.size());
 }
 
 void Frame::ComputeStereoFromRGBD(const cv::Mat &imDepth) {
   mvuRight = vector<float>(N, -1);
   mvDepth = vector<float>(N, -1);
 
-  for (int i = 0; i < N; i++) {
+  for (size_t i = 0; i < N; i++) {
     const cv::KeyPoint &kp = mvKeys[i];
     const cv::KeyPoint &kpU = mvKeysUn[i];
 
@@ -1259,7 +1300,8 @@ void Frame::ComputeStereoFishEyeMatches() {
   mvRightToLeftMatch = vector<int>(Nright, -1);
   mvDepth = vector<float>(Nleft, -1.0f);
   mvuRight = vector<float>(Nleft, -1);
-  mvStereo3Dpoints = vector<Eigen::Vector3f>(Nleft);
+  mvStereo3Dpoints =
+      vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>(Nleft);
   mnCloseMPs = 0;
 
   // Perform a brute force between Keypoint in the left and right image

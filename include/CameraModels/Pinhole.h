@@ -23,6 +23,7 @@
 
 #include <assert.h>
 
+#include <boost/serialization/shared_ptr.hpp>
 #include <memory>
 #include <vector>
 
@@ -31,6 +32,8 @@
 
 namespace ORB_SLAM3 {
 class Pinhole : public GeometricCamera {
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
   friend class boost::serialization::access;
 
   template <class Archive>

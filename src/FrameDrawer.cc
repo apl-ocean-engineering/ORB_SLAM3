@@ -332,13 +332,12 @@ void FrameDrawer::Update(const std::shared_ptr<Tracking> &pTracker) {
   mvCurrentKeys = pTracker->mCurrentFrame->mvKeys;
   mThDepth = pTracker->mCurrentFrame->mThDepth;
   mvCurrentDepth = pTracker->mCurrentFrame->mvDepth;
+  size_t N = mvCurrentKeys.size();
 
   if (both) {
     mvCurrentKeysRight = pTracker->mCurrentFrame->mvKeysRight;
     pTracker->mImRight.copyTo(mImRight);
-    N = mvCurrentKeys.size() + mvCurrentKeysRight.size();
-  } else {
-    N = mvCurrentKeys.size();
+    N += mvCurrentKeysRight.size();
   }
 
   mvbVO = vector<bool>(N, false);
@@ -367,7 +366,7 @@ void FrameDrawer::Update(const std::shared_ptr<Tracking> &pTracker) {
     mvIniMatches = pTracker->mvIniMatches;
 
   } else if (pTracker->mLastProcessedState == Tracking::OK) {
-    for (int i = 0; i < N; i++) {
+    for (size_t i = 0; i < N; i++) {
       MapPoint *pMP = pTracker->mCurrentFrame->mvpMapPoints.at(i);
       if (pMP) {
         if (!pTracker->mCurrentFrame->mvbOutlier[i]) {

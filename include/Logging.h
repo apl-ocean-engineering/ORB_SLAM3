@@ -25,9 +25,117 @@
 
 #include <memory>
 #include <string>
+#include <utility>
 
 namespace ORB_SLAM3 {
 
+class Logger {
+ public:
+  static std::shared_ptr<Logger> &get_instance(
+      const std::shared_ptr<spdlog::logger> &logger_in = nullptr) {
+    static std::shared_ptr<Logger> s_logger(init(logger_in));
+    if ((logger_in) && (logger_in != s_logger->logger_))
+      s_logger->logger_ = logger_in;
+    return s_logger;
+  }
+
+  static std::shared_ptr<spdlog::logger> &get_logger() {
+    return Logger::get_instance()->logger_;
+  }
+
+  static void set_logger(const std::shared_ptr<spdlog::logger> &s) {
+    Logger::get_instance(s);
+  }
+
+  static void add_sink(const spdlog::sink_ptr &s) {
+    // n.b. per the spdlog documentation, this is _not_ thread safe
+    Logger::get_logger()->sinks().push_back(s);
+  }
+
+  ~Logger() {}
+
+ private:
+  static std::shared_ptr<Logger> init(
+      const std::shared_ptr<spdlog::logger> &logger_in = nullptr) {
+    // Use new to access private constructor
+    return std::shared_ptr<Logger>(new Logger(logger_in));
+  }
+
+  explicit Logger(const std::shared_ptr<spdlog::logger> &l = nullptr)
+      : logger_(l) {
+    if (!logger_) {
+      logger_ = std::make_shared<spdlog::logger>("orbslam3");
+      spdlog::register_logger(logger_);
+    }
+  }
+
+  std::shared_ptr<spdlog::logger> logger_;
+
+  Logger(const Logger &) = delete;
+  Logger &operator=(const Logger &) = delete;
+};
+
+// Convenience wrappers around "oslog::"
+namespace oslog {
+using spdlog::format_string_t;
+using spdlog::source_loc;
+
+template <typename... Args>
+inline void log(source_loc source, spdlog::level::level_enum lvl,
+                format_string_t<Args...> fmt, Args &&...args) {
+  Logger::get_logger()->log(source, lvl, fmt, std::forward<Args>(args)...);
+}
+
+template <typename... Args>
+inline void log(spdlog::level::level_enum lvl, format_string_t<Args...> fmt,
+                Args &&...args) {
+  Logger::get_logger()->log(source_loc{}, lvl, fmt,
+                            std::forward<Args>(args)...);
+}
+
+template <typename... Args>
+inline void trace(format_string_t<Args...> fmt, Args &&...args) {
+  Logger::get_logger()->trace(fmt, std::forward<Args>(args)...);
+}
+
+template <typename... Args>
+inline void debug(format_string_t<Args...> fmt, Args &&...args) {
+  Logger::get_logger()->debug(fmt, std::forward<Args>(args)...);
+}
+
+template <typename... Args>
+inline void info(format_string_t<Args...> fmt, Args &&...args) {
+  Logger::get_logger()->info(fmt, std::forward<Args>(args)...);
+}
+
+template <typename... Args>
+inline void warn(format_string_t<Args...> fmt, Args &&...args) {
+  Logger::get_logger()->warn(fmt, std::forward<Args>(args)...);
+}
+
+template <typename... Args>
+inline void error(format_string_t<Args...> fmt, Args &&...args) {
+  Logger::get_logger()->error(fmt, std::forward<Args>(args)...);
+}
+
+template <typename... Args>
+inline void critical(format_string_t<Args...> fmt, Args &&...args) {
+  Logger::get_logger()->critical(fmt, std::forward<Args>(args)...);
+}
+
+template <typename T>
+inline void log(source_loc source, spdlog::level::level_enum lvl,
+                const T &msg) {
+  Logger::get_logger()->log(source, lvl, msg);
+}
+
+template <typename T>
+inline void log(spdlog::level::level_enum lvl, const T &msg) {
+  Logger::get_logger()->log(lvl, msg);
+}
+}  // namespace oslog
+
+// Old logging framework for compatibility
 class Verbose {
  public:
   enum eLevel {
@@ -44,29 +152,24 @@ class Verbose {
   static void PrintMess(std::string str, eLevel lev) {
     switch (lev) {
       case VERBOSITY_DEBUG:
-        spdlog::debug("{}", str);
+        oslog::debug("{}", str);
         break;
       case VERBOSITY_VERY_VERBOSE:
-        spdlog::debug("{}", str);
+        oslog::debug("{}", str);
         break;
       case VERBOSITY_VERBOSE:
-        spdlog::info("{}", str);
+        oslog::info("{}", str);
         break;
       case VERBOSITY_NORMAL:
-        spdlog::error("{}", str);
+        oslog::error("{}", str);
         break;
       case VERBOSITY_QUIET:
-        spdlog::critical("{}", str);
+        oslog::critical("{}", str);
         break;
     }
   }
 
   static void SetTh(eLevel _th) {}
-
-  static void set_default_logger(
-      const std::shared_ptr<spdlog::logger>& logger) {
-    spdlog::set_default_logger(logger);
-  }
 };
 
 }  // namespace ORB_SLAM3

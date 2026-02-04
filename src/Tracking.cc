@@ -79,6 +79,7 @@ Tracking::Tracking(const std::shared_ptr<System>& pSys,
       mnFirstFrameId(0),
       mpCamera2(nullptr),
       mpLastKeyFrame(),
+      mThDepth(1.0),
       initID(0),
       lastID(0),
       mbInitWith3KFs(false),
@@ -87,15 +88,15 @@ Tracking::Tracking(const std::shared_ptr<System>& pSys,
 
   {
     vector<std::shared_ptr<GeometricCamera>> vpCams = mpAtlas->GetAllCameras();
-    spdlog::debug("There are {} cameras in the atlas", vpCams.size());
+    oslog::debug("There are {} cameras in the atlas", vpCams.size());
 
     for (auto const& pCam : vpCams) {
       if (pCam->GetType() == GeometricCamera::CAM_PINHOLE) {
-        spdlog::debug("Camera {} is pinhole", pCam->GetId());
+        oslog::debug("Camera {} is pinhole", pCam->GetId());
       } else if (pCam->GetType() == GeometricCamera::CAM_FISHEYE) {
-        spdlog::debug("Camera {} is fisheye", pCam->GetId());
+        oslog::debug("Camera {} is fisheye", pCam->GetId());
       } else {
-        spdlog::debug("Camera {} is unknown", pCam->GetId());
+        oslog::debug("Camera {} is unknown", pCam->GetId());
       }
     }
   }
@@ -156,33 +157,46 @@ double calcDeviation(vector<int> v_values, double average) {
 
 void Tracking::LocalMapStats2File() {
   ofstream f;
-  f.open("LocalMapTimeStats.txt");
-  f << fixed << setprecision(6);
-  f << "#Stereo rect[ms], MP culling[ms], MP creation[ms], LBA[ms], KF "
-       "culling[ms], Total[ms]"
-    << endl;
-  for (int i = 0; i < mpLocalMapper->vdLMTotal_ms.size(); ++i) {
-    f << mpLocalMapper->vdKFInsert_ms[i] << ","
-      << mpLocalMapper->vdMPCulling_ms[i] << ","
-      << mpLocalMapper->vdMPCreation_ms[i] << ","
-      << mpLocalMapper->vdLBASync_ms[i] << ","
-      << mpLocalMapper->vdKFCullingSync_ms[i] << ","
-      << mpLocalMapper->vdLMTotal_ms[i] << endl;
-  }
 
-  f.close();
-
-  f.open("LBA_Stats.txt");
-  f << fixed << setprecision(6);
-  f << "#LBA time[ms], KF opt[#], KF fixed[#], MP[#], Edges[#]" << endl;
-  for (int i = 0; i < mpLocalMapper->vdLBASync_ms.size(); ++i) {
-    f << mpLocalMapper->vdLBASync_ms[i] << "," << mpLocalMapper->vnLBA_KFopt[i]
-      << "," << mpLocalMapper->vnLBA_KFfixed[i] << ","
-      << mpLocalMapper->vnLBA_MPs[i] << "," << mpLocalMapper->vnLBA_edges[i]
+  try {
+    f.open("LocalMapTimeStats.txt");
+    f << fixed << setprecision(6);
+    f << "#Stereo rect[ms], MP culling[ms], MP creation[ms], LBA[ms], KF "
+         "culling[ms], Total[ms]"
       << endl;
+    for (size_t i = 0; i < mpLocalMapper->vdLMTotal_ms.size(); ++i) {
+      f << mpLocalMapper->vdKFInsert_ms.at(i) << ","
+        << mpLocalMapper->vdMPCulling_ms.at(i) << ","
+        << mpLocalMapper->vdMPCreation_ms.at(i) << ","
+        << mpLocalMapper->vdLBASync_ms.at(i) << ","
+        << mpLocalMapper->vdKFCullingSync_ms.at(i) << ","
+        << mpLocalMapper->vdLMTotal_ms.at(i) << endl;
+
+      f.close();
+    }
+  } catch (const std::out_of_range& ex) {
+    oslog::error("[Tracking::LocalMapStats2File] Caught exception: {}",
+                 ex.what());
+    f.close();
   }
 
-  f.close();
+  try {
+    f.open("LBA_Stats.txt");
+    f << fixed << setprecision(6);
+    f << "#LBA time[ms], KF opt[#], KF fixed[#], MP[#], Edges[#]" << endl;
+    for (size_t i = 0; i < mpLocalMapper->vdLBASync_ms.size(); ++i) {
+      f << mpLocalMapper->vdLBASync_ms.at(i) << ","
+        << mpLocalMapper->vnLBA_KFopt.at(i) << ","
+        << mpLocalMapper->vnLBA_KFfixed.at(i) << ","
+        << mpLocalMapper->vnLBA_MPs.at(i) << ","
+        << mpLocalMapper->vnLBA_edges.at(i) << endl;
+    }
+    f.close();
+  } catch (const std::out_of_range& ex) {
+    oslog::error("[Tracking::LocalMapStats2File] Caught exception: {}",
+                 ex.what());
+    f.close();
+  }
 }
 
 void Tracking::TrackStats2File() {
@@ -224,10 +238,15 @@ void Tracking::TrackStats2File() {
       imu_preint = vdIMUInteg_ms[i];
     }
 
-    f << stereo_rect << "," << resize_image << "," << vdORBExtract_ms[i] << ","
-      << stereo_match << "," << imu_preint << "," << vdPosePred_ms[i] << ","
-      << vdLMTrack_ms[i] << "," << vdNewKF_ms[i] << "," << vdTrackTotal_ms[i]
-      << endl;
+    try {
+      f << stereo_rect << "," << resize_image << "," << vdORBExtract_ms.at(i)
+        << "," << stereo_match << "," << imu_preint << ","
+        << vdPosePred_ms.at(i) << "," << vdLMTrack_ms.at(i) << ","
+        << vdNewKF_ms.at(i) << "," << vdTrackTotal_ms.at(i) << endl;
+    } catch (const std::out_of_range& ex) {
+      oslog::error("[Tracking::TrackStats2File] Caught exception: {}",
+                   ex.what());
+    }
   }
 
   f.close();
@@ -314,7 +333,7 @@ void Tracking::PrintTimeStats() {
   f << "Total Tracking: " << average << " +/- " << deviation << std::endl;
 
   // Local Mapping time stats
-  std::cout << std::endl << std::endl << std::endl;
+  std::cout << std::endl << std::endl;
   std::cout << "Local Mapping" << std::endl << std::endl;
   f << std::endl << "Local Mapping" << std::endl << std::endl;
 
@@ -385,6 +404,7 @@ void Tracking::PrintTimeStats() {
   // Map complexity
   std::cout << "---------------------------" << std::endl;
   std::cout << std::endl << "Map complexity" << std::endl;
+  std::cout << "Num maps  : " << mpAtlas->CountMaps() << std::endl;
   std::cout << "KFs in map: " << mpAtlas->GetAllKeyFrames().size() << std::endl;
   std::cout << "MPs in map: " << mpAtlas->GetAllMapPoints().size() << std::endl;
   f << "---------------------------" << std::endl;
@@ -402,9 +422,9 @@ void Tracking::PrintTimeStats() {
   f << "MPs in map: " << pBestMap->GetAllMapPoints().size() << std::endl;
 
   f << "---------------------------" << std::endl;
-  f << std::endl << "Place Recognition (mean +/- std)" << std::endl;
+  f << std::endl << "## Place Recognition (mean +/- std)" << std::endl;
   std::cout << "---------------------------" << std::endl;
-  std::cout << std::endl << "Place Recognition (mean +/- std)" << std::endl;
+  std::cout << std::endl << "## Place Recognition (mean +/- std)" << std::endl;
   average = calcAverage(mpLoopClosing->vdDataQuery_ms);
   deviation = calcDeviation(mpLoopClosing->vdDataQuery_ms, average);
   f << "Database Query: " << average << " +/- " << deviation << std::endl;
@@ -424,8 +444,8 @@ void Tracking::PrintTimeStats() {
             << std::endl
             << std::endl;
 
-  f << std::endl << "Loop Closing (mean +/- std)" << std::endl;
-  std::cout << std::endl << "Loop Closing (mean +/- std)" << std::endl;
+  f << std::endl << "## Loop Closing (mean +/- std)" << std::endl;
+  std::cout << std::endl << "## Loop Closing (mean +/- std)" << std::endl;
   average = calcAverage(mpLoopClosing->vdLoopFusion_ms);
   deviation = calcDeviation(mpLoopClosing->vdLoopFusion_ms, average);
   f << "Loop Fusion: " << average << " +/- " << deviation << std::endl;
@@ -451,8 +471,8 @@ void Tracking::PrintTimeStats() {
   std::cout << "Number of KFs: " << average << " +/- " << deviation
             << std::endl;
 
-  f << std::endl << "Map Merging (mean +/- std)" << std::endl;
-  std::cout << std::endl << "Map Merging (mean +/- std)" << std::endl;
+  f << std::endl << "## Map Merging (mean +/- std)" << std::endl;
+  std::cout << std::endl << "## Map Merging (mean +/- std)" << std::endl;
   average = calcAverage(mpLoopClosing->vdMergeMaps_ms);
   deviation = calcDeviation(mpLoopClosing->vdMergeMaps_ms, average);
   f << "Merge Maps: " << average << " +/- " << deviation << std::endl;
@@ -487,8 +507,8 @@ void Tracking::PrintTimeStats() {
   std::cout << "Number of MPs: " << average << " +/- " << deviation
             << std::endl;
 
-  f << std::endl << "Full GBA (mean +/- std)" << std::endl;
-  std::cout << std::endl << "Full GBA (mean +/- std)" << std::endl;
+  f << std::endl << "## Full GBA (mean +/- std)" << std::endl;
+  std::cout << std::endl << "## Full GBA (mean +/- std)" << std::endl;
   average = calcAverage(mpLoopClosing->vdGBA_ms);
   deviation = calcDeviation(mpLoopClosing->vdGBA_ms, average);
   f << "GBA: " << average << " +/- " << deviation << std::endl;
@@ -535,6 +555,8 @@ void Tracking::newParameterLoader(const std::shared_ptr<Settings>& settings) {
 
   if (settings->needToUndistort()) {
     mDistCoef = settings->camera1DistortionCoef();
+
+    // std::cout << "[Tracking::newParameterLoader] " << mDistCoef << endl;
   } else {
     mDistCoef = cv::Mat::zeros(4, 1, CV_32F);
   }
@@ -581,6 +603,8 @@ void Tracking::newParameterLoader(const std::shared_ptr<Settings>& settings) {
   mMinFrames = 0;
   mMaxFrames = settings->fps();
   mbRGB = settings->rgb();
+
+  mnFramesToResetIMU = mMaxFrames;
 
   {
     // ORB parameters
@@ -692,8 +716,8 @@ Sophus::SE3f Tracking::GrabImageStereo(const cv::Mat& imRectLeft,
   std::chrono::steady_clock::time_point t_post_track =
       std::chrono::steady_clock::now();
 
-  spdlog::info(
-      "Tracking::GrabImageStereo Elapsed time (ms): image_conversion {:.4}, "
+  oslog::info(
+      "[Tracking::GrabImageStereo] Elapsed time (ms): image_conversion {:.4}, "
       "frame_creation {:.4}, track {:.4}",
       std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(
           t_post_image_conversion - t_start)
@@ -850,7 +874,7 @@ void Tracking::PreintegrateIMU() {
 
   const int n = mvImuFromLastFrame.size() - 1;
   if (n == 0) {
-    spdlog::warn("Empty IMU measurements vector!!!");
+    oslog::warn("Empty IMU measurements vector!!!");
     return;
   }
 
@@ -899,7 +923,7 @@ void Tracking::PreintegrateIMU() {
     }
 
     if (!mpImuPreintegratedFromLastKF)
-      spdlog::warn("mpImuPreintegratedFromLastKF does not exist");
+      oslog::warn("mpImuPreintegratedFromLastKF does not exist");
     mpImuPreintegratedFromLastKF->IntegrateNewMeasurement(acc, angVel, tstep);
     pImuPreintegratedFromLastFrame->IntegrateNewMeasurement(acc, angVel, tstep);
   }
@@ -913,7 +937,7 @@ void Tracking::PreintegrateIMU() {
 
 bool Tracking::PredictStateIMU() {
   if (!mCurrentFrame->mpPrevFrame) {
-    spdlog::debug("[Tracking::PredictStateIMU] No last frame");
+    oslog::debug("[Tracking::PredictStateIMU] No last frame");
     return false;
   }
 
@@ -981,25 +1005,25 @@ void Tracking::Track() {
       std::chrono::steady_clock::now();
 
   if (bStepByStep) {
-    spdlog::trace("Tracking: Waiting to the next step");
+    oslog::trace("Tracking: Waiting to the next step");
     while (!mbStep && bStepByStep) usleep(500);
     mbStep = false;
   }
 
   if (mpLocalMapper->mbBadImu) {
-    spdlog::info("TRACK: Reset map because local mapper set the bad imu flag ");
+    oslog::info("TRACK: Reset map because local mapper set the bad imu flag ");
     mpSystem->ResetActiveMap();
     return;
   }
 
-  std::shared_ptr<Map> pCurrentMap = mpAtlas->GetCurrentMap();
+  auto pCurrentMap = mpAtlas->GetCurrentMap();
   if (!pCurrentMap) {
-    spdlog::error("ERROR: There is not an active map in the atlas");
+    oslog::error("ERROR: There is not an active map in the atlas");
   }
 
   if (mState != NO_IMAGES_YET) {
     if (mLastFrame->mTimeStamp > mCurrentFrame->mTimeStamp) {
-      spdlog::error(
+      oslog::error(
           "ERROR: Frame with a timestamp older than previous frame detected!");
       unique_lock<mutex> lock(mMutexImuQueue);
       mlQueueImuData.clear();
@@ -1011,7 +1035,7 @@ void Tracking::Track() {
       // mCurrentFrame->mnId << endl;
       if (mpAtlas->isInertial()) {
         if (mpAtlas->isImuInitialized()) {
-          spdlog::warn(
+          oslog::warn(
               "Timestamp jump detected. State set to LOST. resetting IMU "
               "integration...");
 
@@ -1021,7 +1045,7 @@ void Tracking::Track() {
             CreateMapInAtlas();
           }
         } else {
-          spdlog::warn(
+          oslog::warn(
               "Timestamp jump detected, before IMU initialization. "
               "resetting...");
           mpSystem->ResetActiveMap();
@@ -1114,13 +1138,13 @@ void Tracking::Track() {
 
         if ((!mbVelocity && !pCurrentMap->isImuInitialized()) ||
             mCurrentFrame->mnId < mnLastRelocFrameId + 2) {
-          spdlog::info("TRACK: Track with respect to the reference KF");
+          oslog::info("TRACK: Track with respect to the reference KF");
           bOK = TrackReferenceKeyFrame();
         } else {
-          spdlog::info("TRACK: Track with motion model");
+          oslog::info("TRACK: Track with motion model");
           bOK = TrackWithMotionModel();
           if (!bOK) {
-            spdlog::info(
+            oslog::info(
                 "TRACK:  ... motion model failed, falling back to reference "
                 "key frame");
             bOK = TrackReferenceKeyFrame();
@@ -1128,7 +1152,7 @@ void Tracking::Track() {
         }
 
         if (!bOK) {
-          spdlog::info("TRACK:   Tracking still bad, I am lost!");
+          oslog::info("TRACK:   Tracking still bad, I am lost!");
           if (mCurrentFrame->mnId <=
                   (mnLastRelocFrameId + mnFramesToResetIMU) &&
               mSensor.isImu()) {
@@ -1142,7 +1166,7 @@ void Tracking::Track() {
         }
       } else {
         if (mState == RECENTLY_LOST) {
-          spdlog::info("Lost for a short time");
+          oslog::info("Lost for a short time");
 
           bOK = true;
           if (mSensor.isImu()) {
@@ -1154,7 +1178,7 @@ void Tracking::Track() {
             if (mCurrentFrame->mTimeStamp - mTimeStampLost >
                 time_recently_lost) {
               mState = LOST;
-              spdlog::info("Track Lost...");
+              oslog::info("Track Lost...");
               bOK = false;
             }
           } else {
@@ -1165,16 +1189,16 @@ void Tracking::Track() {
             // "mTimeStampLost:" << to_string(mTimeStampLost) << std::endl;
             if (mCurrentFrame->mTimeStamp - mTimeStampLost > 3.0f && !bOK) {
               mState = LOST;
-              spdlog::info("Track Lost...");
+              oslog::info("Track Lost...");
               bOK = false;
             }
           }
         } else if (mState == LOST) {
-          spdlog::info("A new map is started...");
+          oslog::info("A new map is started...");
 
           if (pCurrentMap->KeyFramesInMap() < 10) {
             mpSystem->ResetActiveMap();
-            spdlog::info("resetting current map...");
+            oslog::info("resetting current map...");
           } else {
             CreateMapInAtlas();
           }
@@ -1185,7 +1209,7 @@ void Tracking::Track() {
         }
       }
 
-      spdlog::info(
+      oslog::info(
           "[Tracking::Track] !mbOnlyTracking  {} ms ",
           std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(
               std::chrono::steady_clock::now() - t_before_track)
@@ -1202,7 +1226,7 @@ void Tracking::Track() {
         bOK = Relocalization();
       } else {
         if (!mbVO) {
-          spdlog::info("[Track::Track] Tracked enough map points");
+          oslog::info("[Track::Track] Tracked enough map points");
           // In last frame we tracked enough MapPoints in the map
           if (mbVelocity) {
             bOK = TrackWithMotionModel();
@@ -1212,7 +1236,7 @@ void Tracking::Track() {
           }
 
         } else {
-          spdlog::info("[Track::Track] Tracked mostly VO points");
+          oslog::info("[Track::Track] Tracked mostly VO points");
 
           // In last frame we tracked mainly "visual odometry" points.
 
@@ -1250,7 +1274,7 @@ void Tracking::Track() {
             mbVO = false;
           }
 
-          spdlog::info(
+          oslog::info(
               "[Track::Track] Tracking status Reloc {}, Motion model {}",
               (bOKReloc ? "GOOD" : "BAD"), (bOKMM ? "GOOD" : "BAD"));
 
@@ -1258,7 +1282,7 @@ void Tracking::Track() {
         }
       }
 
-      spdlog::info(
+      oslog::info(
           "[Tracking::Track]  {} ms ",
           std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(
               std::chrono::steady_clock::now() - t_before_track)
@@ -1289,7 +1313,7 @@ void Tracking::Track() {
       if (bOK) {
         bOK = TrackLocalMap();
       }
-      if (!bOK) spdlog::warn("Fail to track local map!");
+      if (!bOK) oslog::warn("Fail to track local map!");
     } else {
       // mbVO true means that there are few matches to MapPoints in the map. We
       // cannot retrieve a local map and therefore we do not perform
@@ -1299,8 +1323,8 @@ void Tracking::Track() {
     }
 
 #ifdef REGISTER_TIMES
-    spdlog::info(
-        "[Tracking::Track] TrackLocalMap  {} ms ",
+    oslog::info(
+        "[Tracking::Track] TrackLocalMap took {} ms ",
         std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(
             std::chrono::steady_clock::now() - time_StartLMTrack)
             .count());
@@ -1309,12 +1333,12 @@ void Tracking::Track() {
     if (bOK) {
       mState = OK;
     } else if (mState == OK) {
-      spdlog::info("[Tracking::Track] TrackLocalMap() not OK");
+      oslog::info("[Tracking::Track] TrackLocalMap() not OK");
       if (mSensor.isImu()) {
-        spdlog::info("Track lost for less than one second...");
+        oslog::info("Track lost for less than one tick...");
         if (!pCurrentMap->isImuInitialized() ||
             !pCurrentMap->GetInertialBA2()) {
-          spdlog::info(
+          oslog::info(
               "IMU is not or recently initialized. resetting active map...");
           mpSystem->ResetActiveMap();
         }
@@ -1336,7 +1360,7 @@ void Tracking::Track() {
     if ((mCurrentFrame->mnId < (mnLastRelocFrameId + mnFramesToResetIMU)) &&
         (mCurrentFrame->mnId > mnFramesToResetIMU) && mSensor.isImu() &&
         pCurrentMap->isImuInitialized()) {
-      spdlog::info("Saving pointer to frame. imu needs reset...");
+      oslog::info("Saving pointer to frame. imu needs reset...");
 
       // \todo{} check this situation.  This is a deep copy
       std::shared_ptr<Frame> pF = std::make_shared<Frame>(*mCurrentFrame);
@@ -1354,7 +1378,7 @@ void Tracking::Track() {
     if (pCurrentMap->isImuInitialized()) {
       if (bOK) {
         if (mCurrentFrame->mnId == (mnLastRelocFrameId + mnFramesToResetIMU)) {
-          spdlog::warn("resetting FRAME!!!");
+          oslog::warn("resetting FRAME!!!");
           ResetFrameIMU();
         } else if (mCurrentFrame->mnId > (mnLastRelocFrameId + 30)) {
           mLastBias = mCurrentFrame->mImuBias;
@@ -1454,7 +1478,7 @@ void Tracking::Track() {
 
       if (mSensor.isImu()) {
         if (!pCurrentMap->isImuInitialized()) {
-          spdlog::warn("Track lost before IMU initialisation, resetting...");
+          oslog::warn("Track lost before IMU initialisation, resetting...");
           mpSystem->ResetActiveMap();
           return;
         }
@@ -1500,18 +1524,24 @@ void Tracking::Track() {
 }
 
 void Tracking::StereoInitialization() {
+  oslog::info("[Tracking::StereoInitialization]");
+
   if (mCurrentFrame->N > 500) {
+    oslog::info(
+        "[Tracking::StereoInitialization] Initializing map with {} points",
+        mCurrentFrame->N);
+
     if (mSensor == SensorType::IMU_STEREO || mSensor == SensorType::IMU_RGBD) {
       if (!mCurrentFrame->mpImuPreintegrated ||
           !mLastFrame->mpImuPreintegrated) {
-        spdlog::warn("No IMU measurements to initialize this map");
+        oslog::warn("No IMU measurements to initialize this map");
         return;
       }
 
       if (!mFastInit && (mCurrentFrame->mpImuPreintegratedFrame->avgA -
                          mLastFrame->mpImuPreintegratedFrame->avgA)
                                 .norm() < 0.5) {
-        spdlog::warn("not enough acceleration to initialize");
+        oslog::warn("not enough acceleration to initialize");
         return;
       }
 
@@ -1540,8 +1570,12 @@ void Tracking::StereoInitialization() {
 
     // Create MapPoints and asscoiate to KeyFrame
     if (!mpCamera2) {
+      oslog::debug(
+          "[Tracking::StereoInitialization] No camera2, checking {} points",
+          mCurrentFrame->N);
+
       for (int i = 0; i < mCurrentFrame->N; i++) {
-        float z = mCurrentFrame->mvDepth[i];
+        const float z = mCurrentFrame->mvDepth[i];
         if (z > 0) {
           Eigen::Vector3f x3D;
           mCurrentFrame->UnprojectStereo(i, x3D);
@@ -1557,8 +1591,12 @@ void Tracking::StereoInitialization() {
         }
       }
     } else {
+      oslog::info(
+          "[Tracking::StereoInitialization] Have camera2, checking {} points",
+          mCurrentFrame->Nleft);
       for (int i = 0; i < mCurrentFrame->Nleft; i++) {
         int rightIndex = mCurrentFrame->mvLeftToRightMatch[i];
+        oslog::info("{} {}", i, rightIndex);
         if (rightIndex != -1) {
           Eigen::Vector3f x3D = mCurrentFrame->mvStereo3Dpoints[i];
 
@@ -1582,9 +1620,10 @@ void Tracking::StereoInitialization() {
       }
     }
 
-    Verbose::PrintMess("New Map created with " +
-                           to_string(mpAtlas->MapPointsInMap()) + " points",
-                       Verbose::VERBOSITY_QUIET);
+    Verbose::PrintMess(
+        "[Tracking::StereoInitialization] New Map created with " +
+            to_string(mpAtlas->MapPointsInMap()) + " points",
+        Verbose::VERBOSITY_QUIET);
 
     // cout << "Active map: " << mpAtlas->GetCurrentMap()->GetId() << endl;
 
@@ -1607,6 +1646,10 @@ void Tracking::StereoInitialization() {
     mpMapDrawer->SetCurrentCameraPose(mCurrentFrame->GetPose());
 
     mState = OK;
+  } else {
+    oslog::info(
+        "[Tracking::StereoInitialization] Frame has {} points, not enough to "
+        "initialize map");
   }
 }
 
@@ -1820,7 +1863,7 @@ void Tracking::CreateMapInAtlas() {
   mbVelocity = false;
   // mnLastRelocFrameId = mnLastInitFrameId; // The last relocation KF_id is the
   // current id, because it is the new starting point for new map
-  spdlog::debug("First frame id in map: {}", to_string(mnLastInitFrameId + 1));
+  oslog::debug("First frame id in map: {}", to_string(mnLastInitFrameId + 1));
   mbVO = false;  // Init value for know if there are enough MapPoints in the
                  // last KF
 
@@ -1867,10 +1910,10 @@ bool Tracking::TrackReferenceKeyFrame() {
   int nmatches =
       matcher.SearchByBoW(mpReferenceKF, mCurrentFrame, vpMapPointMatches);
 
-  spdlog::debug("Tracking::TrackReferenceKeyFrame:  Got {} matches", nmatches);
+  oslog::debug("Tracking::TrackReferenceKeyFrame:  Got {} matches", nmatches);
 
   if (nmatches < 15) {
-    spdlog::warn("TRACK_REF_KF: Less than 15 matches!!");
+    oslog::warn("TRACK_REF_KF: Less than 15 matches!!");
     return false;
   }
 
@@ -2001,30 +2044,37 @@ bool Tracking::TrackWithMotionModel() {
   // Project points seen in previous frame
   int th;
 
-  // if(mSensor==SensorType::STEREO)
-  //     th=7;
-  // else
-  th = 15;
+  if (mSensor == SensorType::STEREO)
+    th = 7;
+  else
+    th = 15;
 
   int nmatches = matcher.SearchByProjection(mCurrentFrame, mLastFrame, th,
                                             mSensor.isMonocular());
 
-  spdlog::info("Tracking::TrackWithMotionModel found {}  matches in first pass",
-               nmatches);
+  oslog::debug(
+      "[Tracking::TrackWithMotionModel] found {} matches in first pass",
+      nmatches);
 
   // If few matches, uses a wider window search
   if (nmatches < 20) {
-    spdlog::info("Not enough matches, wider window search!!");
+    oslog::info(
+        "[Tracking::TrackWithMotionModel] Not enough matches, wider window "
+        "search!!");
     fill(mCurrentFrame->mvpMapPoints.begin(), mCurrentFrame->mvpMapPoints.end(),
          static_cast<MapPoint*>(NULL));
 
     nmatches = matcher.SearchByProjection(mCurrentFrame, mLastFrame, 2 * th,
                                           mSensor.isMonocular());
-    spdlog::debug("Matches with wider search: {}", to_string(nmatches));
+    oslog::debug(
+        "[Tracking::TrackWithMotionModel] Matches with wider search: {}",
+        to_string(nmatches));
   }
 
   if (nmatches < 20) {
-    spdlog::info("Not enough matches after wider search!!");
+    oslog::info(
+        "[Tracking::TrackWithMotionModel] Not enough matches after wider "
+        "search!!");
 
     if (mSensor.isImu())
       return true;
@@ -2057,11 +2107,11 @@ bool Tracking::TrackWithMotionModel() {
     }
   }
 
-  spdlog::info(
-      "Tracking::TrackWithMotionModel this led to {} matches against the map",
+  oslog::debug(
+      "[Tracking::TrackWithMotionModel] this led to {} matches against the map",
       nmatchesMap);
 
-  spdlog::info(
+  oslog::info(
       "[Tracking::TrackWithMotionModel]  {} ms ",
       std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(
           std::chrono::steady_clock::now() - t_start)
@@ -2076,8 +2126,8 @@ bool Tracking::TrackWithMotionModel() {
     return true;
   } else {
     const bool goodTracking = (nmatchesMap >= 10);
-    spdlog::info("Tracking::TrackWithMotionModel tracking is {}",
-                 (goodTracking ? "GOOD" : "BAD"));
+    oslog::info("[Tracking::TrackWithMotionModel] tracking is {}",
+                (goodTracking ? "GOOD" : "BAD"));
     return goodTracking;
   }
 }
@@ -2110,24 +2160,29 @@ bool Tracking::TrackLocalMap() {
     }
   }
 
+  oslog::info("Before optimization, {} map points, {} outliers", aux1, aux2);
+
   int inliers;
   if (!mpAtlas->isImuInitialized()) {
+    oslog::trace("[Tracking::TrackLocalMap] No IMU, conventional optimization");
     Optimizer::PoseOptimization(mCurrentFrame);
   } else {
     if (mCurrentFrame->mnId <= mnLastRelocFrameId + mnFramesToResetIMU) {
-      spdlog::info("TLM: PoseOptimization");
+      oslog::info("[Tracking::TrackLocalMap] PoseOptimization");
       Optimizer::PoseOptimization(mCurrentFrame);
     } else {
       // if(!mbMapUpdated && mState == OK) //  && (mnMatchesInliers>30))
       //
       //  && (mnMatchesInliers>30))
       if (!mbMapUpdated) {
-        spdlog::info("TLM: PoseInertialOptimizationLastFrame");
+        oslog::info(
+            "[Tracking::TrackLocalMap] PoseInertialOptimizationLastFrame");
         inliers = Optimizer::PoseInertialOptimizationLastFrame(
             mCurrentFrame);  // ,
                              // !mpLastKeyFrame->GetMap()->GetInertialBA1());
       } else {
-        spdlog::info("TLM: PoseInertialOptimizationLastKeyFrame");
+        oslog::info(
+            "[Tracking::TrackLocalMap] PoseInertialOptimizationLastKeyFrame");
         inliers = Optimizer::PoseInertialOptimizationLastKeyFrame(
             mCurrentFrame);  // ,
                              // !mpLastKeyFrame->GetMap()->GetInertialBA1());
@@ -2146,6 +2201,8 @@ bool Tracking::TrackLocalMap() {
     }
   }
 
+  oslog::info("After optimization, {} map points, {} outliers", aux1, aux2);
+
   mnMatchesInliers = 0;
 
   // Update MapPoints Statistics
@@ -2154,6 +2211,10 @@ bool Tracking::TrackLocalMap() {
       if (!mCurrentFrame->mvbOutlier[i]) {
         mCurrentFrame->mvpMapPoints[i]->IncreaseFound();
         if (!mbOnlyTracking) {
+          // if( i < 10 )
+          // oslog::debug("{}, observations {}", i ,
+          // mCurrentFrame->mvpMapPoints[i]->Observations() );
+
           if (mCurrentFrame->mvpMapPoints[i]->Observations() > 0) {
             mnMatchesInliers++;
           }
@@ -2166,13 +2227,14 @@ bool Tracking::TrackLocalMap() {
     }
   }
 
-  spdlog::info("mnMatchesInliers: {}", mnMatchesInliers);
+  oslog::debug("[Tracking::TrackLocalMap] mnMatchesInliers: {}",
+               mnMatchesInliers);
 
   std::chrono::steady_clock::time_point t_end =
       std::chrono::steady_clock::now();
 
-  spdlog::info(
-      "Tracking::TrackLocalMap Elapsed time: Update local map {:.4}, search "
+  oslog::info(
+      "[Tracking::TrackLocalMap] Elapsed time: Update local map {:.4}, search "
       "local points {:.4}, pose optimization {:.4} everything else {:.4}",
       std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(
           t_post_update_local_map - t_start)
@@ -2235,7 +2297,9 @@ bool Tracking::NeedNewKeyFrame() {
   if (mpLocalMapper->isStopped() || mpLocalMapper->stopRequested()) {
     /*if(mSensor == SensorType::MONOCULAR)
     {*/
-    spdlog::info("NeedNewKeyFrame: Not adding KF because localmap is stopped");
+    oslog::info(
+        "[Tracking::NeedNewKeyFrame] Not adding KF because localmap is "
+        "stopped");
 
     return false;
   }
@@ -2264,9 +2328,9 @@ bool Tracking::NeedNewKeyFrame() {
   int nTrackedClose = 0;
 
   if (!mSensor.isMonocular()) {
-    const int N =
+    const size_t N =
         (mCurrentFrame->Nleft == -1) ? mCurrentFrame->N : mCurrentFrame->Nleft;
-    for (int i = 0; i < N; i++) {
+    for (size_t i = 0; i < N; i++) {
       if (mCurrentFrame->mvDepth[i] > 0 &&
           mCurrentFrame->mvDepth[i] < mThDepth) {
         if (mCurrentFrame->mvpMapPoints[i] && !mCurrentFrame->mvbOutlier[i])
@@ -2275,8 +2339,9 @@ bool Tracking::NeedNewKeyFrame() {
           nNonTrackedClose++;
       }
     }
-    spdlog::info(
-        "[NEEDNEWKF]-> tracked close points: {}; non tracked close points: {}",
+    oslog::info(
+        "[Tracking::NeedNewKeyFrame] tracked close points: {}; non tracked "
+        "close points: {}",
         to_string(nTrackedClose), to_string(nNonTrackedClose));
   }
 
@@ -2307,8 +2372,10 @@ bool Tracking::NeedNewKeyFrame() {
       thRefRatio = 0.90f;
   }
 
-  spdlog::debug("mnMatchesInliers: {}; nRefMatches: {}; thRefRatio: {}",
-                mnMatchesInliers, nRefMatches, thRefRatio);
+  oslog::info(
+      "[Tracking::NeedNewKeyFrame] mnMatchesInliers: {}; nRefMatches: {}; "
+      "thRefRatio: {}",
+      mnMatchesInliers, nRefMatches, thRefRatio);
 
   // Condition 1a: More than "MaxFrames" have passed from last keyframe
   // insertion
@@ -2355,18 +2422,20 @@ bool Tracking::NeedNewKeyFrame() {
   else
     c4 = false;
 
-  std::cout << "NeedNewKF: c1a=" << c1a << "; c1b=" << c1b << "; c1c=" << c1c
-            << "; c2=" << c2 << "; c3=" << c3 << "; c4=" << c4 << std::endl;
+  oslog::debug(
+      "[Tracking::NeedNewKeyFrame] c1a={}; c1b={}; c1c={}; c2={}; c3={}; c4={}",
+      c1a, c1b, c1c, c2, c3, c4);
 
   if (((c1a || c1b || c1c) && c2) || c3 || c4) {
     // If the mapping accepts keyframes, insert keyframe.
     // Otherwise send a signal to interrupt BA
     if (bLocalMappingIdle || mpLocalMapper->IsInitializing()) {
-      std::cout << "!!! Create a new keyframe!" << std::endl;
+      oslog::info("[Tracking::NeedNewKeyFrame] !!! Create a new keyframe!");
       return true;
     } else {
-      std::cout << "!!! Want to create a new keyframe, interrupting BA"
-                << std::endl;
+      oslog::info(
+          "[Tracking::NeedNewKeyFrame] !!! Want to create a new keyframe, "
+          "interrupting BA");
       mpLocalMapper->InterruptBA();
       if (mSensor != SensorType::MONOCULAR &&
           mSensor != SensorType::IMU_MONOCULAR) {
@@ -2375,7 +2444,8 @@ bool Tracking::NeedNewKeyFrame() {
         else
           return false;
       } else {
-        std::cout << "NeedNewKeyFrame: localmap is busy" << std::endl;
+        oslog::info(
+            "[Tracking::NeedNewKeyFrame] NeedNewKeyFrame: localmap is busy");
         return false;
       }
     }
@@ -2403,7 +2473,7 @@ void Tracking::CreateNewKeyFrame() {
     pKF->mPrevKF = mpLastKeyFrame;
     mpLastKeyFrame->mNextKF = pKF;
   } else {
-    spdlog::info("No last KF in KF creation!!");
+    oslog::info("[Tracking::CreateNewKeyFrame] No last KF in KF creation!!");
   }
   // Reset preintegration from last KF (Create new object)
   if (mSensor.isImu()) {
@@ -2490,7 +2560,8 @@ void Tracking::CreateNewKeyFrame() {
           break;
         }
       }
-      spdlog::info("New stereo KF with {} points", nPoints);
+      oslog::info("[Tracking::CreateNewKeyFrame] New stereo KF with {} points",
+                  nPoints);
     }
   }
 
@@ -2543,7 +2614,7 @@ void Tracking::SearchLocalPoints() {
 
   if (nToMatch > 0) {
     ORBmatcher matcher(0.8);
-    int th = 10;
+    int th = 1;
     if (mSensor == SensorType::RGBD || mSensor == SensorType::IMU_RGBD) th = 3;
     if (mpAtlas->isImuInitialized()) {
       if (mpAtlas->GetCurrentMap()->GetInertialBA2())
@@ -2602,7 +2673,7 @@ void Tracking::UpdateLocalKeyFrames() {
 
   if (!mpAtlas->isImuInitialized() ||
       (mCurrentFrame->mnId < mnLastRelocFrameId + 2)) {
-    for (int i = 0; i < mCurrentFrame->N; i++) {
+    for (size_t i = 0; i < mCurrentFrame->N; i++) {
       MapPoint* pMP = mCurrentFrame->mvpMapPoints[i];
       if (pMP) {
         if (!pMP->isBad()) {
@@ -2618,7 +2689,7 @@ void Tracking::UpdateLocalKeyFrames() {
       }
     }
   } else {
-    for (int i = 0; i < mLastFrame->N; i++) {
+    for (size_t i = 0; i < mLastFrame->N; i++) {
       // Using lastframe since current frame has not matches yet
       if (mLastFrame->mvpMapPoints[i]) {
         MapPoint* pMP = mLastFrame->mvpMapPoints[i];
@@ -2720,7 +2791,7 @@ void Tracking::UpdateLocalKeyFrames() {
 }
 
 bool Tracking::Relocalization() {
-  spdlog::debug("[Tracking::Relocalization] Starting relocalization");
+  oslog::debug("[Tracking::Relocalization] Starting relocalization");
   // Compute Bag of Words Vector
   mCurrentFrame->ComputeBoW();
 
@@ -2731,13 +2802,12 @@ bool Tracking::Relocalization() {
       mCurrentFrame, mpAtlas->GetCurrentMap());
 
   if (vpCandidateKFs.empty()) {
-    spdlog::warn(
-        "[Tracking::Relocalization] There are no candidates keyframes");
+    oslog::warn("[Tracking::Relocalization] There are no candidates keyframes");
     return false;
   }
 
-  spdlog::info("[Tracking::Relocalization] Found {} candidate KFs",
-               vpCandidateKFs.size());
+  oslog::info("[Tracking::Relocalization] Found {} candidate KFs",
+              vpCandidateKFs.size());
 
   // We perform first an ORB matching with each candidate
   // If enough matches are found we setup a PnP solver
@@ -2762,8 +2832,8 @@ bool Tracking::Relocalization() {
     } else {
       int nmatches =
           matcher.SearchByBoW(pKF, mCurrentFrame, vvpMapPointMatches[i]);
-      spdlog::info("[Tracking::Relocalization]   kf {};  {} matches", i,
-                   nmatches);
+      oslog::info("[Tracking::Relocalization]   kf {};  {} matches", i,
+                  nmatches);
       if (nmatches < 15) {
         vbDiscarded[i] = true;
         continue;
@@ -2779,8 +2849,8 @@ bool Tracking::Relocalization() {
     }
   }
 
-  spdlog::info("[Tracking::Relocalization] ... {} candidates are plausible",
-               nCandidates);
+  oslog::info("[Tracking::Relocalization] ... {} candidates are plausible",
+              nCandidates);
 
   // Alternatively perform some iterations of P4P RANSAC
   // Until we found a camera pose supported by enough inliers
@@ -2829,7 +2899,7 @@ bool Tracking::Relocalization() {
 
         if (nGood < 10) continue;
 
-        for (int io = 0; io < mCurrentFrame->N; io++)
+        for (size_t io = 0; io < mCurrentFrame->N; io++)
           if (mCurrentFrame->mvbOutlier[io])
             mCurrentFrame->mvpMapPoints[io] = static_cast<MapPoint*>(NULL);
 
@@ -2847,7 +2917,7 @@ bool Tracking::Relocalization() {
             // many points
             if (nGood > 30 && nGood < 50) {
               sFound.clear();
-              for (int ip = 0; ip < mCurrentFrame->N; ip++) {
+              for (size_t ip = 0; ip < mCurrentFrame->N; ip++) {
                 if (mCurrentFrame->mvpMapPoints[ip])
                   sFound.insert(mCurrentFrame->mvpMapPoints[ip]);
               }
@@ -2859,7 +2929,7 @@ bool Tracking::Relocalization() {
               if (nGood + nadditional >= 50) {
                 nGood = Optimizer::PoseOptimization(mCurrentFrame);
 
-                for (int io = 0; io < mCurrentFrame->N; io++) {
+                for (size_t io = 0; io < mCurrentFrame->N; io++) {
                   if (mCurrentFrame->mvbOutlier[io])
                     mCurrentFrame->mvpMapPoints[io] = NULL;
                 }
@@ -2881,13 +2951,13 @@ bool Tracking::Relocalization() {
     return false;
   } else {
     mnLastRelocFrameId = mCurrentFrame->mnId;
-    spdlog::warn("[Tracking::Relocalization] ... Successful relocalization!!");
+    oslog::warn("[Tracking::Relocalization] ... Successful relocalization!!");
     return true;
   }
 }
 
 void Tracking::Reset(bool bLocMap) {
-  spdlog::info("System resetting");
+  oslog::info("[Tracking::Reset] System resetting");
 
   if (mpViewer) {
     mpViewer->RequestStop();
@@ -2896,16 +2966,16 @@ void Tracking::Reset(bool bLocMap) {
 
   // Reset Local Mapping
   if (!bLocMap) {
-    spdlog::debug("!! resetting Local Mapper...");
+    oslog::debug("[Tracking::Reset] !! resetting Local Mapper...");
     mpLocalMapper->RequestReset();
   }
 
   // Reset Loop Closing
-  spdlog::debug("!! resetting Loop Closing...");
+  oslog::debug("[Tracking::Reset] !! resetting Loop Closing...");
   mpLoopClosing->RequestReset();
 
   // Clear BoW Database
-  spdlog::debug("!! resetting Database...");
+  oslog::debug("[Tracking::Reset] !! resetting Database...");
   mpKeyFrameDB->clear();
 
   // Clear Map (this erase MapPoints and KeyFrames)
@@ -2934,11 +3004,11 @@ void Tracking::Reset(bool bLocMap) {
 
   if (mpViewer) mpViewer->Release();
 
-  spdlog::info("!! End resetting!");
+  oslog::info("[Tracking::Reset] !! End resetting!");
 }
 
 void Tracking::ResetActiveMap(bool bLocMap) {
-  spdlog::info("!! Active map resetting");
+  oslog::info("[Tracking::ResetActiveMap] !! Active map resetting");
   if (mpViewer) {
     mpViewer->RequestStop();
     while (!mpViewer->isStopped()) usleep(3000);
@@ -2947,16 +3017,16 @@ void Tracking::ResetActiveMap(bool bLocMap) {
   std::shared_ptr<Map> pMap(mpAtlas->GetCurrentMap());
 
   if (!bLocMap) {
-    spdlog::info("!! resetting Local Mapper...");
+    oslog::info("[Tracking::ResetActiveMap] !! resetting Local Mapper...");
     mpLocalMapper->RequestResetActiveMap(pMap);
   }
 
   // Reset Loop Closing
-  spdlog::info("!! resetting Loop Closing...");
+  oslog::info("[Tracking::ResetActiveMap] !! resetting Loop Closing...");
   mpLoopClosing->RequestResetActiveMap(pMap);
 
   // Clear BoW Database
-  spdlog::info("!! resetting Database");
+  oslog::info("[Tracking::ResetActiveMap] !! resetting Database");
   mpKeyFrameDB->clearMap(pMap);  // Only clear the active map references
 
   // Clear Map (this erase MapPoints and KeyFrames)
@@ -2992,7 +3062,7 @@ void Tracking::ResetActiveMap(bool bLocMap) {
 
     index++;
   }
-  spdlog::warn("{} frames set to lost", num_lost);
+  oslog::warn("[Tracking::ResetActiveMap] {} frames set to lost", num_lost);
 
   mlbLost = lbLost;
 
@@ -3009,7 +3079,7 @@ void Tracking::ResetActiveMap(bool bLocMap) {
 
   if (mpViewer) mpViewer->Release();
 
-  spdlog::warn("!! End resetting!");
+  oslog::warn("[Tracking::ResetActiveMap] !! End resetting!");
 }
 
 vector<MapPoint*> Tracking::GetLocalMapMPS() { return mvpLocalMapPoints; }
@@ -3164,7 +3234,7 @@ bool Tracking::Stop() {
   unique_lock<mutex> lock(mMutexStop);
   if (mbStopRequested && !mbNotStop) {
     mbStopped = true;
-    cout << "Tracking STOP" << endl;
+    oslog::info("Tracking STOP");
     return true;
   }
 

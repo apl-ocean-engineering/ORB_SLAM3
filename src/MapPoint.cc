@@ -249,7 +249,11 @@ void MapPoint::EraseObservation(const std::shared_ptr<KeyFrame>& pKF) {
 
       mObservations.erase(pKF);
 
-      if (mpRefKF == pKF) mpRefKF = mObservations.begin()->first;
+      if (mObservations.size() == 0) {
+        bBad = true;
+      } else if (mpRefKF == pKF) {
+        mpRefKF = mObservations.begin()->first;
+      }
 
       // If only 2 observations or less, discard point
       if (nObs <= 2) bBad = true;
@@ -583,11 +587,11 @@ int MapPoint::PredictScale(const float& currentDist,
 }
 
 void MapPoint::PrintObservations() {
-  cout << "MP_OBS: MP " << mnId << endl;
+  oslog::debug("MP_OBS: MP {}", mnId);
   for (auto const& [pKFi, indexes] : mObservations) {
-    int leftIndex = get<0>(indexes), rightIndex = get<1>(indexes);
-    cout << "--OBS in KF " << pKFi->mnId << " in map "
-         << pKFi->GetMap()->GetId() << endl;
+    // int leftIndex = get<0>(indexes), rightIndex = get<1>(indexes);
+    oslog::debug("--OBS in KF {} in map {}", pKFi->mnId,
+                 pKFi->GetMap()->GetId());
   }
 }
 

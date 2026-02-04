@@ -82,7 +82,8 @@ Map::~Map() {
 void Map::AddKeyFrame(const std::shared_ptr<KeyFrame>& pKF) {
   unique_lock<mutex> lock(mMutexMap);
   if (mspKeyFrames.empty()) {
-    cout << "First KF:" << pKF->mnId << "; Map init KF:" << mnInitKFid << endl;
+    oslog::info("[Map::AddKeyFrame] First KF: {}; Map init KF: {}", pKF->mnId,
+                mnInitKFid);
     mnInitKFid = pKF->mnId;
     mpKFinitial = pKF;
     mpKFlowerID = pKF;
@@ -321,6 +322,8 @@ void Map::SetLastMapChange(int currentChangeId) {
 
 void Map::PreSave(std::set<std::shared_ptr<GeometricCamera>>& spCams) {
   int nMPWithoutObs = 0;
+
+  oslog::info("[Map::PreSave] for {} map points", mspMapPoints.size());
   for (MapPoint* pMPi : mspMapPoints) {
     if (!pMPi || pMPi->isBad()) continue;
 
@@ -427,7 +430,7 @@ void Map::PostLoad(
 
   mvpKeyFrameOrigins.clear();
   mvpKeyFrameOrigins.reserve(mvBackupKeyFrameOriginsId.size());
-  for (int i = 0; i < mvBackupKeyFrameOriginsId.size(); ++i) {
+  for (size_t i = 0; i < mvBackupKeyFrameOriginsId.size(); ++i) {
     mvpKeyFrameOrigins.push_back(mpKeyFrameId[mvBackupKeyFrameOriginsId[i]]);
   }
 
