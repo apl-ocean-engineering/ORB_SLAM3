@@ -4,6 +4,12 @@
 #
 # Contains values specific to the odometry nano _in water_
 #
+# The camera intrinsics and extrinsics are specific to the "2025_05_23_aquarium_test/"
+# The calibration is taken from  "2025_04_07_hh101_calibration/"
+#
+# This calibration _WILL NOT_ work for APL pier data
+#
+# !! This configuration file includes downsampling images by a factor of 2
 
 #--------------------------------------------------------------------------------------------
 # Camera Parameters. Adjust them!
@@ -17,7 +23,6 @@ Camera.type: "PinHole"
 Camera.width: 1440
 Camera.height: 1080
 
-# This configuration file includes downsampling images by a factor of 2
 Camera.newWidth: 720
 Camera.newHeight: 540
 
@@ -43,8 +48,6 @@ Camera2.p1: -0.003977
 Camera2.p2: 0.000629
 Camera2.k3: -0.0902
 
-# Taken from Kalibr calibration _after_ aquarium but before APL pier test
-#   This is T_cn_cnm1 inverted
 Stereo.T_c1_c2: !!opencv-matrix
   rows: 4
   cols: 4

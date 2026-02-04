@@ -4,6 +4,12 @@
 #
 # Contains values specific to the odometry nano _in water_
 #
+# The camera intrinsics and extrinsics are specific to the "2025_05_23_aquarium_test/"
+# The calibration is taken from  "2025_04_07_hh101_calibration/"
+#
+# This calibration _WILL NOT_ work for APL pier data
+#
+# !! This configuration file includes downsampling images by a factor of 2
 
 #--------------------------------------------------------------------------------------------
 # Camera Parameters. Adjust them!
