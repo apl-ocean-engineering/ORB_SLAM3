@@ -33,7 +33,7 @@
 using namespace std;
 
 int main(int argc, char **argv) {
-  setupEurocCommonLogger();
+  setupEurocSpdLogger();
   spdlog::set_level(spdlog::level::debug);
 
   if (argc < 5) {
@@ -73,8 +73,7 @@ int main(int argc, char **argv) {
   auto eurocData = EuRoCData::LoadSequences(imagePaths);
 
   // Vector for tracking time statistics
-  vector<float> vTimesTrack;
-  vTimesTrack.resize(eurocData.totalImages());
+  vector<float> vTimesTrack(eurocData.totalImages());
 
   spdlog::info("------");
 
@@ -91,13 +90,12 @@ int main(int argc, char **argv) {
   auto SLAM = exSLAM.value();
 
   cv::Mat imLeft, imRight;
-  bool first = true;
+  size_t nseq = 0;
   for (auto const &seq : eurocData.mvSequences) {
-    if (!first) {
+    if (nseq > 0) {
       spdlog::info("Changing dataset");
       SLAM->ChangeDataset();
     }
-    first = false;
 
     // Seq loop
     double t_resize = 0;
@@ -151,6 +149,8 @@ int main(int argc, char **argv) {
       if (ttrack < dt) usleep((dt - ttrack) * 1e6);
       ni++;
     }
+
+    nseq++;
   }
   // Stop all threads
   SLAM->Shutdown();

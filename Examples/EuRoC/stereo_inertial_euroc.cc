@@ -34,7 +34,7 @@
 using namespace std;
 
 int main(int argc, char **argv) {
-  setupEurocCommonLogger();
+  setupEurocSpdLogger();
   spdlog::set_level(spdlog::level::info);
 
   if (argc < 5) {
@@ -91,7 +91,13 @@ int main(int argc, char **argv) {
   auto SLAM = exSLAM.value();
 
   cv::Mat imLeft, imRight;
+  size_t nseq = 0;
   for (auto const &seq : eurocData.mvSequences) {
+    if (nseq > 0) {
+      spdlog::info("Changing dataset");
+      SLAM->ChangeDataset();
+    }
+
     // Seq loop
     vector<ORB_SLAM3::IMU::Point> vImuMeas;
     double t_rect = 0.f;
@@ -182,6 +188,8 @@ int main(int argc, char **argv) {
 
       SLAM->ChangeDataset();
     }
+
+    nseq++;
   }
   // Stop all threads
   SLAM->Shutdown();
@@ -190,11 +198,11 @@ int main(int argc, char **argv) {
   if (bFileName) {
     const string kf_file = "kf_" + trajFileName + ".txt";
     const string f_file = "f_" + trajFileName + ".txt";
-    SLAM->SaveTrajectoryEuRoC(f_file);
-    SLAM->SaveKeyFrameTrajectoryEuRoC(kf_file);
+    SLAM->SaveTrajectoryTUM(f_file);
+    SLAM->SaveKeyFrameTrajectoryTUM(kf_file);
   } else {
-    SLAM->SaveTrajectoryEuRoC("CameraTrajectory.txt");
-    SLAM->SaveKeyFrameTrajectoryEuRoC("KeyFrameTrajectory.txt");
+    SLAM->SaveTrajectoryTUM("CameraTrajectory.txt");
+    SLAM->SaveKeyFrameTrajectoryTUM("KeyFrameTrajectory.txt");
   }
 
   return 0;

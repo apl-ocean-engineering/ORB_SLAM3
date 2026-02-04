@@ -32,7 +32,7 @@
 using namespace std;
 
 int main(int argc, char **argv) {
-  setupEurocCommonLogger();
+  setupEurocSpdLogger();
   spdlog::set_level(spdlog::level::info);
 
   if (argc < 5) {
@@ -72,7 +72,7 @@ int main(int argc, char **argv) {
   auto eurocData = EuRoCData::LoadSequences(imagePaths);
 
   // Vector for tracking time statistics
-  vector<float> vTimesTrack;
+  vector<float> vTimesTrack(eurocData.totalImages());
 
   cout << endl << "-------" << endl;
   cout.precision(17);
@@ -96,9 +96,14 @@ int main(int argc, char **argv) {
 
   int nseq = 0;
   for (auto const &seq : eurocData.mvSequences) {
+    if (nseq > 0) {
+      cout << "Changing the dataset" << endl;
+      SLAM->ChangeDataset();
+    }
+
     // Main loop
     cv::Mat im;
-    int ni = 0;
+    size_t ni = 0;
     for (auto const &imgSet : seq.mvImageSets) {
       cout << "=== Processing image " << ni << " of " << seq.size() << " at "
            << imgSet.mTimestamp << " ===" << endl;
@@ -159,6 +164,8 @@ int main(int argc, char **argv) {
 
       const double dt = seq.dt();
       if (ttrack < dt) usleep((dt - ttrack) * 1e6);
+
+      ni++;
     }
 
     string kf_file_submap =
@@ -168,10 +175,7 @@ int main(int argc, char **argv) {
     SLAM->SaveTrajectoryEuRoC(f_file_submap);
     SLAM->SaveKeyFrameTrajectoryEuRoC(kf_file_submap);
 
-    cout << "Changing the dataset" << endl;
     nseq++;
-
-    SLAM->ChangeDataset();
   }
   // Stop all threads
   SLAM->Shutdown();
@@ -180,11 +184,11 @@ int main(int argc, char **argv) {
   if (bFileName) {
     const string kf_file = "kf_" + trajFileName + ".txt";
     const string f_file = "f_" + trajFileName + ".txt";
-    SLAM->SaveTrajectoryEuRoC(f_file);
-    SLAM->SaveKeyFrameTrajectoryEuRoC(kf_file);
+    SLAM->SaveTrajectoryTUM(f_file);
+    SLAM->SaveKeyFrameTrajectoryTUM(kf_file);
   } else {
-    SLAM->SaveTrajectoryEuRoC("CameraTrajectory.txt");
-    SLAM->SaveKeyFrameTrajectoryEuRoC("KeyFrameTrajectory.txt");
+    SLAM->SaveTrajectoryTUM("CameraTrajectory.txt");
+    SLAM->SaveKeyFrameTrajectoryTUM("KeyFrameTrajectory.txt");
   }
 
   return 0;

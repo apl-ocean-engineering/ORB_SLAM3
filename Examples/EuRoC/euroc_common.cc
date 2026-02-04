@@ -142,7 +142,7 @@ cv::Mat ImageSet::rightImage() const {
   return cv::imread(mRightImage, cv::IMREAD_UNCHANGED);
 }
 
-void setupEurocCommonLogger() {
+void setupEurocSpdLogger() {
   auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
 
   ORB_SLAM3::Logger::add_sink(stdout_sink);

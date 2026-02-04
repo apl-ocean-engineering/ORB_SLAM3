@@ -35,7 +35,7 @@ using namespace std;
 
 double ttrack_tot = 0;
 int main(int argc, char *argv[]) {
-  setupEurocCommonLogger();
+  setupEurocSpdLogger();
   spdlog::set_level(spdlog::level::info);
 
   if (argc < 5) {
@@ -73,11 +73,8 @@ int main(int argc, char *argv[]) {
 
   auto eurocData = EuRoCData::LoadSequences(imagePaths, true);
 
-  std::setprecision(17);
-
   // Vector for tracking time statistics
-  vector<float> vTimesTrack;
-  vTimesTrack.reserve(eurocData.totalImages());
+  vector<float> vTimesTrack(eurocData.totalImages());
 
   // Create SLAM system. It initializes all system threads and gets ready to
   // process frames.
@@ -94,7 +91,13 @@ int main(int argc, char *argv[]) {
   float imageScale = SLAM->GetImageScale();
 
   cv::Mat imLeft, imRight;
+  size_t nseq = 0;
   for (auto const &seq : eurocData.mvSequences) {
+    if (nseq > 0) {
+      cout << "Changing the dataset" << endl;
+      SLAM->ChangeDataset();
+    }
+
     // Seq loop
     vector<ORB_SLAM3::IMU::Point> vImuMeas;
     double t_rect = 0.f;
@@ -159,8 +162,6 @@ int main(int argc, char *argv[]) {
       std::chrono::steady_clock::time_point t1 =
           std::chrono::steady_clock::now();
 
-      // Pass the image to the SLAM system
-      // cout << "tframe = " << tframe << endl;
       SLAM->TrackMonocular(im, imgSet.mTimestamp,
                            vImuMeas);  // TODO change to monocular_inertial
 
@@ -188,9 +189,7 @@ int main(int argc, char *argv[]) {
       ni++;
     }
 
-    cout << "Changing the dataset" << endl;
-
-    SLAM->ChangeDataset();
+    nseq++;
   }
 
   // Stop all threads
@@ -200,11 +199,11 @@ int main(int argc, char *argv[]) {
   if (bFileName) {
     const string kf_file = "kf_" + trajFileName + ".txt";
     const string f_file = "f_" + trajFileName + ".txt";
-    SLAM->SaveTrajectoryEuRoC(f_file);
-    SLAM->SaveKeyFrameTrajectoryEuRoC(kf_file);
+    SLAM->SaveTrajectoryTUM(f_file);
+    SLAM->SaveKeyFrameTrajectoryTUM(kf_file);
   } else {
-    SLAM->SaveTrajectoryEuRoC("CameraTrajectory.txt");
-    SLAM->SaveKeyFrameTrajectoryEuRoC("KeyFrameTrajectory.txt");
+    SLAM->SaveTrajectoryTUM("CameraTrajectory.txt");
+    SLAM->SaveKeyFrameTrajectoryTUM("KeyFrameTrajectory.txt");
   }
 
   return 0;

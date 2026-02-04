@@ -118,7 +118,7 @@ Viewer.ViewpointZ: -1.8
 Viewer.ViewpointF: 500.0
 Viewer.imageViewScale: 1.0
 
-Viewer.Enable: 1
+Viewer.Enable: 0
 
 
 System.SaveAtlasToFile: euroc.atlas

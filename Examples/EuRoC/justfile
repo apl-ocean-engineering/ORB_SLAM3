@@ -1,12 +1,10 @@
-# yaml-language-server: $schema=https://taskfile.dev/schema.json
 
-
+# Can be set to "gdb --args"
 launch_prefix:=''
+
 build_type:='RelWithDebInfo'
-
 orbslam_dir:=parent_directory(parent_directory(justfile_directory()))
-euroc_dir:= orbslam_dir + "/Examples/EuRoC/"
-
+euroc_dir:=orbslam_dir + "/Examples/EuRoC/"
 bin_dir:=euroc_dir + build_type
 
 vocab_file:=orbslam_dir + '/Vocabulary/ORBvoc.txt'
@@ -15,51 +13,60 @@ resize_settings_file:= euroc_dir + 'EuRoC_resize.yaml'
 
 ## Must be possible to reduce repetition
 
-mono euroc_set:
-    mkdir  -p mono_euroc
-    cd mono_euroc && \
+_mono euroc_set:
+    mkdir  -p results/mono_euroc
+    cd results/mono_euroc && \
         {{launch_prefix}} {{bin_dir}}/mono_euroc \
                 {{resize_settings_file}} \
                 {{vocab_file}}  \
-                ../EuRoC_datasets/machine_hall/{{euroc_set}}/  \
-                ../EuRoC_TimeStamps/{{euroc_set}}.txt 2>&1 | tee mono_euroc.txt
+                {{euroc_dir}}/EuRoC_datasets/machine_hall/{{euroc_set}}/  \
+                {{euroc_dir}}/EuRoC_TimeStamps/{{euroc_set}}.txt 2>&1 | tee mono_euroc.txt
 
-mono-mh01:
-    just mono MH_01_easy
-
-mono_inertial euroc_set:
-    mkdir  -p mono_inertial_euroc
-    cd mono_inertial_euroc && \
+_mono_inertial euroc_set:
+    mkdir  -p results/mono_inertial_euroc
+    cd results/mono_inertial_euroc && \
         {{launch_prefix}} {{bin_dir}}/mono_inertial_euroc \
                 {{resize_settings_file}} \
                 {{vocab_file}}  \
-                ../EuRoC_datasets/machine_hall/{{euroc_set}}/  \
-                ../EuRoC_TimeStamps/{{euroc_set}}.txt 2>&1 | tee mono_inertial_euroc.txt
+                {{euroc_dir}}/EuRoC_datasets/machine_hall/{{euroc_set}}/  \
+                {{euroc_dir}}/EuRoC_TimeStamps/{{euroc_set}}.txt 2>&1 | tee mono_inertial_euroc.txt
 
-mono-inertial-mh01:
-    just mono_inertial MH_01_easy
-
-stereo euroc_set:
-    mkdir  -p stereo_euroc
-    cd stereo_euroc && \
+_stereo euroc_set:
+    mkdir  -p results/stereo_euroc
+    cd results/stereo_euroc && \
         {{launch_prefix}} {{bin_dir}}/stereo_euroc \
                 {{resize_settings_file}} \
                 {{vocab_file}}  \
-                ../EuRoC_datasets/machine_hall/{{euroc_set}}/  \
-                ../EuRoC_TimeStamps/{{euroc_set}}.txt 2>&1 | tee stereo_euroc.txt
+                {{euroc_dir}}/EuRoC_datasets/machine_hall/{{euroc_set}}/  \
+                {{euroc_dir}}/EuRoC_TimeStamps/{{euroc_set}}.txt 2>&1 | tee stereo_euroc.txt
 
-stereo-mh01:
-    just stereo MH_01_easy
-
-
-stereo_inertial euroc_set:
-    mkdir  -p stereo_inertial_euroc
-    cd stereo_inertial_euroc && \
+_stereo_inertial euroc_set:
+    mkdir  -p results/stereo_inertial_euroc
+    cd results/stereo_inertial_euroc && \
         {{launch_prefix}} {{bin_dir}}/stereo_inertial_euroc \
                 {{resize_settings_file}} \
                 {{vocab_file}}  \
-                ../EuRoC_datasets/machine_hall/{{euroc_set}}/  \
-                ../EuRoC_TimeStamps/{{euroc_set}}.txt 2>&1 | tee stereo_inertial_euroc.txt
+                {{euroc_dir}}/EuRoC_datasets/machine_hall/{{euroc_set}}/  \
+                {{euroc_dir}}/EuRoC_TimeStamps/{{euroc_set}}.txt 2>&1 | tee stereo_inertial_euroc.txt
 
-stereo-inertial-mh01:
-    just stereo_inertial MH_01_easy
+_eval euroc_set data_dir:
+    evo_ape euroc EuRoC_datasets/machine_hall/{{euroc_set}}/mav0/state_groundtruth_estimate0/data.csv {{data_dir}}/CameraTrajectory.txt --align  --align
+    evo_rpe euroc EuRoC_datasets/machine_hall/{{euroc_set}}/mav0/state_groundtruth_estimate0/data.csv {{data_dir}}/CameraTrajectory.txt --align  --align
+
+## MH01
+
+mh01_mono: (_mono "MH_01_easy") && (mh01_mono_eval)
+
+mh01_mono_eval: (_eval "MH_01_easy" "results/mono_euroc")
+
+mh01_mono_inertial: (_mono_inertial "MH_01_easy") && (mh01_mono_inertial_eval)
+
+mh01_mono_inertial_eval: (_eval "MH_01_easy" "results/mono_inertial_euroc")
+
+mh01_stereo: (_stereo "MH_01_easy") && (mh01_stereo_eval)
+
+mh01_stereo_eval: (_eval "MH_01_easy" "results/stereo_euroc")
+
+mh01_stereo_inertial: (_stereo_inertial "MH_01_easy") && (mh01_stereo_inertial_eval)
+
+mh01_stereo_inertial_eval: (_eval "MH_01_easy" "results/stereo_inertial_euroc")
