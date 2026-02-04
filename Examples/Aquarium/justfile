@@ -10,6 +10,12 @@ VOCAB_FILE:="../../Vocabulary/ORBvoc.txt"
 stereo bagfile:
   {{BIN_DIR}}/{{BUILD_TYPE}}/stereo_{{BIN_SUFFIX}} {{CONFIG_FILE}} {{VOCAB_FILE}} aquarium_data/{{bagfile}} aquarium_data/{{bagfile}}/mav0/cam0/data.csv 2>&1 | tee {{bagfile}}_stereo.txt
 
+  just eval {{bagfile}}
+
+eval bagfile:
+  evo_ape  tum --align --correct_scale colmap_groundtruth/colmap_tum.csv CameraTrajectory.txt
+  evo_rpe  tum --align --correct_scale colmap_groundtruth/colmap_tum.csv CameraTrajectory.txt
+  evo_traj tum --align --correct_scale --sync --ref=colmap_groundtruth/colmap_tum.csv CameraTrajectory.txt
 
 
 convert bagfile:
