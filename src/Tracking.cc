@@ -2612,8 +2612,6 @@ void Tracking::SearchLocalPoints() {
     }
   }
 
-  oslog::info("nToMatch {}", nToMatch);
-
   if (nToMatch > 0) {
     ORBmatcher matcher(0.8);
     int th = 1;

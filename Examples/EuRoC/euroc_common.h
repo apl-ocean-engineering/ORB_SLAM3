@@ -93,3 +93,5 @@ class EuRoCData {
 
   std::vector<EuRoCSequence> mvSequences;
 };
+
+void setupEurocSpdLogger();
