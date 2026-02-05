@@ -69,5 +69,5 @@ jobs:
           VCPKG_DEFAULT_TRIPLET: ${{ matrix.triplet }}
         with:
           configurePreset: 'ninja-multi-vcpkg'
-          buildPreset: 'ninja-vcpkg-release'
-          testPreset: 'test-release'
+          buildPreset: 'ninja-vcpkg-Release'
+          testPreset: 'test-Release'
