@@ -141,7 +141,6 @@ class Settings {
   bool needToUndistort() { return bNeedToUndistort_; }
 
   cv::Size newImSize() { return newImSize_; }
-  float fps() { return fps_; }
   bool rgb() { return bRGB_; }
   bool needToResize() { return bNeedToResize1_; }
   bool needToRectify() { return bNeedToRectify_; }
@@ -214,7 +213,6 @@ class Settings {
   std::vector<float> vPinHoleDistorsion1_, vPinHoleDistorsion2_;
 
   cv::Size originalImSize_, newImSize_;
-  float fps_;
   bool bRGB_;
 
   bool bNeedToUndistort_;

@@ -601,10 +601,7 @@ void Tracking::newParameterLoader(const std::shared_ptr<Settings>& settings) {
   }
 
   mMinFrames = 0;
-  mMaxFrames = settings->fps();
   mbRGB = settings->rgb();
-
-  mnFramesToResetIMU = mMaxFrames;
 
   {
     // ORB parameters
@@ -1003,6 +1000,9 @@ void Tracking::ResetFrameIMU() {
 void Tracking::Track() {
   std::chrono::steady_clock::time_point t_start =
       std::chrono::steady_clock::now();
+
+  mMaxFrames = mpSystem->fps();
+  mnFramesToResetIMU = mMaxFrames;
 
   if (bStepByStep) {
     oslog::trace("Tracking: Waiting to the next step");

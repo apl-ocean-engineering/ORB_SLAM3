@@ -301,9 +301,11 @@ ostream& operator<<(std::ostream& output, const Settings& settings) {
   output << "SLAM settings: " << endl;
 
   output << "\t-Camera 1 parameters (";
-  if (settings.cameraType_ == Settings::PinHole ||
-      settings.cameraType_ == Settings::Rectified) {
+  if (settings.cameraType_ == Settings::PinHole) {
     output << "Pinhole";
+
+  } else if (settings.cameraType_ == Settings::Rectified) {
+    output << "Rectified";
   } else {
     output << "Kannala-Brandt";
   }
@@ -373,8 +375,6 @@ ostream& operator<<(std::ostream& output, const Settings& settings) {
       output << " ]" << endl;
     }
   }
-
-  output << "\t-Sequence FPS: " << settings.fps_ << endl;
 
   // Stereo stuff
   if (settings.sensor_.isStereo()) {

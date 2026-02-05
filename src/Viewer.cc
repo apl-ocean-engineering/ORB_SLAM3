@@ -46,9 +46,7 @@ Viewer::Viewer(System *pSystem,
       mbStopTrack(false) {
   mImageViewerScale = 1.f;
 
-  float fps = settings->fps();
-  if (fps < 1) fps = 30;
-  mT = 1e3 / fps;
+  mT = 1e3 / 30;
 
   cv::Size imSize = settings->newImSize();
   mImageHeight = imSize.height;
