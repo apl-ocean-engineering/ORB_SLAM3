@@ -43,6 +43,7 @@
 #include "ORBVocabulary.h"
 #include "Settings.h"
 #include "Tracking.h"
+#include "Utils/FpsEstimator.h"
 #include "Viewer.h"
 
 namespace ORB_SLAM3 {
@@ -186,6 +187,8 @@ class System : public std::enable_shared_from_this<System> {
   bool isLost();
   bool isFinished();
 
+  float fps() const { return fps_estimator_.fps(); }
+
   void ChangeDataset();
 
   float GetImageScale();
@@ -278,6 +281,8 @@ class System : public std::enable_shared_from_this<System> {
   std::mutex mMutexState;
 
   std::shared_ptr<Settings> settings_;
+
+  FpsEstimator fps_estimator_;
 };
 
 }  // namespace ORB_SLAM3

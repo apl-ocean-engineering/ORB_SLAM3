@@ -379,7 +379,6 @@ void SettingsLoader::readImageInfo(cv::FileStorage& fSettings) {
   if (resizeHeightFound || resizeWidthFound)
     settings_->setResizeImageSize(resizeWidth, resizeHeight);
 
-  settings_->fps_ = readParameter<int>(fSettings, "Camera.fps", found);
   settings_->bRGB_ =
       static_cast<bool>(readParameter<int>(fSettings, "Camera.RGB", found));
 }

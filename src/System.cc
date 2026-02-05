@@ -277,6 +277,9 @@ Sophus::SE3f System::TrackStereo(const cv::Mat &imLeft, const cv::Mat &imRight,
   processLocalizationModeChange();
   processReset();
 
+  fps_estimator_.pushTimestamp(timestamp);
+  oslog::debug("[System] Current FPS estimate {:2f}", fps_estimator_.fps());
+
   if (sensorType().isImu()) {
     for (auto const &imuMeas : vImuMeas) {
       mpTracker->GrabImuData(imuMeas);
@@ -313,6 +316,8 @@ Sophus::SE3f System::TrackRGBD(const cv::Mat &im, const cv::Mat &depthmap,
 
   processLocalizationModeChange();
   processReset();
+
+  fps_estimator_.pushTimestamp(timestamp);
 
   if (sensorType().isImu()) {
     for (auto const &imuMeas : vImuMeas) {
@@ -352,6 +357,8 @@ Sophus::SE3f System::TrackMonocular(const cv::Mat &im, const double &timestamp,
 
   processLocalizationModeChange();
   processReset();
+
+  fps_estimator_.pushTimestamp(timestamp);
 
   if (sensorType().isImu()) {
     for (auto const &imuMeas : vImuMeas) {
