@@ -71,7 +71,7 @@ int ORBmatcher::SearchByProjection(const std::shared_ptr<Frame> &F,
 
       const vector<size_t> vIndices =
           F->GetFeaturesInArea(pMP->mTrackProjX, pMP->mTrackProjY,
-                               r * F->mvScaleFactors[nPredictedLevel],
+                               r * F->mvScaleFactors.at(nPredictedLevel),
                                nPredictedLevel - 1, nPredictedLevel);
 
       if (!vIndices.empty()) {
