@@ -458,7 +458,7 @@ void System::Shutdown() {
     mbShutDown = true;
   }
 
-  cout << "Shutdown" << endl;
+  oslog::warn("Shutdown");
 
   mpLocalMapper->RequestFinish();
   mpLoopCloser->RequestFinish();
@@ -517,7 +517,7 @@ void System::SaveTrajectoryTUM(const string &filename) {
     return;
   }
 
-  cout << endl << "Saving camera trajectory to " << filename << " ..." << endl;
+  oslog::info("Saving camera trajectory to {} ...", filename);
   if (sensorType() == SensorType::MONOCULAR) {
     cerr << "ERROR: SaveTrajectoryTUM cannot be used for monocular." << endl;
     return;
@@ -574,12 +574,10 @@ void System::SaveTrajectoryTUM(const string &filename) {
       << " " << q.w() << endl;
   }
   f.close();
-  // cout << endl << "trajectory saved!" << endl;
 }
 
 void System::SaveKeyFrameTrajectoryTUM(const string &filename) {
-  cout << endl
-       << "Saving keyframe trajectory to " << filename << " ..." << endl;
+  oslog::info("Saving keyframe trajectory to {} ...", filename);
 
   vector<std::shared_ptr<KeyFrame>> vpKFs = mpAtlas->GetAllKeyFrames();
   sort(vpKFs.begin(), vpKFs.end(), KeyFrame::lId);
@@ -616,12 +614,10 @@ void System::SaveTrajectoryEuRoC(const string &filename) {
   vector<std::shared_ptr<Map>> vpMaps = mpAtlas->GetAllMaps();
   size_t numMaxKFs = 0;
   std::shared_ptr<Map> pBiggerMap;
-  std::cout << "There are " << std::to_string(vpMaps.size())
-            << " maps in the atlas" << std::endl;
+  oslog::debug("There are {} maps in the atlas", std::to_string(vpMaps.size()));
   for (auto pMap : vpMaps) {
-    std::cout << "  Map " << std::to_string(pMap->GetId()) << " has "
-              << std::to_string(pMap->GetAllKeyFrames().size()) << " KFs"
-              << std::endl;
+    oslog::debug("  Map {} has {} KFs", std::to_string(pMap->GetId()),
+                 std::to_string(pMap->GetAllKeyFrames().size()));
     if (pMap->GetAllKeyFrames().size() > numMaxKFs) {
       numMaxKFs = pMap->GetAllKeyFrames().size();
       pBiggerMap = pMap;
@@ -648,7 +644,6 @@ void System::SaveTrajectoryEuRoC(const string &filename) {
 
   ofstream f;
   f.open(filename.c_str());
-  // cout << "file open" << endl;
   f << fixed;
 
   // Frame pose is stored relative to its reference keyframe (which is optimized
@@ -671,19 +666,15 @@ void System::SaveTrajectoryEuRoC(const string &filename) {
   for (auto lit = mpTracker->mlRelativeFramePoses.begin(),
             lend = mpTracker->mlRelativeFramePoses.end();
        lit != lend; lit++, lRit++, lT++, lbL++) {
-    // cout << "1" << endl;
     if (*lbL) continue;
 
     std::shared_ptr<KeyFrame> pKF = *lRit;
-    // cout << "KF: " << pKF->mnId << endl;
 
     Sophus::SE3f Trw;
 
     // If the reference keyframe was culled, traverse the spanning tree to get a
     // suitable keyframe.
     if (!pKF) continue;
-
-    // cout << "2.5" << endl;
 
     while (pKF->isBad()) {
       // cout << " 2.bad" << endl;
@@ -697,12 +688,8 @@ void System::SaveTrajectoryEuRoC(const string &filename) {
       continue;
     }
 
-    // cout << "3" << endl;
-
     Trw = Trw * pKF->GetPose() *
           Twb;  // Tcp*Tpw*Twb0=Tcb0 where b0 is the new world reference
-
-    // cout << "4" << endl;
 
     if (sensorType().isImu()) {
       Sophus::SE3f Twb = (pKF->mImuCalib.mTbc * (*lit) * Trw).inverse();
@@ -719,19 +706,15 @@ void System::SaveTrajectoryEuRoC(const string &filename) {
         << " " << twc(1) << " " << twc(2) << " " << q.x() << " " << q.y() << " "
         << q.z() << " " << q.w() << endl;
     }
-
-    // cout << "5" << endl;
   }
-  // cout << "end saving trajectory" << endl;
   f.close();
-  cout << endl << "End of saving trajectory to " << filename << " ..." << endl;
+  oslog::info("End of saving trajectory to {} ...", filename);
 }
 
 void System::SaveTrajectoryEuRoC(const string &filename,
                                  const std::shared_ptr<Map> &pMap) {
-  cout << endl
-       << "Saving trajectory of map " << pMap->GetId() << " to " << filename
-       << " ..." << endl;
+  oslog::info("Saving trajectory of map {} to {} ...", pMap->GetId(), filename);
+
   /*if(sensorType()==MONOCULAR)
   {
       cerr << "ERROR: SaveTrajectoryEuRoC cannot be used for monocular." <<
@@ -752,7 +735,6 @@ void System::SaveTrajectoryEuRoC(const string &filename,
   }
   ofstream f;
   f.open(filename.c_str());
-  // cout << "file open" << endl;
   f << fixed;
 
   // Frame pose is stored relative to its reference keyframe (which is optimized
@@ -779,7 +761,6 @@ void System::SaveTrajectoryEuRoC(const string &filename,
     if (*lbL) continue;
 
     std::shared_ptr<KeyFrame> pKF = *lRit;
-    // cout << "KF: " << pKF->mnId << endl;
 
     Sophus::SE3f Trw;
 
@@ -787,10 +768,7 @@ void System::SaveTrajectoryEuRoC(const string &filename,
     // suitable keyframe.
     if (!pKF) continue;
 
-    // cout << "2.5" << endl;
-
     while (pKF->isBad()) {
-      // cout << " 2.bad" << endl;
       Trw = Trw * pKF->mTcp;
       pKF = pKF->GetParent();
       // cout << "--Parent KF: " << pKF->mnId << endl;
@@ -801,12 +779,8 @@ void System::SaveTrajectoryEuRoC(const string &filename,
       continue;
     }
 
-    // cout << "3" << endl;
-
     Trw = Trw * pKF->GetPose() *
           Twb;  // Tcp*Tpw*Twb0=Tcb0 where b0 is the new world reference
-
-    // cout << "4" << endl;
 
     if (sensorType().isImu()) {
       Sophus::SE3f Twb = (pKF->mImuCalib.mTbc * (*lit) * Trw).inverse();
@@ -823,17 +797,13 @@ void System::SaveTrajectoryEuRoC(const string &filename,
         << " " << twc(1) << " " << twc(2) << " " << q.x() << " " << q.y() << " "
         << q.z() << " " << q.w() << endl;
     }
-
-    // cout << "5" << endl;
   }
-  // cout << "end saving trajectory" << endl;
   f.close();
-  cout << endl << "End of saving trajectory to " << filename << " ..." << endl;
+  oslog::info("End of saving trajectory to {} ...", filename);
 }
 
 void System::SaveKeyFrameTrajectoryEuRoC(const string &filename) {
-  cout << endl
-       << "Saving keyframe trajectory to " << filename << " ..." << endl;
+  oslog::info("Saving keyframe trajectory to {} ...", filename);
 
   vector<std::shared_ptr<Map>> vpMaps = mpAtlas->GetAllMaps();
   std::shared_ptr<Map> pBiggerMap;
@@ -846,7 +816,7 @@ void System::SaveKeyFrameTrajectoryEuRoC(const string &filename) {
   }
 
   if (!pBiggerMap) {
-    std::cout << "There is not a map!!" << std::endl;
+    oslog::error("There is not a map!!");
     return;
   }
 
@@ -885,9 +855,8 @@ void System::SaveKeyFrameTrajectoryEuRoC(const string &filename) {
 
 void System::SaveKeyFrameTrajectoryEuRoC(const string &filename,
                                          const std::shared_ptr<Map> &pMap) {
-  cout << endl
-       << "Saving keyframe trajectory of map " << pMap->GetId() << " to "
-       << filename << " ..." << endl;
+  oslog::info("Saving keyframe trajectory of map {} to {} ...", pMap->GetId(),
+              filename);
 
   auto vpKFs = pMap->GetAllKeyFrames();
   sort(vpKFs.begin(), vpKFs.end(), KeyFrame::lId);
@@ -922,9 +891,9 @@ void System::SaveKeyFrameTrajectoryEuRoC(const string &filename,
 }
 
 void System::SaveTrajectoryKITTI(const string &filename) {
-  cout << endl << "Saving camera trajectory to " << filename << " ..." << endl;
+  oslog::info("Saving camera trajectory to {} ...", filename);
   if (sensorType() == SensorType::MONOCULAR) {
-    cerr << "ERROR: SaveTrajectoryKITTI cannot be used for monocular." << endl;
+    oslog::error("ERROR: SaveTrajectoryKITTI cannot be used for monocular.");
     return;
   }
 
@@ -1129,7 +1098,7 @@ void System::SaveAtlas(int type) {
     if (type == TEXT_FILE) {
       // File text
 
-      cout << "Starting to write the save text file " << endl;
+      oslog::debug("Starting to write the save text file ");
       std::remove(pathSaveFileName.c_str());
       std::ofstream ofs(pathSaveFileName, std::ios::binary);
       boost::archive::text_oarchive oa(ofs);
@@ -1137,18 +1106,18 @@ void System::SaveAtlas(int type) {
       oa << strVocabularyName;
       oa << strVocabularyChecksum;
       oa << mpAtlas;
-      cout << "End to write the save text file" << endl;
+      oslog::debug("End to write the save text file");
     } else if (type == BINARY_FILE) {
       // File binary
 
-      cout << "Starting to write the save binary file" << endl;
+      oslog::debug("Starting to write the save binary file");
       std::remove(pathSaveFileName.c_str());
       std::ofstream ofs(pathSaveFileName, std::ios::binary);
       boost::archive::binary_oarchive oa(ofs);
       oa << strVocabularyName;
       oa << strVocabularyChecksum;
       oa << mpAtlas;
-      cout << "End to write save binary file" << endl;
+      oslog::debug("End to write save binary file");
     }
   }
 }
@@ -1166,10 +1135,10 @@ bool System::LoadAtlas(int type) {
 
   if (type == TEXT_FILE) {
     // File text
-    cout << "Starting to read the save text file " << endl;
+    oslog::debug("Starting to read the save text file ");
     std::ifstream ifs(pathLoadFileName, std::ios::binary);
     if (!ifs.good()) {
-      cout << "Load file not found" << endl;
+      oslog::error("Cannot find Atlas file {}", pathLoadFileName);
       return false;
     }
     boost::archive::text_iarchive ia(ifs);
@@ -1177,14 +1146,14 @@ bool System::LoadAtlas(int type) {
     ia >> strVocChecksum;
     ia >> mpAtlas;
 
-    cout << "Finished loading the saved text file " << endl;
+    oslog::debug("Finished loading the saved text file ");
     isRead = true;
   } else if (type == BINARY_FILE) {
     // File binary
-    cout << "Starting to read the save binary file" << endl;
+    oslog::debug("Starting to read the save binary file");
     std::ifstream ifs(pathLoadFileName, std::ios::binary);
     if (!ifs.good()) {
-      cout << "Load file not found" << endl;
+      oslog::error("Cannot find Atlas file {}", pathLoadFileName);
       return false;
     }
     boost::archive::binary_iarchive ia(ifs);
@@ -1192,7 +1161,7 @@ bool System::LoadAtlas(int type) {
     ia >> strVocChecksum;
     ia >> mpAtlas;
 
-    cout << "Finished loading the saved binary file" << endl;
+    oslog::debug("Finished loading the saved binary file");
     isRead = true;
   }
 
@@ -1206,10 +1175,10 @@ bool System::LoadAtlas(int type) {
         CalculateCheckSum(vocabularyFilePath, TEXT_FILE);
 
     if (strInputVocabularyChecksum.compare(strVocChecksum) != 0) {
-      cout << "The vocabulary load isn't the same which the load session was "
-              "created "
-           << endl;
-      cout << "-Vocabulary name: " << strFileVoc << endl;
+      oslog::warn(
+          "The vocabulary load isn't the same which the load session was "
+          "created.  Loading vocab file {}",
+          strFileVoc);
       return false;  // Both are differents
     }
 
@@ -1233,8 +1202,7 @@ string System::CalculateCheckSum(string filename, int type) {
 
   ifstream f(filename.c_str(), flags);
   if (!f.is_open()) {
-    cout << "[E] Unable to open the in file " << filename << " for Md5 hash."
-         << endl;
+    oslog::error("[E] Unable to open the in file {} for Md5 hash.", filename);
     return checksum;
   }
 
