@@ -52,33 +52,38 @@ class MapPoint {
     ar & mnFirstKFid;
     ar & mnFirstFrame;
     ar & nObs;
+
     // Variables used by the tracking
-    // ar & mTrackProjX;
-    // ar & mTrackProjY;
-    // ar & mTrackDepth;
-    // ar & mTrackDepthR;
-    // ar & mTrackProjXR;
-    // ar & mTrackProjYR;
-    // ar & mbTrackInView;
-    // ar & mbTrackInViewR;
-    // ar & mnTrackScaleLevel;
-    // ar & mnTrackScaleLevelR;
-    // ar & mTrackViewCos;
-    // ar & mTrackViewCosR;
-    // ar & mnTrackReferenceForFrame;
-    // ar & mnLastFrameSeen;
+    ar & mTrackProjX;
+    ar & mTrackProjY;
+    ar & mTrackDepth;
+    ar & mTrackDepthR;
+    ar & mTrackProjXR;
+    ar & mTrackProjYR;
+    ar & mbTrackInView;
+    ar & mbTrackInViewR;
+    ar & mnTrackScaleLevel;
+    ar & mnTrackScaleLevelR;
+    ar & mTrackViewCos;
+    ar & mTrackViewCosR;
+    ar & mnTrackReferenceForFrame;
+    ar & mnLastFrameSeen;
 
     // Variables used by local mapping
-    // ar & mnBALocalForKF;
-    // ar & mnFuseCandidateForKF;
+    ar & mnBALocalForKF;
+    ar & mnFuseCandidateForKF;
 
     // Variables used by loop closing and merging
-    // ar & mnLoopPointForKF;
-    // ar & mnCorrectedByKF;
-    // ar & mnCorrectedReference;
+    ar & mnLoopPointForKF;
+    ar & mnCorrectedByKF;
+    ar & mnCorrectedReference;
+    ar& boost::serialization::make_array(mPosGBA.data(), mPosGBA.size());
     // serializeMatrix(ar,mPosGBA,version);
-    // ar & mnBAGlobalForKF;
-    // ar & mnBALocalForMerge;
+    ar & mnBAGlobalForKF;
+    ar & mnBALocalForMerge;
+    ar& boost::serialization::make_array(mPosMerge.data(), mPosMerge.size());
+    ar& boost::serialization::make_array(mNormalVectorMerge.data(),
+                                         mNormalVectorMerge.size());
     // serializeMatrix(ar,mPosMerge,version);
     // serializeMatrix(ar,mNormalVectorMerge,version);
 
@@ -88,12 +93,12 @@ class MapPoint {
                                          mNormalVector.size());
     // ar & BOOST_SERIALIZATION_NVP(mBackupObservationsId);
     // ar & mObservations;
-    ar & mBackupObservationsId1;
-    ar & mBackupObservationsId2;
+    // ar & mBackupObservationsId1;
+    // ar & mBackupObservationsId2;
     serializeMatrix(ar, mDescriptor, version);
-    ar & mBackupRefKFId;
-    // ar & mnVisible;
-    // ar & mnFound;
+    // ar & mBackupRefKFId;
+    ar & mnVisible;
+    ar & mnFound;
 
     ar & mbBad;
     ar & mBackupReplacedId;
