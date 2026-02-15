@@ -98,6 +98,7 @@ add_library(${PROJECT_NAME} SHARED
         src/System.cc
         src/System/Atlas.cc
         src/System/Exporters.cc
+        src/System/Factory.cc
         src/Tracking.cc
         src/TwoViewReconstruction.cc
         src/Utils/Checksum.cc

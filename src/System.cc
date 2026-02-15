@@ -49,55 +49,6 @@ namespace ORB_SLAM3 {
 
 Verbose::eLevel Verbose::th = Verbose::VERBOSITY_NORMAL;
 
-SystemFactory::Expected SystemFactory::create(
-    const std::shared_ptr<Settings> &settings, bool initFr,
-    const string &strSequence) {
-  if (!settings->validate()) {
-    return tl::make_unexpected(ExpectedError::fmt("Settings do not validate"));
-  }
-
-  // Cannot use make_shared with friend constructors?
-  auto sys = std::shared_ptr<System>(new System(settings, initFr, strSequence));
-
-  // Initialization must occur separately because we use shared_from_this
-  if (!sys->initialize()) {
-    return tl::make_unexpected(
-        ExpectedError::fmt("Unable to initialize SLAM system"));
-  }
-
-  return sys;
-}
-
-SystemFactory::Expected SystemFactory::create(const std::string &configFile,
-                                              const SensorType sensor,
-                                              bool initFr,
-                                              const string &strSequence) {
-  auto exSettings = SettingsLoader::load(configFile, sensor);
-
-  if (!exSettings) {
-    return tl::make_unexpected(ExpectedError::fmt("Unable to load settings"));
-  }
-
-  return SystemFactory::create(exSettings.value(), initFr, strSequence);
-}
-
-SystemFactory::Expected SystemFactory::create(const std::string &configFile,
-                                              const std::string &vocabFile,
-                                              const SensorType sensor,
-                                              bool initFr,
-                                              const string &strSequence) {
-  auto exSettings = SettingsLoader::load(configFile, sensor, vocabFile);
-
-  if (!exSettings) {
-    return tl::make_unexpected(ExpectedError::fmt("Unable to load settings"));
-  }
-
-  auto settings = exSettings.value();
-  return SystemFactory::create(settings, initFr, strSequence);
-}
-
-//===================================================================
-
 System::System(const std::shared_ptr<Settings> &settings, bool initFr,
                const string &strSequence)
     : enable_shared_from_this<System>(),
@@ -245,8 +196,8 @@ bool System::initialize(bool initFr, const string &strSequence) {
   return true;
 }
 
-Sophus::SE3f System::TrackStereo(const cv::Mat &imLeft, const cv::Mat &imRight,
-                                 const double &timestamp,
+Sophus::SE3f System::TrackStereo(cv::InputArray imLeft, cv::InputArray imRight,
+                                 double timestamp,
                                  const vector<IMU::Point> &vImuMeas,
                                  string filename) {
   if (!sensorType().isStereo()) {
@@ -263,14 +214,14 @@ Sophus::SE3f System::TrackStereo(const cv::Mat &imLeft, const cv::Mat &imRight,
     cv::Mat M1r = settings_->M1r();
     cv::Mat M2r = settings_->M2r();
 
-    cv::remap(imLeft, imLeftToFeed, M1l, M2l, cv::INTER_LINEAR);
-    cv::remap(imRight, imRightToFeed, M1r, M2r, cv::INTER_LINEAR);
+    cv::remap(imLeft.getMat(), imLeftToFeed, M1l, M2l, cv::INTER_LINEAR);
+    cv::remap(imRight.getMat(), imRightToFeed, M1r, M2r, cv::INTER_LINEAR);
   } else if (settings_ && settings_->needToResize()) {
-    cv::resize(imLeft, imLeftToFeed, settings_->newImSize());
-    cv::resize(imRight, imRightToFeed, settings_->newImSize());
+    cv::resize(imLeft.getMat(), imLeftToFeed, settings_->newImSize());
+    cv::resize(imRight.getMat(), imRightToFeed, settings_->newImSize());
   } else {
-    imLeftToFeed = imLeft.clone();
-    imRightToFeed = imRight.clone();
+    imLeftToFeed = imLeft.getMat().clone();
+    imRightToFeed = imRight.getMat().clone();
   }
 
   processLocalizationModeChange();
@@ -293,8 +244,8 @@ Sophus::SE3f System::TrackStereo(const cv::Mat &imLeft, const cv::Mat &imRight,
   return Tcw;
 }
 
-Sophus::SE3f System::TrackRGBD(const cv::Mat &im, const cv::Mat &depthmap,
-                               const double &timestamp,
+Sophus::SE3f System::TrackRGBD(cv::InputArray im, cv::InputArray depthmap,
+                               double timestamp,
                                const vector<IMU::Point> &vImuMeas,
                                string filename) {
   if (!sensorType().isRGBD()) {
@@ -303,14 +254,14 @@ Sophus::SE3f System::TrackRGBD(const cv::Mat &im, const cv::Mat &depthmap,
     exit(-1);
   }
 
-  cv::Mat imToFeed = im.clone();
-  cv::Mat imDepthToFeed = depthmap.clone();
+  cv::Mat imToFeed;
+  cv::Mat imDepthToFeed;
   if (settings_ && settings_->needToResize()) {
-    cv::Mat resizedIm;
-    cv::resize(im, resizedIm, settings_->newImSize());
-    imToFeed = resizedIm;
-
-    cv::resize(depthmap, imDepthToFeed, settings_->newImSize());
+    cv::resize(im.getMat(), imToFeed, settings_->newImSize());
+    cv::resize(depthmap.getMat(), imDepthToFeed, settings_->newImSize());
+  } else {
+    imToFeed = im.getMat().clone();
+    imDepthToFeed = depthmap.getMat().clone();
   }
 
   processLocalizationModeChange();
@@ -332,7 +283,7 @@ Sophus::SE3f System::TrackRGBD(const cv::Mat &im, const cv::Mat &depthmap,
   return Tcw;
 }
 
-Sophus::SE3f System::TrackMonocular(const cv::Mat &im, const double &timestamp,
+Sophus::SE3f System::TrackMonocular(cv::InputArray im, double timestamp,
                                     const vector<IMU::Point> &vImuMeas,
                                     string filename) {
   {
@@ -347,11 +298,13 @@ Sophus::SE3f System::TrackMonocular(const cv::Mat &im, const double &timestamp,
     exit(-1);
   }
 
-  cv::Mat imToFeed = im.clone();
+  cv::Mat imToFeed;
   if (settings_ && settings_->needToResize()) {
     cv::Mat resizedIm;
-    cv::resize(im, resizedIm, settings_->newImSize());
+    cv::resize(im.getMat(), resizedIm, settings_->newImSize());
     imToFeed = resizedIm;
+  } else {
+    imToFeed = im.getMat().clone();
   }
 
   processLocalizationModeChange();
