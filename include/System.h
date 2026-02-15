@@ -84,12 +84,6 @@ class System : public std::enable_shared_from_this<System> {
   friend SystemFactory::Expected SystemFactory::create(
       const std::shared_ptr<Settings> &, bool, const string &);
 
-  // File type
-  enum FileType {
-    TEXT_FILE = 0,
-    BINARY_FILE = 1,
-  };
-
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
   // Proccess the given stereo frame. Images must be synchronized and rectified.
@@ -218,10 +212,8 @@ class System : public std::enable_shared_from_this<System> {
   void processReset(void);
   void updateTrackingState();
 
-  void SaveAtlas(int type);
-  bool LoadAtlas(int type);
-
-  string CalculateCheckSum(string filename, int type);
+  void SaveAtlas(FileType type);
+  bool LoadAtlas(FileType type);
 
   // ORB vocabulary used for place recognition and feature matching.
   std::shared_ptr<ORBVocabulary> mpVocabulary;

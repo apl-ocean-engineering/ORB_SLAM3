@@ -21,10 +21,13 @@
 
 #pragma once
 
+#include <cstdint>
 #include <string>
 
 namespace ORB_SLAM3 {
 
+// Rather than a conventional enum class, use this pattern which lets us
+// add member functions
 class SensorType {
  public:
   enum Value : uint8_t {
@@ -76,5 +79,7 @@ class SensorType {
  private:
   Value value;
 };
+
+enum class FileType { TEXT_FILE, BINARY_FILE };
 
 }  // namespace ORB_SLAM3
