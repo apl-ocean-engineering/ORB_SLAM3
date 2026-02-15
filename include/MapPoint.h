@@ -92,11 +92,11 @@ class MapPoint {
     ar& boost::serialization::make_array(mNormalVector.data(),
                                          mNormalVector.size());
     // ar & BOOST_SERIALIZATION_NVP(mBackupObservationsId);
-    // ar & mObservations;
-    // ar & mBackupObservationsId1;
-    // ar & mBackupObservationsId2;
+    ar & mObservations;
+    ar & mBackupObservationsId1;
+    ar & mBackupObservationsId2;
     serializeMatrix(ar, mDescriptor, version);
-    // ar & mBackupRefKFId;
+    ar & mBackupRefKFId;
     ar & mnVisible;
     ar & mnFound;
 
