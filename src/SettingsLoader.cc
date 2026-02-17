@@ -42,17 +42,16 @@ float SettingsLoader::readParameter<float>(cv::FileStorage& fSettings,
   cv::FileNode node = fSettings[name];
   if (node.empty()) {
     if (required) {
-      std::cerr << name << " required parameter does not exist, aborting..."
-                << std::endl;
+      oslog::error("Required parameter \"{}\" does not exist, aborting...",
+                   name);
       exit(-1);
     } else {
-      std::cerr << name << " optional parameter does not exist..." << std::endl;
+      oslog::warn("Optional parameter \"{}\" does not exist.", name);
       found = false;
       return 0.0f;
     }
   } else if (!node.isReal()) {
-    std::cerr << name << " parameter must be a real number, aborting..."
-              << std::endl;
+    oslog::error("{} parameter must be a real number, aborting...", name);
     exit(-1);
   } else {
     found = true;
@@ -67,17 +66,17 @@ int SettingsLoader::readParameter<int>(cv::FileStorage& fSettings,
   cv::FileNode node = fSettings[name];
   if (node.empty()) {
     if (required) {
-      std::cerr << name << " required parameter does not exist, aborting..."
-                << std::endl;
+      oslog::error("Required parameter \"{}\" does not exist, aborting...",
+                   name);
+
       exit(-1);
-    } else {
-      std::cerr << name << " optional parameter does not exist..." << std::endl;
+      oslog::warn("Optional parameter \"{}\" does not exist.", name);
       found = false;
       return 0;
     }
   } else if (!node.isInt()) {
-    std::cerr << name << " parameter must be an integer number, aborting..."
-              << std::endl;
+    oslog::error("{} parameter must be an integer number, aborting...", name);
+
     exit(-1);
   } else {
     found = true;
@@ -92,17 +91,17 @@ string SettingsLoader::readParameter<string>(cv::FileStorage& fSettings,
   cv::FileNode node = fSettings[name];
   if (node.empty()) {
     if (required) {
-      std::cerr << name << " required parameter does not exist, aborting..."
-                << std::endl;
+      oslog::error("Required parameter \"{}\" does not exist, aborting...",
+                   name);
+
       exit(-1);
     } else {
-      std::cerr << name << " optional parameter does not exist..." << std::endl;
+      oslog::warn("Optional parameter \"{}\" does not exist.", name);
       found = false;
       return string();
     }
   } else if (!node.isString()) {
-    std::cerr << name << " parameter must be a string, aborting..."
-              << std::endl;
+    oslog::error("{} parameter must be a string, aborting...", name);
     exit(-1);
   } else {
     found = true;
@@ -118,11 +117,11 @@ cv::Mat SettingsLoader::readParameter<cv::Mat>(cv::FileStorage& fSettings,
   cv::FileNode node = fSettings[name];
   if (node.empty()) {
     if (required) {
-      std::cerr << name << " required parameter does not exist, aborting..."
-                << std::endl;
+      oslog::error("Required parameter \"{}\" does not exist, aborting...",
+                   name);
       exit(-1);
     } else {
-      std::cerr << name << " optional parameter does not exist..." << std::endl;
+      oslog::warn("Optional parameter \"{}\" does not exist.", name);
       found = false;
       return cv::Mat();
     }
@@ -132,7 +131,7 @@ cv::Mat SettingsLoader::readParameter<cv::Mat>(cv::FileStorage& fSettings,
   }
 }
 
-SettingsLoader::Expected SettingsLoader::load(const std::string& configFile,
+SettingsLoader::Expected SettingsLoader::Load(const std::string& configFile,
                                               const SensorType sensor,
                                               const std::string& vocabFile) {
   SettingsLoader loader(sensor);
@@ -147,9 +146,9 @@ SettingsLoader::Expected SettingsLoader::load(const std::string& configFile,
   // Open settings file
   cv::FileStorage fSettings(configFile, cv::FileStorage::READ);
   if (!fSettings.isOpened()) {
-    cerr << "[ERROR]: could not open configuration file at: " << configFile
-         << endl;
-    cerr << "Aborting..." << endl;
+    oslog::error("[ERROR]: could not open configuration file \"{}\"",
+                 configFile);
+    oslog::error("Aborting...");
 
     return tl::make_unexpected(
         ExpectedError::fmt("Unable to open configuration file {}", configFile));
@@ -283,7 +282,7 @@ void SettingsLoader::readCamera1(cv::FileStorage& fSettings) {
     //       vOverlapping;
     //}
   } else {
-    cerr << "Error: " << cameraModel << " not known" << endl;
+    oslog::error("Error: {} not known", cameraModel);
     exit(-1);
   }
 }

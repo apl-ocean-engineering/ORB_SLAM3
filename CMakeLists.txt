@@ -96,8 +96,12 @@ add_library(${PROJECT_NAME} SHARED
         src/SettingsLoader.cc
         src/Sim3Solver.cc
         src/System.cc
+        src/System/Atlas.cc
+        src/System/Exporters.cc
+        src/System/Factory.cc
         src/Tracking.cc
         src/TwoViewReconstruction.cc
+        src/Utils/Checksum.cc
         src/Viewer.cc
 )
 target_compile_definitions(${PROJECT_NAME} PUBLIC REGISTER_TIMES)

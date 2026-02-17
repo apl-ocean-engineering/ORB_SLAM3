@@ -42,6 +42,7 @@
 #include "MapDrawer.h"
 #include "ORBVocabulary.h"
 #include "Settings.h"
+#include "System/Factory.h"
 #include "Tracking.h"
 #include "Utils/FpsEstimator.h"
 #include "Viewer.h"
@@ -57,25 +58,6 @@ class LocalMapping;
 class LoopClosing;
 class Settings;
 
-class SystemFactory {
- public:
-  typedef tl::expected<std::shared_ptr<System>, ExpectedError> Expected;
-
-  static Expected create(const std::shared_ptr<Settings> &settings,
-                         bool initFr = false,
-                         const string &strSequence = std::string());
-
-  static Expected create(const std::string &configFile, const SensorType sensor,
-                         bool initFr = false,
-                         const string &strSequence = std::string());
-
-  // Provided for compatibility with old API
-  static Expected create(const std::string &configFile,
-                         const std::string &vocabFile, const SensorType sensor,
-                         bool initFr = false,
-                         const string &strSequence = std::string());
-};
-
 // System should be created using  SystemFactory::create()
 //
 // It will validate settings and catch errors on startup
@@ -84,19 +66,13 @@ class System : public std::enable_shared_from_this<System> {
   friend SystemFactory::Expected SystemFactory::create(
       const std::shared_ptr<Settings> &, bool, const string &);
 
-  // File type
-  enum FileType {
-    TEXT_FILE = 0,
-    BINARY_FILE = 1,
-  };
-
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
   // Proccess the given stereo frame. Images must be synchronized and rectified.
   // Input images: RGB (CV_8UC3) or grayscale (CV_8U). RGB is converted to
   // grayscale. Returns the camera pose (empty if tracking fails).
   Sophus::SE3f TrackStereo(
-      const cv::Mat &imLeft, const cv::Mat &imRight, const double &timestamp,
+      cv::InputArray imLeft, cv::InputArray imRight, double timestamp,
       const vector<IMU::Point> &vImuMeas = vector<IMU::Point>(),
       string filename = "");
 
@@ -105,7 +81,7 @@ class System : public std::enable_shared_from_this<System> {
   // grayscale. Input depthmap: Float (CV_32F). Returns the camera pose (empty
   // if tracking fails).
   Sophus::SE3f TrackRGBD(
-      const cv::Mat &im, const cv::Mat &depthmap, const double &timestamp,
+      cv::InputArray im, cv::InputArray depthmap, double timestamp,
       const vector<IMU::Point> &vImuMeas = vector<IMU::Point>(),
       string filename = "");
 
@@ -113,7 +89,7 @@ class System : public std::enable_shared_from_this<System> {
   // Input images: RGB (CV_8UC3) or grayscale (CV_8U). RGB is converted to
   // grayscale. Returns the camera pose (empty if tracking fails).
   Sophus::SE3f TrackMonocular(
-      const cv::Mat &im, const double &timestamp,
+      cv::InputArray im, double timestamp,
       const vector<IMU::Point> &vImuMeas = vector<IMU::Point>(),
       string filename = "");
 
@@ -213,15 +189,12 @@ class System : public std::enable_shared_from_this<System> {
   bool initialize(bool initFr = false,
                   const string &strSequence = std::string());
 
- private:
   void processLocalizationModeChange(void);
   void processReset(void);
   void updateTrackingState();
 
-  void SaveAtlas(int type);
-  bool LoadAtlas(int type);
-
-  string CalculateCheckSum(string filename, int type);
+  void SaveAtlas(FileType type);
+  bool LoadAtlas(FileType type);
 
   // ORB vocabulary used for place recognition and feature matching.
   std::shared_ptr<ORBVocabulary> mpVocabulary;

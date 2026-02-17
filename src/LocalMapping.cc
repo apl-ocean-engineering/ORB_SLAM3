@@ -1255,8 +1255,7 @@ void LocalMapping::InitializeIMU(float priorG, float priorA, bool bFIBA) {
 
   std::chrono::steady_clock::time_point t5 = std::chrono::steady_clock::now();
 
-  Verbose::PrintMess("Global Bundle Adjustment finished\nUpdating map ...",
-                     Verbose::VERBOSITY_NORMAL);
+  oslog::info("Global Bundle Adjustment finished.  Updating map ...");
 
   // Get Map Mutex
   unique_lock<mutex> lock(mpAtlas->GetCurrentMap()->mMutexMapUpdate);
@@ -1292,8 +1291,7 @@ void LocalMapping::InitializeIMU(float priorG, float priorA, bool bFIBA) {
         if (pChild->isVelocitySet()) {
           pChild->mVwbGBA = Rcor * pChild->GetVelocity();
         } else {
-          Verbose::PrintMess("Child velocity empty!! ",
-                             Verbose::VERBOSITY_NORMAL);
+          oslog::warn("Child velocity empty!! ");
         }
 
         pChild->mBiasGBA = pChild->GetImuBias();
@@ -1341,7 +1339,7 @@ void LocalMapping::InitializeIMU(float priorG, float priorA, bool bFIBA) {
     }
   }
 
-  Verbose::PrintMess("Map updated!", Verbose::VERBOSITY_NORMAL);
+  oslog::info("Map updated!");
 
   mnKFs = vpKF.size();
   mIdxInit++;

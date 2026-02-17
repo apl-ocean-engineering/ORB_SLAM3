@@ -161,7 +161,7 @@ class Verbose {
         oslog::info("{}", str);
         break;
       case VERBOSITY_NORMAL:
-        oslog::error("{}", str);
+        oslog::warn("{}", str);
         break;
       case VERBOSITY_QUIET:
         oslog::critical("{}", str);

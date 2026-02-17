@@ -638,8 +638,8 @@ void MapPoint::PostLoad(
     map<long unsigned int, MapPoint*>& mpMPid) {
   mpRefKF = mpKFid[mBackupRefKFId];
   if (!mpRefKF) {
-    cout << "ERROR: MP without KF reference " << mBackupRefKFId
-         << "; Num obs: " << nObs << endl;
+    oslog::warn("ERROR: MP without KF reference {}; Num obs: {}",
+                mBackupRefKFId, nObs);
   }
   mpReplaced = static_cast<MapPoint*>(NULL);
   if (mBackupReplacedId >= 0) {
