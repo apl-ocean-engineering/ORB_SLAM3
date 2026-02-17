@@ -95,8 +95,8 @@ bool System::initialize(bool initFr, const string &strSequence) {
   mpVocabulary = std::make_shared<ORBVocabulary>();
   bool bVocLoad = mpVocabulary->loadFromTextFile(vocabularyFilePath);
   if (!bVocLoad) {
-    cerr << "Wrong path to vocabulary. " << endl;
-    cerr << "Falied to open at: " << vocabularyFilePath << endl;
+    oslog::error("Wrong path to vocabulary.  Failed to open {}",
+                 vocabularyFilePath);
     return false;
   }
   oslog::info("Vocabulary loaded!");
@@ -249,8 +249,8 @@ Sophus::SE3f System::TrackRGBD(cv::InputArray im, cv::InputArray depthmap,
                                const vector<IMU::Point> &vImuMeas,
                                string filename) {
   if (!sensorType().isRGBD()) {
-    cerr << "ERROR: you called TrackRGBD but input sensor was not set to RGBD."
-         << endl;
+    oslog::error(
+        "ERROR: you called TrackRGBD but input sensor was not set to RGBD.");
     exit(-1);
   }
 
@@ -292,9 +292,9 @@ Sophus::SE3f System::TrackMonocular(cv::InputArray im, double timestamp,
   }
 
   if (!sensorType().isMonocular()) {
-    cerr << "ERROR: you called TrackMonocular but input sensor was not set to "
-            "Monocular nor Monocular-Inertial."
-         << endl;
+    oslog::error(
+        "ERROR: you called TrackMonocular but input sensor was not set to "
+        "Monocular nor Monocular-Inertial.");
     exit(-1);
   }
 

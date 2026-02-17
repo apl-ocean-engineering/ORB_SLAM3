@@ -36,6 +36,7 @@
 
 #include "CameraModels/GeometricCamera.h"
 #include "Expected.h"
+#include "Logging.h"
 #include "Types.h"
 
 namespace ORB_SLAM3 {
@@ -48,7 +49,7 @@ class Settings;
 class SettingsLoader {
  public:
   typedef tl::expected<std::shared_ptr<Settings>, ExpectedError> Expected;
-  static Expected load(const std::string& configFile, const SensorType sensor,
+  static Expected Load(const std::string& configFile, const SensorType sensor,
                        const std::string& vocabFile = "");
 
   explicit SettingsLoader(const SensorType sensor);
@@ -74,12 +75,11 @@ class SettingsLoader {
     cv::FileNode node = fSettings[name];
     if (node.empty()) {
       if (required) {
-        std::cerr << name << " required parameter does not exist, aborting..."
-                  << std::endl;
+        oslog::error("Required parameter \"{}\" does not exist, aborting...",
+                     name);
         exit(-1);
       } else {
-        std::cerr << name << " optional parameter does not exist..."
-                  << std::endl;
+        oslog::warn("Optional parameter \"{}\" does not exist.", name);
         found = false;
         return T();
       }

@@ -171,8 +171,7 @@ void LoopClosing::Run() {
                 mvpMergeMPs.clear();
                 mnMergeNumNotFound = 0;
                 mbMergeDetected = false;
-                Verbose::PrintMess("scale bad estimated. Abort merging",
-                                   Verbose::VERBOSITY_NORMAL);
+                oslog::warn("scale bad estimated. Abort merging");
                 continue;
               }
               // If inertial, force only yaw
@@ -193,7 +192,7 @@ void LoopClosing::Run() {
 
             // mpTracker->SetStepByStep(true);
 
-            Verbose::PrintMess("*Merge detected", Verbose::VERBOSITY_QUIET);
+            oslog::info("*Merge detected");
 
 #ifdef REGISTER_TIMES
             std::chrono::steady_clock::time_point time_StartMerge =
@@ -219,7 +218,7 @@ void LoopClosing::Run() {
             vdMergeTotal_ms.push_back(timeMergeTotal);
 #endif
 
-            Verbose::PrintMess("Merge finished!", Verbose::VERBOSITY_QUIET);
+            oslog::info("Merge finished!");
           }
 
           vdPR_CurrentTime.push_back(mpCurrentKF->mTimeStamp);
@@ -253,7 +252,7 @@ void LoopClosing::Run() {
           vdPR_MatchedTime.push_back(mpLoopMatchedKF->mTimeStamp);
           vnPR_TypeRecogn.push_back(0);
 
-          Verbose::PrintMess("*Loop detected", Verbose::VERBOSITY_QUIET);
+          oslog::debug("*Loop detected");
 
           mg2oLoopScw = mg2oLoopSlw;  // *mvg2oSim3LoopTcw[nCurrentIndex];
           if (mpCurrentKF->GetMap()->IsInertial()) {
@@ -1487,13 +1486,12 @@ void LoopClosing::MergeLocal() {
 #endif
   for (auto pKFi : spLocalWindowKFs) {
     if (!pKFi || pKFi->isBad()) {
-      Verbose::PrintMess("Bad KF in correction", Verbose::VERBOSITY_DEBUG);
+      oslog::debug("Bad KF in correction");
       continue;
     }
 
     if (pKFi->GetMap() != pCurrentMap)
-      Verbose::PrintMess("Other map KF, this should't happen",
-                         Verbose::VERBOSITY_DEBUG);
+      oslog::debug("Other map KF, this should't happen");
 
     g2o::Sim3 g2oCorrectedSiw;
 
@@ -2330,8 +2328,7 @@ void LoopClosing::ResetIfRequested() {
 
 void LoopClosing::RunGlobalBundleAdjustment(
     const std::shared_ptr<Map>& pActiveMap, unsigned long nLoopKF) {
-  Verbose::PrintMess("Starting Global Bundle Adjustment",
-                     Verbose::VERBOSITY_NORMAL);
+  oslog::debug("Starting Global Bundle Adjustment");
 
 #ifdef REGISTER_TIMES
   std::chrono::steady_clock::time_point time_StartFGBA =
@@ -2381,9 +2378,8 @@ void LoopClosing::RunGlobalBundleAdjustment(
     if (!bImuInit && pActiveMap->isImuInitialized()) return;
 
     if (!mbStopGBA) {
-      Verbose::PrintMess("Global Bundle Adjustment finished",
-                         Verbose::VERBOSITY_NORMAL);
-      Verbose::PrintMess("Updating map ...", Verbose::VERBOSITY_NORMAL);
+      oslog::info("Global Bundle Adjustment finished");
+      oslog::info("Updating map ...");
 
       mpLocalMapper->RequestStop();
       // Wait until Local Mapping has effectively stopped
@@ -2428,8 +2424,7 @@ void LoopClosing::RunGlobalBundleAdjustment(
             if (pChild->isVelocitySet()) {
               pChild->mVwbGBA = Rcor * pChild->GetVelocity();
             } else {
-              Verbose::PrintMess("Child velocity empty!! ",
-                                 Verbose::VERBOSITY_NORMAL);
+              oslog::info("Child velocity empty!!");
             }
 
             // cout << "Child bias: " << pChild->GetImuBias() << endl;
@@ -2574,7 +2569,7 @@ void LoopClosing::RunGlobalBundleAdjustment(
               .count();
       vdFGBATotal_ms.push_back(timeFGBA);
 #endif
-      Verbose::PrintMess("Map updated!", Verbose::VERBOSITY_NORMAL);
+      oslog::info("Map updated!");
     }
 
     mbFinishedGBA = true;

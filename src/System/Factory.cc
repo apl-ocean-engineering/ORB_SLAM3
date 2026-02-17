@@ -53,7 +53,7 @@ SystemFactory::Expected SystemFactory::create(const std::string &configFile,
                                               const SensorType sensor,
                                               bool initFr,
                                               const string &strSequence) {
-  auto exSettings = SettingsLoader::load(configFile, sensor);
+  auto exSettings = SettingsLoader::Load(configFile, sensor);
 
   if (!exSettings) {
     return tl::make_unexpected(ExpectedError::fmt("Unable to load settings"));
@@ -67,7 +67,7 @@ SystemFactory::Expected SystemFactory::create(const std::string &configFile,
                                               const SensorType sensor,
                                               bool initFr,
                                               const string &strSequence) {
-  auto exSettings = SettingsLoader::load(configFile, sensor, vocabFile);
+  auto exSettings = SettingsLoader::Load(configFile, sensor, vocabFile);
 
   if (!exSettings) {
     return tl::make_unexpected(ExpectedError::fmt("Unable to load settings"));

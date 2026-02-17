@@ -57,7 +57,7 @@ void System::SaveTrajectoryTUM(const string &filename) {
 
   oslog::info("Saving camera trajectory to {} ...", filename);
   if (sensorType() == SensorType::MONOCULAR) {
-    cerr << "ERROR: SaveTrajectoryTUM cannot be used for monocular." << endl;
+    oslog::error("ERROR: SaveTrajectoryTUM cannot be used for monocular.");
     return;
   }
 

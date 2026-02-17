@@ -274,7 +274,7 @@ void Optimizer::BundleAdjustment(const vector<std::shared_ptr<KeyFrame>>& vpKFs,
   optimizer.setVerbose(false);
   optimizer.initializeOptimization();
   optimizer.optimize(nIterations);
-  Verbose::PrintMess("BA: End of the optimization", Verbose::VERBOSITY_NORMAL);
+  oslog::debug("BA: End of the optimization");
 
   // Recover optimized data
   // Keyframes
@@ -432,8 +432,7 @@ void Optimizer::FullInertialBA(const std::shared_ptr<Map>& pMap, int its,
   // IMU links
   for (auto pKFi : vpKFs) {
     if (!pKFi->mPrevKF) {
-      Verbose::PrintMess("NOT INERTIAL LINK TO PREVIOUS FRAME!",
-                         Verbose::VERBOSITY_NORMAL);
+      oslog::warn("NOT INERTIAL LINK TO PREVIOUS FRAME!");
       continue;
     }
 
@@ -1104,9 +1103,8 @@ void Optimizer::LocalBundleAdjustment(const shared_ptr<KeyFrame>& pKF,
   num_fixedKF = lFixedCameras.size() + num_fixedKF;
 
   if (num_fixedKF == 0) {
-    Verbose::PrintMess(
-        "LM-LBA: There are 0 fixed KF in the optimizations, LBA aborted",
-        Verbose::VERBOSITY_NORMAL);
+    oslog::info(
+        "LM-LBA: There are 0 fixed KF in the optimizations, LBA aborted");
     return;
   }
 
