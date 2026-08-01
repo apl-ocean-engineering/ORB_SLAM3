@@ -29,16 +29,9 @@
 
 namespace ORB_SLAM3 {
 
-Viewer::Viewer(System *pSystem,
-               const std::shared_ptr<FrameDrawer> &pFrameDrawer,
-               const std::shared_ptr<MapDrawer> &pMapDrawer,
-               const std::shared_ptr<Tracking> &pTracking,
-               const std::shared_ptr<Settings> &settings)
-    : both(false),
-      mpSystem(pSystem),
-      mpFrameDrawer(pFrameDrawer),
-      mpMapDrawer(pMapDrawer),
-      mpTracker(pTracking),
+Viewer::Viewer(const std::shared_ptr<System> &pSystem)
+    : SystemAccessor(pSystem),
+      both(false),
       mbFinishRequested(false),
       mbFinished(true),
       mbStopped(true),
@@ -48,15 +41,15 @@ Viewer::Viewer(System *pSystem,
 
   mT = 1e3 / 30;
 
-  cv::Size imSize = settings->newImSize();
+  cv::Size imSize = getSettings()->newImSize();
   mImageHeight = imSize.height;
   mImageWidth = imSize.width;
 
-  mImageViewerScale = settings->imageViewerScale();
-  mViewpointX = settings->viewPointX();
-  mViewpointY = settings->viewPointY();
-  mViewpointZ = settings->viewPointZ();
-  mViewpointF = settings->viewPointF();
+  mImageViewerScale = getSettings()->imageViewerScale();
+  mViewpointX = getSettings()->viewPointX();
+  mViewpointY = getSettings()->viewPointY();
+  mViewpointZ = getSettings()->viewPointZ();
+  mViewpointF = getSettings()->viewPointF();
 }
 
 void Viewer::Run() {
@@ -116,19 +109,19 @@ void Viewer::Run() {
   bool bStepByStep = false;
   bool bCameraView = true;
 
-  if (mpTracker->mSensor == SensorType::MONOCULAR ||
-      mpTracker->mSensor == SensorType::STEREO ||
-      mpTracker->mSensor == SensorType::RGBD) {
+  if (getTracker()->mSensor == SensorType::MONOCULAR ||
+      getTracker()->mSensor == SensorType::STEREO ||
+      getTracker()->mSensor == SensorType::RGBD) {
     menuShowGraph = true;
   }
 
-  float trackedImageScale = mpTracker->GetImageScale();
+  float trackedImageScale = getTracker()->GetImageScale();
 
   cout << "Starting the Viewer" << endl;
   while (1) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    mpMapDrawer->GetCurrentOpenGLCameraMatrix(Twc, Ow);
+    getMapDrawer()->GetCurrentOpenGLCameraMatrix(Twc, Ow);
 
     if (mbStopTrack) {
       menuStepByStep = true;
@@ -169,7 +162,7 @@ void Viewer::Run() {
       s_cam.Follow(Twc);
     }
 
-    if (menuTopView && mpMapDrawer->mpAtlas->isImuInitialized()) {
+    if (menuTopView && getAtlas()->isImuInitialized()) {
       menuTopView = false;
       bCameraView = false;
       s_cam.SetProjectionMatrix(pangolin::ProjectionMatrix(
@@ -180,43 +173,43 @@ void Viewer::Run() {
     }
 
     if (menuLocalizationMode && !bLocalizationMode) {
-      mpSystem->ActivateLocalizationMode();
+      system()->ActivateLocalizationMode();
       bLocalizationMode = true;
     } else if (!menuLocalizationMode && bLocalizationMode) {
-      mpSystem->DeactivateLocalizationMode();
+      system()->DeactivateLocalizationMode();
       bLocalizationMode = false;
     }
 
     if (menuStepByStep && !bStepByStep) {
       // cout << "Viewer: step by step" << endl;
-      mpTracker->SetStepByStep(true);
+      getTracker()->SetStepByStep(true);
       bStepByStep = true;
     } else if (!menuStepByStep && bStepByStep) {
-      mpTracker->SetStepByStep(false);
+      getTracker()->SetStepByStep(false);
       bStepByStep = false;
     }
 
     if (menuStep) {
-      mpTracker->mbStep = true;
+      getTracker()->mbStep = true;
       menuStep = false;
     }
 
     d_cam.Activate(s_cam);
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-    mpMapDrawer->DrawCurrentCamera(Twc);
+    getMapDrawer()->DrawCurrentCamera(Twc);
     if (menuShowKeyFrames || menuShowGraph || menuShowInertialGraph ||
         menuShowOptLba)
-      mpMapDrawer->DrawKeyFrames(menuShowKeyFrames, menuShowGraph,
-                                 menuShowInertialGraph, menuShowOptLba);
-    if (menuShowPoints) mpMapDrawer->DrawMapPoints();
+      getMapDrawer()->DrawKeyFrames(menuShowKeyFrames, menuShowGraph,
+                                    menuShowInertialGraph, menuShowOptLba);
+    if (menuShowPoints) getMapDrawer()->DrawMapPoints();
 
     pangolin::FinishFrame();
 
     cv::Mat toShow;
-    cv::Mat im = mpFrameDrawer->DrawFrame(trackedImageScale);
+    cv::Mat im = getFrameDrawer()->DrawFrame(trackedImageScale);
 
     if (both) {
-      cv::Mat imRight = mpFrameDrawer->DrawRightFrame(trackedImageScale);
+      cv::Mat imRight = getFrameDrawer()->DrawRightFrame(trackedImageScale);
       cv::hconcat(im, imRight, toShow);
     } else {
       toShow = im;
@@ -237,23 +230,23 @@ void Viewer::Run() {
       menuShowKeyFrames = true;
       menuShowPoints = true;
       menuLocalizationMode = false;
-      if (bLocalizationMode) mpSystem->DeactivateLocalizationMode();
+      if (bLocalizationMode) system()->DeactivateLocalizationMode();
       bLocalizationMode = false;
       bFollow = true;
       menuFollowCamera = true;
-      mpSystem->ResetActiveMap();
+      system()->ResetActiveMap();
       menuReset = false;
     }
 
     if (menuStop) {
-      if (bLocalizationMode) mpSystem->DeactivateLocalizationMode();
+      if (bLocalizationMode) system()->DeactivateLocalizationMode();
 
       // Stop all threads
-      mpSystem->Shutdown();
+      system()->Shutdown();
 
       // Save camera trajectory
-      mpSystem->SaveTrajectoryEuRoC("CameraTrajectory.txt");
-      mpSystem->SaveKeyFrameTrajectoryEuRoC("KeyFrameTrajectory.txt");
+      system()->SaveTrajectoryEuRoC("CameraTrajectory.txt");
+      system()->SaveKeyFrameTrajectoryEuRoC("KeyFrameTrajectory.txt");
       menuStop = false;
     }
 

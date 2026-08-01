@@ -47,31 +47,18 @@
 
 namespace ORB_SLAM3 {
 
-Tracking::Tracking(const std::shared_ptr<System>& pSys,
-                   const std::shared_ptr<ORBVocabulary>& pVoc,
-                   const std::shared_ptr<FrameDrawer>& pFrameDrawer,
-                   const std::shared_ptr<MapDrawer>& pMapDrawer,
-                   const std::shared_ptr<Atlas>& pAtlas,
-                   const std::shared_ptr<VPRImplementation>& pKFDB,
-                   const std::shared_ptr<Settings>& settings,
-                   const string& _nameSeq)
-    : std::enable_shared_from_this<Tracking>(),
+Tracking::Tracking(const std::shared_ptr<System>& pSys, const string& _nameSeq)
+    : SystemAccessor(pSys),
+      std::enable_shared_from_this<Tracking>(),
       mState(NO_IMAGES_YET),
-      mSensor(settings->sensor_),
+      mSensor(pSys->getSettings()->sensor_),
       mTrackedFr(0),
       mbStep(false),
       mbOnlyTracking(false),
       mbMapUpdated(false),
       mbVO(false),
-      mpORBVocabulary(pVoc),
-      mpKeyFrameDB(pKFDB),
       mbReadyToInitializate(false),
-      mpSystem(pSys),
-      mpViewer(nullptr),
       bStepByStep(false),
-      mpFrameDrawer(pFrameDrawer),
-      mpMapDrawer(pMapDrawer),
-      mpAtlas(pAtlas),
       mnLastRelocFrameId(0),
       time_recently_lost(5.0),
       mnInitialFrameId(0),
@@ -84,10 +71,11 @@ Tracking::Tracking(const std::shared_ptr<System>& pSys,
       lastID(0),
       mbInitWith3KFs(false),
       mnNumDataset(0) {
-  newParameterLoader(settings);
+  newParameterLoader(system()->getSettings());
 
   {
-    vector<std::shared_ptr<GeometricCamera>> vpCams = mpAtlas->GetAllCameras();
+    vector<std::shared_ptr<GeometricCamera>> vpCams =
+        getAtlas()->GetAllCameras();
     oslog::debug("There are {} cameras in the atlas", vpCams.size());
 
     for (auto const& pCam : vpCams) {
@@ -164,13 +152,13 @@ void Tracking::LocalMapStats2File() {
     f << "#Stereo rect[ms], MP culling[ms], MP creation[ms], LBA[ms], KF "
          "culling[ms], Total[ms]"
       << endl;
-    for (size_t i = 0; i < mpLocalMapper->vdLMTotal_ms.size(); ++i) {
-      f << mpLocalMapper->vdKFInsert_ms.at(i) << ","
-        << mpLocalMapper->vdMPCulling_ms.at(i) << ","
-        << mpLocalMapper->vdMPCreation_ms.at(i) << ","
-        << mpLocalMapper->vdLBASync_ms.at(i) << ","
-        << mpLocalMapper->vdKFCullingSync_ms.at(i) << ","
-        << mpLocalMapper->vdLMTotal_ms.at(i) << endl;
+    for (size_t i = 0; i < getLocalMapper()->vdLMTotal_ms.size(); ++i) {
+      f << getLocalMapper()->vdKFInsert_ms.at(i) << ","
+        << getLocalMapper()->vdMPCulling_ms.at(i) << ","
+        << getLocalMapper()->vdMPCreation_ms.at(i) << ","
+        << getLocalMapper()->vdLBASync_ms.at(i) << ","
+        << getLocalMapper()->vdKFCullingSync_ms.at(i) << ","
+        << getLocalMapper()->vdLMTotal_ms.at(i) << endl;
 
       f.close();
     }
@@ -184,12 +172,12 @@ void Tracking::LocalMapStats2File() {
     f.open("LBA_Stats.txt");
     f << fixed << setprecision(6);
     f << "#LBA time[ms], KF opt[#], KF fixed[#], MP[#], Edges[#]" << endl;
-    for (size_t i = 0; i < mpLocalMapper->vdLBASync_ms.size(); ++i) {
-      f << mpLocalMapper->vdLBASync_ms.at(i) << ","
-        << mpLocalMapper->vnLBA_KFopt.at(i) << ","
-        << mpLocalMapper->vnLBA_KFfixed.at(i) << ","
-        << mpLocalMapper->vnLBA_MPs.at(i) << ","
-        << mpLocalMapper->vnLBA_edges.at(i) << endl;
+    for (size_t i = 0; i < getLocalMapper()->vdLBASync_ms.size(); ++i) {
+      f << getLocalMapper()->vdLBASync_ms.at(i) << ","
+        << getLocalMapper()->vnLBA_KFopt.at(i) << ","
+        << getLocalMapper()->vnLBA_KFfixed.at(i) << ","
+        << getLocalMapper()->vnLBA_MPs.at(i) << ","
+        << getLocalMapper()->vnLBA_edges.at(i) << endl;
     }
     f.close();
   } catch (const std::out_of_range& ex) {
@@ -203,8 +191,8 @@ void Tracking::TrackStats2File() {
   ofstream f;
   f.open("SessionInfo.txt");
   f << fixed;
-  f << "Number of KFs: " << mpAtlas->GetAllKeyFrames().size() << endl;
-  f << "Number of MPs: " << mpAtlas->GetAllMapPoints().size() << endl;
+  f << "Number of KFs: " << getAtlas()->GetAllKeyFrames().size() << endl;
+  f << "Number of MPs: " << getAtlas()->GetAllMapPoints().size() << endl;
 
   f << "OpenCV version: " << CV_VERSION << endl;
 
@@ -337,33 +325,33 @@ void Tracking::PrintTimeStats() {
   std::cout << "Local Mapping" << std::endl << std::endl;
   f << std::endl << "Local Mapping" << std::endl << std::endl;
 
-  average = calcAverage(mpLocalMapper->vdKFInsert_ms);
-  deviation = calcDeviation(mpLocalMapper->vdKFInsert_ms, average);
+  average = calcAverage(getLocalMapper()->vdKFInsert_ms);
+  deviation = calcDeviation(getLocalMapper()->vdKFInsert_ms, average);
   std::cout << "KF Insertion: " << average << " +/- " << deviation << std::endl;
   f << "KF Insertion: " << average << " +/- " << deviation << std::endl;
 
-  average = calcAverage(mpLocalMapper->vdMPCulling_ms);
-  deviation = calcDeviation(mpLocalMapper->vdMPCulling_ms, average);
+  average = calcAverage(getLocalMapper()->vdMPCulling_ms);
+  deviation = calcDeviation(getLocalMapper()->vdMPCulling_ms, average);
   std::cout << "MP Culling: " << average << " +/- " << deviation << std::endl;
   f << "MP Culling: " << average << " +/- " << deviation << std::endl;
 
-  average = calcAverage(mpLocalMapper->vdMPCreation_ms);
-  deviation = calcDeviation(mpLocalMapper->vdMPCreation_ms, average);
+  average = calcAverage(getLocalMapper()->vdMPCreation_ms);
+  deviation = calcDeviation(getLocalMapper()->vdMPCreation_ms, average);
   std::cout << "MP Creation: " << average << " +/- " << deviation << std::endl;
   f << "MP Creation: " << average << " +/- " << deviation << std::endl;
 
-  average = calcAverage(mpLocalMapper->vdLBA_ms);
-  deviation = calcDeviation(mpLocalMapper->vdLBA_ms, average);
+  average = calcAverage(getLocalMapper()->vdLBA_ms);
+  deviation = calcDeviation(getLocalMapper()->vdLBA_ms, average);
   std::cout << "LBA: " << average << " +/- " << deviation << std::endl;
   f << "LBA: " << average << " +/- " << deviation << std::endl;
 
-  average = calcAverage(mpLocalMapper->vdKFCulling_ms);
-  deviation = calcDeviation(mpLocalMapper->vdKFCulling_ms, average);
+  average = calcAverage(getLocalMapper()->vdKFCulling_ms);
+  deviation = calcDeviation(getLocalMapper()->vdKFCulling_ms, average);
   std::cout << "KF Culling: " << average << " +/- " << deviation << std::endl;
   f << "KF Culling: " << average << " +/- " << deviation << std::endl;
 
-  average = calcAverage(mpLocalMapper->vdLMTotal_ms);
-  deviation = calcDeviation(mpLocalMapper->vdLMTotal_ms, average);
+  average = calcAverage(getLocalMapper()->vdLMTotal_ms);
+  deviation = calcDeviation(getLocalMapper()->vdLMTotal_ms, average);
   std::cout << "Total Local Mapping: " << average << " +/- " << deviation
             << std::endl;
   f << "Total Local Mapping: " << average << " +/- " << deviation << std::endl;
@@ -374,42 +362,44 @@ void Tracking::PrintTimeStats() {
   f << "---------------------------" << std::endl;
   f << std::endl << "LBA complexity (mean +/- std)" << std::endl;
 
-  average = calcAverage(mpLocalMapper->vnLBA_edges);
-  deviation = calcDeviation(mpLocalMapper->vnLBA_edges, average);
+  average = calcAverage(getLocalMapper()->vnLBA_edges);
+  deviation = calcDeviation(getLocalMapper()->vnLBA_edges, average);
   std::cout << "LBA Edges: " << average << " +/- " << deviation << std::endl;
   f << "LBA Edges: " << average << " +/- " << deviation << std::endl;
 
-  average = calcAverage(mpLocalMapper->vnLBA_KFopt);
-  deviation = calcDeviation(mpLocalMapper->vnLBA_KFopt, average);
+  average = calcAverage(getLocalMapper()->vnLBA_KFopt);
+  deviation = calcDeviation(getLocalMapper()->vnLBA_KFopt, average);
   std::cout << "LBA KF optimized: " << average << " +/- " << deviation
             << std::endl;
   f << "LBA KF optimized: " << average << " +/- " << deviation << std::endl;
 
-  average = calcAverage(mpLocalMapper->vnLBA_KFfixed);
-  deviation = calcDeviation(mpLocalMapper->vnLBA_KFfixed, average);
+  average = calcAverage(getLocalMapper()->vnLBA_KFfixed);
+  deviation = calcDeviation(getLocalMapper()->vnLBA_KFfixed, average);
   std::cout << "LBA KF fixed: " << average << " +/- " << deviation << std::endl;
   f << "LBA KF fixed: " << average << " +/- " << deviation << std::endl;
 
-  average = calcAverage(mpLocalMapper->vnLBA_MPs);
-  deviation = calcDeviation(mpLocalMapper->vnLBA_MPs, average);
+  average = calcAverage(getLocalMapper()->vnLBA_MPs);
+  deviation = calcDeviation(getLocalMapper()->vnLBA_MPs, average);
   std::cout << "LBA MP: " << average << " +/- " << deviation << std::endl
             << std::endl;
   f << "LBA MP: " << average << " +/- " << deviation << std::endl << std::endl;
 
-  std::cout << "LBA executions: " << mpLocalMapper->nLBA_exec << std::endl;
-  std::cout << "LBA aborts: " << mpLocalMapper->nLBA_abort << std::endl;
-  f << "LBA executions: " << mpLocalMapper->nLBA_exec << std::endl;
-  f << "LBA aborts: " << mpLocalMapper->nLBA_abort << std::endl;
+  std::cout << "LBA executions: " << getLocalMapper()->nLBA_exec << std::endl;
+  std::cout << "LBA aborts: " << getLocalMapper()->nLBA_abort << std::endl;
+  f << "LBA executions: " << getLocalMapper()->nLBA_exec << std::endl;
+  f << "LBA aborts: " << getLocalMapper()->nLBA_abort << std::endl;
 
   // Map complexity
   std::cout << "---------------------------" << std::endl;
   std::cout << std::endl << "Map complexity" << std::endl;
-  std::cout << "Num maps  : " << mpAtlas->CountMaps() << std::endl;
-  std::cout << "KFs in map: " << mpAtlas->GetAllKeyFrames().size() << std::endl;
-  std::cout << "MPs in map: " << mpAtlas->GetAllMapPoints().size() << std::endl;
+  std::cout << "Num maps  : " << getAtlas()->CountMaps() << std::endl;
+  std::cout << "KFs in map: " << getAtlas()->GetAllKeyFrames().size()
+            << std::endl;
+  std::cout << "MPs in map: " << getAtlas()->GetAllMapPoints().size()
+            << std::endl;
   f << "---------------------------" << std::endl;
   f << std::endl << "Map complexity" << std::endl;
-  vector<std::shared_ptr<Map>> vpMaps = mpAtlas->GetAllMaps();
+  vector<std::shared_ptr<Map>> vpMaps = getAtlas()->GetAllMaps();
   std::shared_ptr<Map> pBestMap = vpMaps[0];
   for (int i = 1; i < vpMaps.size(); ++i) {
     if (pBestMap->GetAllKeyFrames().size() <
@@ -425,18 +415,18 @@ void Tracking::PrintTimeStats() {
   f << std::endl << "## Place Recognition (mean +/- std)" << std::endl;
   std::cout << "---------------------------" << std::endl;
   std::cout << std::endl << "## Place Recognition (mean +/- std)" << std::endl;
-  average = calcAverage(mpLoopClosing->vdDataQuery_ms);
-  deviation = calcDeviation(mpLoopClosing->vdDataQuery_ms, average);
+  average = calcAverage(getLoopClosing()->vdDataQuery_ms);
+  deviation = calcDeviation(getLoopClosing()->vdDataQuery_ms, average);
   f << "Database Query: " << average << " +/- " << deviation << std::endl;
   std::cout << "Database Query: " << average << " +/- " << deviation
             << std::endl;
-  average = calcAverage(mpLoopClosing->vdEstSim3_ms);
-  deviation = calcDeviation(mpLoopClosing->vdEstSim3_ms, average);
+  average = calcAverage(getLoopClosing()->vdEstSim3_ms);
+  deviation = calcDeviation(getLoopClosing()->vdEstSim3_ms, average);
   f << "SE3 estimation: " << average << " +/- " << deviation << std::endl;
   std::cout << "SE3 estimation: " << average << " +/- " << deviation
             << std::endl;
-  average = calcAverage(mpLoopClosing->vdPRTotal_ms);
-  deviation = calcDeviation(mpLoopClosing->vdPRTotal_ms, average);
+  average = calcAverage(getLoopClosing()->vdPRTotal_ms);
+  deviation = calcDeviation(getLoopClosing()->vdPRTotal_ms, average);
   f << "Total Place Recognition: " << average << " +/- " << deviation
     << std::endl
     << std::endl;
@@ -446,96 +436,96 @@ void Tracking::PrintTimeStats() {
 
   f << std::endl << "## Loop Closing (mean +/- std)" << std::endl;
   std::cout << std::endl << "## Loop Closing (mean +/- std)" << std::endl;
-  average = calcAverage(mpLoopClosing->vdLoopFusion_ms);
-  deviation = calcDeviation(mpLoopClosing->vdLoopFusion_ms, average);
+  average = calcAverage(getLoopClosing()->vdLoopFusion_ms);
+  deviation = calcDeviation(getLoopClosing()->vdLoopFusion_ms, average);
   f << "Loop Fusion: " << average << " +/- " << deviation << std::endl;
   std::cout << "Loop Fusion: " << average << " +/- " << deviation << std::endl;
-  average = calcAverage(mpLoopClosing->vdLoopOptEss_ms);
-  deviation = calcDeviation(mpLoopClosing->vdLoopOptEss_ms, average);
+  average = calcAverage(getLoopClosing()->vdLoopOptEss_ms);
+  deviation = calcDeviation(getLoopClosing()->vdLoopOptEss_ms, average);
   f << "Essential Graph: " << average << " +/- " << deviation << std::endl;
   std::cout << "Essential Graph: " << average << " +/- " << deviation
             << std::endl;
-  average = calcAverage(mpLoopClosing->vdLoopTotal_ms);
-  deviation = calcDeviation(mpLoopClosing->vdLoopTotal_ms, average);
+  average = calcAverage(getLoopClosing()->vdLoopTotal_ms);
+  deviation = calcDeviation(getLoopClosing()->vdLoopTotal_ms, average);
   f << "Total Loop Closing: " << average << " +/- " << deviation << std::endl
     << std::endl;
   std::cout << "Total Loop Closing: " << average << " +/- " << deviation
             << std::endl
             << std::endl;
 
-  f << "Num exec: " << mpLoopClosing->nLoop << std::endl;
-  std::cout << "Num exec: " << mpLoopClosing->nLoop << std::endl;
-  average = calcAverage(mpLoopClosing->vnLoopKFs);
-  deviation = calcDeviation(mpLoopClosing->vnLoopKFs, average);
+  f << "Num exec: " << getLoopClosing()->nLoop << std::endl;
+  std::cout << "Num exec: " << getLoopClosing()->nLoop << std::endl;
+  average = calcAverage(getLoopClosing()->vnLoopKFs);
+  deviation = calcDeviation(getLoopClosing()->vnLoopKFs, average);
   f << "Number of KFs: " << average << " +/- " << deviation << std::endl;
   std::cout << "Number of KFs: " << average << " +/- " << deviation
             << std::endl;
 
   f << std::endl << "## Map Merging (mean +/- std)" << std::endl;
   std::cout << std::endl << "## Map Merging (mean +/- std)" << std::endl;
-  average = calcAverage(mpLoopClosing->vdMergeMaps_ms);
-  deviation = calcDeviation(mpLoopClosing->vdMergeMaps_ms, average);
+  average = calcAverage(getLoopClosing()->vdMergeMaps_ms);
+  deviation = calcDeviation(getLoopClosing()->vdMergeMaps_ms, average);
   f << "Merge Maps: " << average << " +/- " << deviation << std::endl;
   std::cout << "Merge Maps: " << average << " +/- " << deviation << std::endl;
-  average = calcAverage(mpLoopClosing->vdWeldingBA_ms);
-  deviation = calcDeviation(mpLoopClosing->vdWeldingBA_ms, average);
+  average = calcAverage(getLoopClosing()->vdWeldingBA_ms);
+  deviation = calcDeviation(getLoopClosing()->vdWeldingBA_ms, average);
   f << "Welding BA: " << average << " +/- " << deviation << std::endl;
   std::cout << "Welding BA: " << average << " +/- " << deviation << std::endl;
-  average = calcAverage(mpLoopClosing->vdMergeOptEss_ms);
-  deviation = calcDeviation(mpLoopClosing->vdMergeOptEss_ms, average);
+  average = calcAverage(getLoopClosing()->vdMergeOptEss_ms);
+  deviation = calcDeviation(getLoopClosing()->vdMergeOptEss_ms, average);
   f << "Optimization Ess.: " << average << " +/- " << deviation << std::endl;
   std::cout << "Optimization Ess.: " << average << " +/- " << deviation
             << std::endl;
-  average = calcAverage(mpLoopClosing->vdMergeTotal_ms);
-  deviation = calcDeviation(mpLoopClosing->vdMergeTotal_ms, average);
+  average = calcAverage(getLoopClosing()->vdMergeTotal_ms);
+  deviation = calcDeviation(getLoopClosing()->vdMergeTotal_ms, average);
   f << "Total Map Merging: " << average << " +/- " << deviation << std::endl
     << std::endl;
   std::cout << "Total Map Merging: " << average << " +/- " << deviation
             << std::endl
             << std::endl;
 
-  f << "Num exec: " << mpLoopClosing->nMerges << std::endl;
-  std::cout << "Num exec: " << mpLoopClosing->nMerges << std::endl;
-  average = calcAverage(mpLoopClosing->vnMergeKFs);
-  deviation = calcDeviation(mpLoopClosing->vnMergeKFs, average);
+  f << "Num exec: " << getLoopClosing()->nMerges << std::endl;
+  std::cout << "Num exec: " << getLoopClosing()->nMerges << std::endl;
+  average = calcAverage(getLoopClosing()->vnMergeKFs);
+  deviation = calcDeviation(getLoopClosing()->vnMergeKFs, average);
   f << "Number of KFs: " << average << " +/- " << deviation << std::endl;
   std::cout << "Number of KFs: " << average << " +/- " << deviation
             << std::endl;
-  average = calcAverage(mpLoopClosing->vnMergeMPs);
-  deviation = calcDeviation(mpLoopClosing->vnMergeMPs, average);
+  average = calcAverage(getLoopClosing()->vnMergeMPs);
+  deviation = calcDeviation(getLoopClosing()->vnMergeMPs, average);
   f << "Number of MPs: " << average << " +/- " << deviation << std::endl;
   std::cout << "Number of MPs: " << average << " +/- " << deviation
             << std::endl;
 
   f << std::endl << "## Full GBA (mean +/- std)" << std::endl;
   std::cout << std::endl << "## Full GBA (mean +/- std)" << std::endl;
-  average = calcAverage(mpLoopClosing->vdGBA_ms);
-  deviation = calcDeviation(mpLoopClosing->vdGBA_ms, average);
+  average = calcAverage(getLoopClosing()->vdGBA_ms);
+  deviation = calcDeviation(getLoopClosing()->vdGBA_ms, average);
   f << "GBA: " << average << " +/- " << deviation << std::endl;
   std::cout << "GBA: " << average << " +/- " << deviation << std::endl;
-  average = calcAverage(mpLoopClosing->vdUpdateMap_ms);
-  deviation = calcDeviation(mpLoopClosing->vdUpdateMap_ms, average);
+  average = calcAverage(getLoopClosing()->vdUpdateMap_ms);
+  deviation = calcDeviation(getLoopClosing()->vdUpdateMap_ms, average);
   f << "Map Update: " << average << " +/- " << deviation << std::endl;
   std::cout << "Map Update: " << average << " +/- " << deviation << std::endl;
-  average = calcAverage(mpLoopClosing->vdFGBATotal_ms);
-  deviation = calcDeviation(mpLoopClosing->vdFGBATotal_ms, average);
+  average = calcAverage(getLoopClosing()->vdFGBATotal_ms);
+  deviation = calcDeviation(getLoopClosing()->vdFGBATotal_ms, average);
   f << "Total Full GBA: " << average << " +/- " << deviation << std::endl
     << std::endl;
   std::cout << "Total Full GBA: " << average << " +/- " << deviation
             << std::endl
             << std::endl;
 
-  f << "Num exec: " << mpLoopClosing->nFGBA_exec << std::endl;
-  std::cout << "Num exec: " << mpLoopClosing->nFGBA_exec << std::endl;
-  f << "Num abort: " << mpLoopClosing->nFGBA_abort << std::endl;
-  std::cout << "Num abort: " << mpLoopClosing->nFGBA_abort << std::endl;
-  average = calcAverage(mpLoopClosing->vnGBAKFs);
-  deviation = calcDeviation(mpLoopClosing->vnGBAKFs, average);
+  f << "Num exec: " << getLoopClosing()->nFGBA_exec << std::endl;
+  std::cout << "Num exec: " << getLoopClosing()->nFGBA_exec << std::endl;
+  f << "Num abort: " << getLoopClosing()->nFGBA_abort << std::endl;
+  std::cout << "Num abort: " << getLoopClosing()->nFGBA_abort << std::endl;
+  average = calcAverage(getLoopClosing()->vnGBAKFs);
+  deviation = calcDeviation(getLoopClosing()->vnGBAKFs, average);
   f << "Number of KFs: " << average << " +/- " << deviation << std::endl;
   std::cout << "Number of KFs: " << average << " +/- " << deviation
             << std::endl;
-  average = calcAverage(mpLoopClosing->vnGBAMPs);
-  deviation = calcDeviation(mpLoopClosing->vnGBAMPs, average);
+  average = calcAverage(getLoopClosing()->vnGBAMPs);
+  deviation = calcDeviation(getLoopClosing()->vnGBAMPs, average);
   f << "Number of MPs: " << average << " +/- " << deviation << std::endl;
   std::cout << "Number of MPs: " << average << " +/- " << deviation
             << std::endl;
@@ -551,7 +541,7 @@ Tracking::~Tracking() {
 
 void Tracking::newParameterLoader(const std::shared_ptr<Settings>& settings) {
   mpCamera = settings->camera1();
-  mpCamera = mpAtlas->AddCamera(mpCamera);
+  mpCamera = getAtlas()->AddCamera(mpCamera);
 
   if (settings->needToUndistort()) {
     mDistCoef = settings->camera1DistortionCoef();
@@ -580,11 +570,11 @@ void Tracking::newParameterLoader(const std::shared_ptr<Settings>& settings) {
        mSensor == SensorType::IMU_RGBD) &&
       settings->cameraType() == Settings::KannalaBrandt) {
     mpCamera2 = settings->camera2();
-    mpCamera2 = mpAtlas->AddCamera(mpCamera2);
+    mpCamera2 = getAtlas()->AddCamera(mpCamera2);
 
     mTlr = settings->Tlr();
 
-    mpFrameDrawer->both = true;
+    getFrameDrawer()->both = true;
   }
 
   if (mSensor.isStereo() || mSensor.isRGBD()) {
@@ -679,23 +669,23 @@ Sophus::SE3f Tracking::GrabImageStereo(const cv::Mat& imRectLeft,
   if (mSensor == SensorType::STEREO && !mpCamera2)
     mCurrentFrame = std::make_shared<Frame>(
         mImGray, imGrayRight, timestamp, mpORBextractorLeft,
-        mpORBextractorRight, mpORBVocabulary, mK, mDistCoef, mbf, mThDepth,
-        mpCamera);
+        mpORBextractorRight, system()->getORBVocabulary(), mK, mDistCoef, mbf,
+        mThDepth, mpCamera);
   else if (mSensor == SensorType::STEREO && mpCamera2)
     mCurrentFrame = std::make_shared<Frame>(
         mImGray, imGrayRight, timestamp, mpORBextractorLeft,
-        mpORBextractorRight, mpORBVocabulary, mK, mDistCoef, mbf, mThDepth,
-        mpCamera, mpCamera2, mTlr);
+        mpORBextractorRight, system()->getORBVocabulary(), mK, mDistCoef, mbf,
+        mThDepth, mpCamera, mpCamera2, mTlr);
   else if (mSensor == SensorType::IMU_STEREO && !mpCamera2)
     mCurrentFrame = std::make_shared<Frame>(
         mImGray, imGrayRight, timestamp, mpORBextractorLeft,
-        mpORBextractorRight, mpORBVocabulary, mK, mDistCoef, mbf, mThDepth,
-        mpCamera, mLastFrame, mImuCalib);
+        mpORBextractorRight, system()->getORBVocabulary(), mK, mDistCoef, mbf,
+        mThDepth, mpCamera, mLastFrame, mImuCalib);
   else if (mSensor == SensorType::IMU_STEREO && mpCamera2)
     mCurrentFrame = std::make_shared<Frame>(
         mImGray, imGrayRight, timestamp, mpORBextractorLeft,
-        mpORBextractorRight, mpORBVocabulary, mK, mDistCoef, mbf, mThDepth,
-        mpCamera, mpCamera2, mTlr, mLastFrame, mImuCalib);
+        mpORBextractorRight, system()->getORBVocabulary(), mK, mDistCoef, mbf,
+        mThDepth, mpCamera, mpCamera2, mTlr, mLastFrame, mImuCalib);
 
   std::chrono::steady_clock::time_point t_post_frame_creation =
       std::chrono::steady_clock::now();
@@ -751,12 +741,13 @@ Sophus::SE3f Tracking::GrabImageRGBD(const cv::Mat& imRGB, const cv::Mat& imD,
 
   if (mSensor == SensorType::RGBD)
     mCurrentFrame = std::make_shared<Frame>(
-        mImGray, imDepth, timestamp, mpORBextractorLeft, mpORBVocabulary, mK,
-        mDistCoef, mbf, mThDepth, mpCamera);
+        mImGray, imDepth, timestamp, mpORBextractorLeft,
+        system()->getORBVocabulary(), mK, mDistCoef, mbf, mThDepth, mpCamera);
   else if (mSensor == SensorType::IMU_RGBD)
-    mCurrentFrame = std::make_shared<Frame>(
-        mImGray, imDepth, timestamp, mpORBextractorLeft, mpORBVocabulary, mK,
-        mDistCoef, mbf, mThDepth, mpCamera, mLastFrame, mImuCalib);
+    mCurrentFrame =
+        std::make_shared<Frame>(mImGray, imDepth, timestamp, mpORBextractorLeft,
+                                system()->getORBVocabulary(), mK, mDistCoef,
+                                mbf, mThDepth, mpCamera, mLastFrame, mImuCalib);
 
   mCurrentFrame->mNameFile = filename;
   mCurrentFrame->mnDataset = mnNumDataset;
@@ -790,22 +781,22 @@ Sophus::SE3f Tracking::GrabImageMonocular(const cv::Mat& im,
     if (mState == NOT_INITIALIZED || mState == NO_IMAGES_YET ||
         (lastID - initID) < mMaxFrames) {
       mCurrentFrame = std::make_shared<Frame>(
-          mImGray, timestamp, mpIniORBextractor, mpORBVocabulary, mpCamera,
-          mDistCoef, mbf, mThDepth);
+          mImGray, timestamp, mpIniORBextractor, system()->getORBVocabulary(),
+          mpCamera, mDistCoef, mbf, mThDepth);
     } else {
       mCurrentFrame = std::make_shared<Frame>(
-          mImGray, timestamp, mpORBextractorLeft, mpORBVocabulary, mpCamera,
-          mDistCoef, mbf, mThDepth);
+          mImGray, timestamp, mpORBextractorLeft, system()->getORBVocabulary(),
+          mpCamera, mDistCoef, mbf, mThDepth);
     }
   } else if (mSensor == SensorType::IMU_MONOCULAR) {
     if (mState == NOT_INITIALIZED || mState == NO_IMAGES_YET) {
       mCurrentFrame = std::make_shared<Frame>(
-          mImGray, timestamp, mpIniORBextractor, mpORBVocabulary, mpCamera,
-          mDistCoef, mbf, mThDepth, mLastFrame, mImuCalib);
+          mImGray, timestamp, mpIniORBextractor, system()->getORBVocabulary(),
+          mpCamera, mDistCoef, mbf, mThDepth, mLastFrame, mImuCalib);
     } else {
       mCurrentFrame = std::make_shared<Frame>(
-          mImGray, timestamp, mpORBextractorLeft, mpORBVocabulary, mpCamera,
-          mDistCoef, mbf, mThDepth, mLastFrame, mImuCalib);
+          mImGray, timestamp, mpORBextractorLeft, system()->getORBVocabulary(),
+          mpCamera, mDistCoef, mbf, mThDepth, mLastFrame, mImuCalib);
     }
   }
 
@@ -1001,7 +992,7 @@ void Tracking::Track() {
   std::chrono::steady_clock::time_point t_start =
       std::chrono::steady_clock::now();
 
-  mMaxFrames = mpSystem->fps();
+  mMaxFrames = system()->fps();
   mnFramesToResetIMU = mMaxFrames;
 
   if (bStepByStep) {
@@ -1010,13 +1001,13 @@ void Tracking::Track() {
     mbStep = false;
   }
 
-  if (mpLocalMapper->mbBadImu) {
+  if (getLocalMapper()->mbBadImu) {
     oslog::info("TRACK: Reset map because local mapper set the bad imu flag ");
-    mpSystem->ResetActiveMap();
+    system()->ResetActiveMap();
     return;
   }
 
-  auto pCurrentMap = mpAtlas->GetCurrentMap();
+  auto pCurrentMap = getAtlas()->GetCurrentMap();
   if (!pCurrentMap) {
     oslog::error("ERROR: There is not an active map in the atlas");
   }
@@ -1033,14 +1024,14 @@ void Tracking::Track() {
       // cout << mCurrentFrame->mTimeStamp << ", " << mLastFrame->mTimeStamp <<
       // endl; cout << "id last: " << mLastFrame->mnId << "    id curr: " <<
       // mCurrentFrame->mnId << endl;
-      if (mpAtlas->isInertial()) {
-        if (mpAtlas->isImuInitialized()) {
+      if (getAtlas()->isInertial()) {
+        if (getAtlas()->isImuInitialized()) {
           oslog::warn(
               "Timestamp jump detected. State set to LOST. resetting IMU "
               "integration...");
 
           if (!pCurrentMap->GetInertialBA2()) {
-            mpSystem->ResetActiveMap();
+            system()->ResetActiveMap();
           } else {
             CreateMapInAtlas();
           }
@@ -1048,7 +1039,7 @@ void Tracking::Track() {
           oslog::warn(
               "Timestamp jump detected, before IMU initialization. "
               "resetting...");
-          mpSystem->ResetActiveMap();
+          system()->ResetActiveMap();
         }
         return;
       }
@@ -1103,7 +1094,7 @@ void Tracking::Track() {
       MonocularInitialization();
     }
 
-    if (mpFrameDrawer) mpFrameDrawer->Update(shared_from_this());
+    if (getFrameDrawer()) getFrameDrawer()->Update(shared_from_this());
 
     // If rightly initialized, mState=OK
     if (mState != OK) {
@@ -1111,7 +1102,7 @@ void Tracking::Track() {
       return;
     }
 
-    if (mpAtlas->GetAllMaps().size() == 1) {
+    if (getAtlas()->GetAllMaps().size() == 1) {
       mnFirstFrameId = mCurrentFrame->mnId;
     }
   } else {
@@ -1197,7 +1188,7 @@ void Tracking::Track() {
           oslog::info("A new map is started...");
 
           if (pCurrentMap->KeyFramesInMap() < 10) {
-            mpSystem->ResetActiveMap();
+            system()->ResetActiveMap();
             oslog::info("resetting current map...");
           } else {
             CreateMapInAtlas();
@@ -1340,7 +1331,7 @@ void Tracking::Track() {
             !pCurrentMap->GetInertialBA2()) {
           oslog::info(
               "IMU is not or recently initialized. resetting active map...");
-          mpSystem->ResetActiveMap();
+          system()->ResetActiveMap();
         }
 
         mState = RECENTLY_LOST;
@@ -1398,9 +1389,9 @@ void Tracking::Track() {
 #endif
 
     // Update drawer
-    if (mpFrameDrawer) mpFrameDrawer->Update(shared_from_this());
-    if (mCurrentFrame->isSet() && mpMapDrawer)
-      mpMapDrawer->SetCurrentCameraPose(mCurrentFrame->GetPose());
+    if (getFrameDrawer()) getFrameDrawer()->Update(shared_from_this());
+    if (mCurrentFrame->isSet() && getMapDrawer())
+      getMapDrawer()->SetCurrentCameraPose(mCurrentFrame->GetPose());
 
     if (bOK || mState == RECENTLY_LOST) {
       // Update motion model
@@ -1413,7 +1404,7 @@ void Tracking::Track() {
       }
 
       if (mSensor.isImu())
-        mpMapDrawer->SetCurrentCameraPose(mCurrentFrame->GetPose());
+        getMapDrawer()->SetCurrentCameraPose(mCurrentFrame->GetPose());
 
       // Clean VO matches
       for (int i = 0; i < mCurrentFrame->N; i++) {
@@ -1472,14 +1463,14 @@ void Tracking::Track() {
     // Reset if the camera get lost soon after initialization
     if (mState == LOST) {
       if (pCurrentMap->KeyFramesInMap() <= 10) {
-        mpSystem->ResetActiveMap();
+        system()->ResetActiveMap();
         return;
       }
 
       if (mSensor.isImu()) {
         if (!pCurrentMap->isImuInitialized()) {
           oslog::warn("Track lost before IMU initialisation, resetting...");
-          mpSystem->ResetActiveMap();
+          system()->ResetActiveMap();
           return;
         }
       }
@@ -1562,11 +1553,12 @@ void Tracking::StereoInitialization() {
     }
 
     // Create KeyFrame
-    std::shared_ptr<KeyFrame> pKFini = std::make_shared<KeyFrame>(
-        mCurrentFrame, mpAtlas->GetCurrentMap(), mpKeyFrameDB);
+    std::shared_ptr<KeyFrame> pKFini =
+        std::make_shared<KeyFrame>(mCurrentFrame, getAtlas()->GetCurrentMap(),
+                                   system()->getVprImplementation());
 
     // Insert KeyFrame in the map
-    mpAtlas->AddKeyFrame(pKFini);
+    getAtlas()->AddKeyFrame(pKFini);
 
     // Create MapPoints and asscoiate to KeyFrame
     if (!mpCamera2) {
@@ -1580,12 +1572,12 @@ void Tracking::StereoInitialization() {
           Eigen::Vector3f x3D;
           mCurrentFrame->UnprojectStereo(i, x3D);
           MapPoint* pNewMP =
-              new MapPoint(x3D, pKFini, mpAtlas->GetCurrentMap());
+              new MapPoint(x3D, pKFini, getAtlas()->GetCurrentMap());
           pNewMP->AddObservation(pKFini, i);
           pKFini->AddMapPoint(pNewMP, i);
           pNewMP->ComputeDistinctiveDescriptors();
           pNewMP->UpdateNormalAndDepth();
-          mpAtlas->AddMapPoint(pNewMP);
+          getAtlas()->AddMapPoint(pNewMP);
 
           mCurrentFrame->mvpMapPoints[i] = pNewMP;
         }
@@ -1601,7 +1593,7 @@ void Tracking::StereoInitialization() {
           Eigen::Vector3f x3D = mCurrentFrame->mvStereo3Dpoints[i];
 
           MapPoint* pNewMP =
-              new MapPoint(x3D, pKFini, mpAtlas->GetCurrentMap());
+              new MapPoint(x3D, pKFini, getAtlas()->GetCurrentMap());
 
           pNewMP->AddObservation(pKFini, i);
           pNewMP->AddObservation(pKFini, rightIndex + mCurrentFrame->Nleft);
@@ -1611,7 +1603,7 @@ void Tracking::StereoInitialization() {
 
           pNewMP->ComputeDistinctiveDescriptors();
           pNewMP->UpdateNormalAndDepth();
-          mpAtlas->AddMapPoint(pNewMP);
+          getAtlas()->AddMapPoint(pNewMP);
 
           mCurrentFrame->mvpMapPoints[i] = pNewMP;
           mCurrentFrame->mvpMapPoints[rightIndex + mCurrentFrame->Nleft] =
@@ -1622,12 +1614,12 @@ void Tracking::StereoInitialization() {
 
     Verbose::PrintMess(
         "[Tracking::StereoInitialization] New Map created with " +
-            to_string(mpAtlas->MapPointsInMap()) + " points",
+            to_string(getAtlas()->MapPointsInMap()) + " points",
         Verbose::VERBOSITY_QUIET);
 
-    // cout << "Active map: " << mpAtlas->GetCurrentMap()->GetId() << endl;
+    // cout << "Active map: " << getAtlas()->GetCurrentMap()->GetId() << endl;
 
-    mpLocalMapper->InsertKeyFrame(pKFini);
+    getLocalMapper()->InsertKeyFrame(pKFini);
 
     mLastFrame = std::shared_ptr<Frame>(mCurrentFrame);
     mnLastKeyFrameId = mCurrentFrame->mnId;
@@ -1635,15 +1627,15 @@ void Tracking::StereoInitialization() {
     // mnLastRelocFrameId = mCurrentFrame->mnId;
 
     mvpLocalKeyFrames.push_back(pKFini);
-    mvpLocalMapPoints = mpAtlas->GetAllMapPoints();
+    mvpLocalMapPoints = getAtlas()->GetAllMapPoints();
     mpReferenceKF = pKFini;
     mCurrentFrame->mpReferenceKF = pKFini;
 
-    mpAtlas->SetReferenceMapPoints(mvpLocalMapPoints);
+    getAtlas()->SetReferenceMapPoints(mvpLocalMapPoints);
 
-    mpAtlas->GetCurrentMap()->mvpKeyFrameOrigins.push_back(pKFini);
+    getAtlas()->GetCurrentMap()->mvpKeyFrameOrigins.push_back(pKFini);
 
-    mpMapDrawer->SetCurrentCameraPose(mCurrentFrame->GetPose());
+    getMapDrawer()->SetCurrentCameraPose(mCurrentFrame->GetPose());
 
     mState = OK;
   } else {
@@ -1720,10 +1712,12 @@ void Tracking::MonocularInitialization() {
 
 void Tracking::CreateInitialMapMonocular() {
   // Create KeyFrames
-  std::shared_ptr<KeyFrame> pKFini = std::make_shared<KeyFrame>(
-      mInitialFrame, mpAtlas->GetCurrentMap(), mpKeyFrameDB);
-  std::shared_ptr<KeyFrame> pKFcur = std::make_shared<KeyFrame>(
-      mCurrentFrame, mpAtlas->GetCurrentMap(), mpKeyFrameDB);
+  std::shared_ptr<KeyFrame> pKFini =
+      std::make_shared<KeyFrame>(mInitialFrame, getAtlas()->GetCurrentMap(),
+                                 system()->getVprImplementation());
+  std::shared_ptr<KeyFrame> pKFcur =
+      std::make_shared<KeyFrame>(mCurrentFrame, getAtlas()->GetCurrentMap(),
+                                 system()->getVprImplementation());
 
   if (mSensor == SensorType::IMU_MONOCULAR) pKFini->mpImuPreintegrated.reset();
 
@@ -1731,8 +1725,8 @@ void Tracking::CreateInitialMapMonocular() {
   pKFcur->ComputeBoW();
 
   // Insert KFs in the map
-  mpAtlas->AddKeyFrame(pKFini);
-  mpAtlas->AddKeyFrame(pKFcur);
+  getAtlas()->AddKeyFrame(pKFini);
+  getAtlas()->AddKeyFrame(pKFcur);
 
   for (size_t i = 0; i < mvIniMatches.size(); i++) {
     if (mvIniMatches[i] < 0) continue;
@@ -1740,7 +1734,7 @@ void Tracking::CreateInitialMapMonocular() {
     // Create MapPoint.
     Eigen::Vector3f worldPos;
     worldPos << mvIniP3D[i].x, mvIniP3D[i].y, mvIniP3D[i].z;
-    MapPoint* pMP = new MapPoint(worldPos, pKFcur, mpAtlas->GetCurrentMap());
+    MapPoint* pMP = new MapPoint(worldPos, pKFcur, getAtlas()->GetCurrentMap());
 
     pKFini->AddMapPoint(pMP, i);
     pKFcur->AddMapPoint(pMP, mvIniMatches[i]);
@@ -1756,7 +1750,7 @@ void Tracking::CreateInitialMapMonocular() {
     mCurrentFrame->mvbOutlier[mvIniMatches[i]] = false;
 
     // Add to Map
-    mpAtlas->AddMapPoint(pMP);
+    getAtlas()->AddMapPoint(pMP);
   }
 
   // Update Connections
@@ -1768,9 +1762,9 @@ void Tracking::CreateInitialMapMonocular() {
 
   // Bundle Adjustment
   Verbose::PrintMess("New Map created with " +
-                         to_string(mpAtlas->MapPointsInMap()) + " points",
+                         to_string(getAtlas()->MapPointsInMap()) + " points",
                      Verbose::VERBOSITY_QUIET);
-  Optimizer::GlobalBundleAdjustemnt(mpAtlas->GetCurrentMap(), 20);
+  Optimizer::GlobalBundleAdjustemnt(getAtlas()->GetCurrentMap(), 20);
 
   float medianDepth = pKFini->ComputeSceneMedianDepth(2);
   float invMedianDepth;
@@ -1783,7 +1777,7 @@ void Tracking::CreateInitialMapMonocular() {
   if (medianDepth < 0 || pKFcur->TrackedMapPoints(1) < 50) {
     Verbose::PrintMess("Wrong initialization, resetting...",
                        Verbose::VERBOSITY_QUIET);
-    mpSystem->ResetActiveMap();
+    system()->ResetActiveMap();
     return;
   }
 
@@ -1811,9 +1805,9 @@ void Tracking::CreateInitialMapMonocular() {
         pKFcur->mpImuPreintegrated->GetUpdatedBias(), pKFcur->mImuCalib);
   }
 
-  mpLocalMapper->InsertKeyFrame(pKFini);
-  mpLocalMapper->InsertKeyFrame(pKFcur);
-  mpLocalMapper->mFirstTs = pKFcur->mTimeStamp;
+  getLocalMapper()->InsertKeyFrame(pKFini);
+  getLocalMapper()->InsertKeyFrame(pKFcur);
+  getLocalMapper()->mFirstTs = pKFcur->mTimeStamp;
 
   mCurrentFrame->SetPose(pKFcur->GetPose());
   mnLastKeyFrameId = mCurrentFrame->mnId;
@@ -1822,12 +1816,12 @@ void Tracking::CreateInitialMapMonocular() {
 
   mvpLocalKeyFrames.push_back(pKFcur);
   mvpLocalKeyFrames.push_back(pKFini);
-  mvpLocalMapPoints = mpAtlas->GetAllMapPoints();
+  mvpLocalMapPoints = getAtlas()->GetAllMapPoints();
   mpReferenceKF = pKFcur;
   mCurrentFrame->mpReferenceKF = pKFcur;
 
   // Compute here initial velocity
-  auto vKFs = mpAtlas->GetAllKeyFrames();
+  auto vKFs = getAtlas()->GetAllKeyFrames();
 
   Sophus::SE3f deltaT = vKFs.back()->GetPose() * vKFs.front()->GetPoseInverse();
   mbVelocity = false;
@@ -1839,11 +1833,11 @@ void Tracking::CreateInitialMapMonocular() {
 
   mLastFrame = std::make_shared<Frame>(*mCurrentFrame);
 
-  mpAtlas->SetReferenceMapPoints(mvpLocalMapPoints);
+  getAtlas()->SetReferenceMapPoints(mvpLocalMapPoints);
 
-  mpMapDrawer->SetCurrentCameraPose(pKFcur->GetPose());
+  getMapDrawer()->SetCurrentCameraPose(pKFcur->GetPose());
 
-  mpAtlas->GetCurrentMap()->mvpKeyFrameOrigins.push_back(pKFini);
+  getAtlas()->GetCurrentMap()->mvpKeyFrameOrigins.push_back(pKFini);
 
   mState = OK;
 
@@ -1852,8 +1846,8 @@ void Tracking::CreateInitialMapMonocular() {
 
 void Tracking::CreateMapInAtlas() {
   mnLastInitFrameId = mCurrentFrame->mnId;
-  mpAtlas->CreateNewMap();
-  if (mSensor.isImu()) mpAtlas->SetInertialSensor();
+  getAtlas()->CreateNewMap();
+  if (mSensor.isImu()) getAtlas()->SetInertialSensor();
   mbSetInit = false;
 
   mnInitialFrameId = mCurrentFrame->mnId + 1;
@@ -2006,7 +2000,7 @@ void Tracking::UpdateLastFrame() {
       }
 
       MapPoint* pNewMP =
-          new MapPoint(x3D, mpAtlas->GetCurrentMap(), mLastFrame, i);
+          new MapPoint(x3D, getAtlas()->GetCurrentMap(), mLastFrame, i);
       mLastFrame->mvpMapPoints[i] = pNewMP;
 
       mlpTemporalPoints.push_back(pNewMP);
@@ -2029,7 +2023,7 @@ bool Tracking::TrackWithMotionModel() {
   // Create "visual odometry" points if in Localization Mode
   UpdateLastFrame();
 
-  if (mpAtlas->isImuInitialized() &&
+  if (getAtlas()->isImuInitialized() &&
       (mCurrentFrame->mnId > mnLastRelocFrameId + mnFramesToResetIMU)) {
     // Predict state with IMU if it is initialized and it doesnt need reset
     PredictStateIMU();
@@ -2163,7 +2157,7 @@ bool Tracking::TrackLocalMap() {
   oslog::info("Before optimization, {} map points, {} outliers", aux1, aux2);
 
   int inliers;
-  if (!mpAtlas->isImuInitialized()) {
+  if (!getAtlas()->isImuInitialized()) {
     oslog::trace("[Tracking::TrackLocalMap] No IMU, conventional optimization");
     Optimizer::PoseOptimization(mCurrentFrame);
   } else {
@@ -2251,7 +2245,7 @@ bool Tracking::TrackLocalMap() {
 
   // Decide if the tracking was succesful
   // More restrictive if there was a relocalization recently
-  mpLocalMapper->mnMatchesInliers = mnMatchesInliers;
+  getLocalMapper()->mnMatchesInliers = mnMatchesInliers;
   if (mCurrentFrame->mnId < mnLastRelocFrameId + mMaxFrames &&
       mnMatchesInliers < 50)
     return false;
@@ -2259,8 +2253,8 @@ bool Tracking::TrackLocalMap() {
   if ((mnMatchesInliers > 10) && (mState == RECENTLY_LOST)) return true;
 
   if (mSensor == SensorType::IMU_MONOCULAR) {
-    if ((mnMatchesInliers < 15 && mpAtlas->isImuInitialized()) ||
-        (mnMatchesInliers < 50 && !mpAtlas->isImuInitialized()))
+    if ((mnMatchesInliers < 15 && getAtlas()->isImuInitialized()) ||
+        (mnMatchesInliers < 50 && !getAtlas()->isImuInitialized()))
       return false;
     else
       return true;
@@ -2279,7 +2273,7 @@ bool Tracking::TrackLocalMap() {
 }
 
 bool Tracking::NeedNewKeyFrame() {
-  if (mSensor.isImu() && !mpAtlas->GetCurrentMap()->isImuInitialized()) {
+  if (mSensor.isImu() && !getAtlas()->GetCurrentMap()->isImuInitialized()) {
     if (mSensor == SensorType::IMU_MONOCULAR &&
         (mCurrentFrame->mTimeStamp - mpLastKeyFrame->mTimeStamp) >= 0.25)
       return true;
@@ -2294,7 +2288,7 @@ bool Tracking::NeedNewKeyFrame() {
   if (mbOnlyTracking) return false;
 
   // If Local Mapping is freezed by a Loop Closure do not insert keyframes
-  if (mpLocalMapper->isStopped() || mpLocalMapper->stopRequested()) {
+  if (getLocalMapper()->isStopped() || getLocalMapper()->stopRequested()) {
     /*if(mSensor == SensorType::MONOCULAR)
     {*/
     oslog::info(
@@ -2304,7 +2298,7 @@ bool Tracking::NeedNewKeyFrame() {
     return false;
   }
 
-  const int nKFs = mpAtlas->KeyFramesInMap();
+  const int nKFs = getAtlas()->KeyFramesInMap();
 
   // Do not insert keyframes if not enough frames have passed from last
   // relocalisation
@@ -2320,7 +2314,7 @@ bool Tracking::NeedNewKeyFrame() {
   int nRefMatches = mpReferenceKF->TrackedMapPoints(nMinObs);
 
   // Local Mapping accept keyframes?
-  bool bLocalMappingIdle = mpLocalMapper->AcceptKeyFrames();
+  bool bLocalMappingIdle = getLocalMapper()->AcceptKeyFrames();
 
   // Check how many "close" points are being tracked and how many could be
   // potentially created.
@@ -2383,7 +2377,7 @@ bool Tracking::NeedNewKeyFrame() {
   // Condition 1b: More than "MinFrames" have passed and Local Mapping is idle
   const bool c1b =
       ((mCurrentFrame->mnId >= mnLastKeyFrameId + mMinFrames) &&
-       bLocalMappingIdle);  // mpLocalMapper->KeyframesInQueue() < 2);
+       bLocalMappingIdle);  // getLocalMapper()->KeyframesInQueue() < 2);
   // Condition 1c: tracking is weak
   const bool c1c =
       mSensor != SensorType::MONOCULAR &&
@@ -2429,17 +2423,17 @@ bool Tracking::NeedNewKeyFrame() {
   if (((c1a || c1b || c1c) && c2) || c3 || c4) {
     // If the mapping accepts keyframes, insert keyframe.
     // Otherwise send a signal to interrupt BA
-    if (bLocalMappingIdle || mpLocalMapper->IsInitializing()) {
+    if (bLocalMappingIdle || getLocalMapper()->IsInitializing()) {
       oslog::info("[Tracking::NeedNewKeyFrame] !!! Create a new keyframe!");
       return true;
     } else {
       oslog::info(
           "[Tracking::NeedNewKeyFrame] !!! Want to create a new keyframe, "
           "interrupting BA");
-      mpLocalMapper->InterruptBA();
+      getLocalMapper()->InterruptBA();
       if (mSensor != SensorType::MONOCULAR &&
           mSensor != SensorType::IMU_MONOCULAR) {
-        if (mpLocalMapper->KeyframesInQueue() < 3)
+        if (getLocalMapper()->KeyframesInQueue() < 3)
           return true;
         else
           return false;
@@ -2455,14 +2449,17 @@ bool Tracking::NeedNewKeyFrame() {
 }
 
 void Tracking::CreateNewKeyFrame() {
-  if (mpLocalMapper->IsInitializing() && !mpAtlas->isImuInitialized()) return;
+  if (getLocalMapper()->IsInitializing() && !getAtlas()->isImuInitialized())
+    return;
 
-  if (!mpLocalMapper->SetNotStop(true)) return;
+  if (!getLocalMapper()->SetNotStop(true)) return;
 
-  std::shared_ptr<KeyFrame> pKF = std::make_shared<KeyFrame>(
-      mCurrentFrame, mpAtlas->GetCurrentMap(), mpKeyFrameDB);
+  std::shared_ptr<KeyFrame> pKF =
+      std::make_shared<KeyFrame>(mCurrentFrame, getAtlas()->GetCurrentMap(),
+                                 system()->getVprImplementation());
 
-  if (mpAtlas->isImuInitialized())  //  || mpLocalMapper->IsInitializing())
+  if (getAtlas()
+          ->isImuInitialized())  //  || getLocalMapper()->IsInitializing())
     pKF->bImu = true;
 
   pKF->SetNewBias(mCurrentFrame->mImuBias);
@@ -2528,7 +2525,8 @@ void Tracking::CreateNewKeyFrame() {
             x3D = mCurrentFrame->UnprojectStereoFishEye(i);
           }
 
-          MapPoint* pNewMP = new MapPoint(x3D, pKF, mpAtlas->GetCurrentMap());
+          MapPoint* pNewMP =
+              new MapPoint(x3D, pKF, getAtlas()->GetCurrentMap());
           pNewMP->AddObservation(pKF, i);
 
           // Check if it is a stereo observation in order to not
@@ -2548,7 +2546,7 @@ void Tracking::CreateNewKeyFrame() {
           pKF->AddMapPoint(pNewMP, i);
           pNewMP->ComputeDistinctiveDescriptors();
           pNewMP->UpdateNormalAndDepth();
-          mpAtlas->AddMapPoint(pNewMP);
+          getAtlas()->AddMapPoint(pNewMP);
 
           mCurrentFrame->mvpMapPoints[i] = pNewMP;
           nPoints++;
@@ -2565,9 +2563,9 @@ void Tracking::CreateNewKeyFrame() {
     }
   }
 
-  mpLocalMapper->InsertKeyFrame(pKF);
+  getLocalMapper()->InsertKeyFrame(pKF);
 
-  mpLocalMapper->SetNotStop(false);
+  getLocalMapper()->SetNotStop(false);
 
   mnLastKeyFrameId = mCurrentFrame->mnId;
   mpLastKeyFrame = pKF;
@@ -2616,12 +2614,12 @@ void Tracking::SearchLocalPoints() {
     ORBmatcher matcher(0.8);
     int th = 1;
     if (mSensor == SensorType::RGBD || mSensor == SensorType::IMU_RGBD) th = 3;
-    if (mpAtlas->isImuInitialized()) {
-      if (mpAtlas->GetCurrentMap()->GetInertialBA2())
+    if (getAtlas()->isImuInitialized()) {
+      if (getAtlas()->GetCurrentMap()->GetInertialBA2())
         th = 2;
       else
         th = 6;
-    } else if (!mpAtlas->isImuInitialized() && mSensor.isImu()) {
+    } else if (!getAtlas()->isImuInitialized() && mSensor.isImu()) {
       th = 10;
     }
 
@@ -2633,14 +2631,14 @@ void Tracking::SearchLocalPoints() {
       th = 15;                    // 15
 
     int matches = matcher.SearchByProjection(mCurrentFrame, mvpLocalMapPoints,
-                                             th, mpLocalMapper->mbFarPoints,
-                                             mpLocalMapper->mThFarPoints);
+                                             th, getLocalMapper()->mbFarPoints,
+                                             getLocalMapper()->mThFarPoints);
   }
 }
 
 void Tracking::UpdateLocalMap() {
   // This is for visualization
-  mpAtlas->SetReferenceMapPoints(mvpLocalMapPoints);
+  getAtlas()->SetReferenceMapPoints(mvpLocalMapPoints);
 
   // Update
   UpdateLocalKeyFrames();
@@ -2671,7 +2669,7 @@ void Tracking::UpdateLocalKeyFrames() {
   // Each map point vote for the keyframes in which it has been observed
   map<std::shared_ptr<KeyFrame>, int> keyframeCounter;
 
-  if (!mpAtlas->isImuInitialized() ||
+  if (!getAtlas()->isImuInitialized() ||
       (mCurrentFrame->mnId < mnLastRelocFrameId + 2)) {
     for (size_t i = 0; i < mCurrentFrame->N; i++) {
       MapPoint* pMP = mCurrentFrame->mvpMapPoints[i];
@@ -2798,8 +2796,9 @@ bool Tracking::Relocalization() {
   // Relocalization is performed when tracking is lost
   // Track Lost: Query KeyFrame Database for keyframe candidates for
   // relocalisation
-  auto vpCandidateKFs = mpKeyFrameDB->DetectRelocalizationCandidates(
-      mCurrentFrame, mpAtlas->GetCurrentMap());
+  auto vpCandidateKFs =
+      system()->getVprImplementation()->DetectRelocalizationCandidates(
+          mCurrentFrame, getAtlas()->GetCurrentMap());
 
   if (vpCandidateKFs.empty()) {
     oslog::warn("[Tracking::Relocalization] There are no candidates keyframes");
@@ -2959,29 +2958,29 @@ bool Tracking::Relocalization() {
 void Tracking::Reset(bool bLocMap) {
   oslog::info("[Tracking::Reset] System resetting");
 
-  if (mpViewer) {
-    mpViewer->RequestStop();
-    while (!mpViewer->isStopped()) usleep(3000);
+  if (getViewer()) {
+    getViewer()->RequestStop();
+    while (!getViewer()->isStopped()) usleep(3000);
   }
 
   // Reset Local Mapping
   if (!bLocMap) {
     oslog::debug("[Tracking::Reset] !! resetting Local Mapper...");
-    mpLocalMapper->RequestReset();
+    getLocalMapper()->RequestReset();
   }
 
   // Reset Loop Closing
   oslog::debug("[Tracking::Reset] !! resetting Loop Closing...");
-  mpLoopClosing->RequestReset();
+  getLoopClosing()->RequestReset();
 
   // Clear BoW Database
   oslog::debug("[Tracking::Reset] !! resetting Database...");
-  mpKeyFrameDB->clear();
+  system()->getVprImplementation()->clear();
 
   // Clear Map (this erase MapPoints and KeyFrames)
-  mpAtlas->clearAtlas();
-  mpAtlas->CreateNewMap();
-  if (mSensor.isImu()) mpAtlas->SetInertialSensor();
+  getAtlas()->clearAtlas();
+  getAtlas()->CreateNewMap();
+  if (mSensor.isImu()) getAtlas()->SetInertialSensor();
   mnInitialFrameId = 0;
 
   KeyFrame::nNextId = 0;
@@ -3002,37 +3001,38 @@ void Tracking::Reset(bool bLocMap) {
   mpLastKeyFrame.reset();
   mvIniMatches.clear();
 
-  if (mpViewer) mpViewer->Release();
+  if (getViewer()) getViewer()->Release();
 
   oslog::info("[Tracking::Reset] !! End resetting!");
 }
 
 void Tracking::ResetActiveMap(bool bLocMap) {
   oslog::info("[Tracking::ResetActiveMap] !! Active map resetting");
-  if (mpViewer) {
-    mpViewer->RequestStop();
-    while (!mpViewer->isStopped()) usleep(3000);
+  if (getViewer()) {
+    getViewer()->RequestStop();
+    while (!getViewer()->isStopped()) usleep(3000);
   }
 
-  std::shared_ptr<Map> pMap(mpAtlas->GetCurrentMap());
+  std::shared_ptr<Map> pMap(getAtlas()->GetCurrentMap());
 
   if (!bLocMap) {
     oslog::info("[Tracking::ResetActiveMap] !! resetting Local Mapper...");
-    mpLocalMapper->RequestResetActiveMap(pMap);
+    getLocalMapper()->RequestResetActiveMap(pMap);
   }
 
   // Reset Loop Closing
   oslog::info("[Tracking::ResetActiveMap] !! resetting Loop Closing...");
-  mpLoopClosing->RequestResetActiveMap(pMap);
+  getLoopClosing()->RequestResetActiveMap(pMap);
 
   // Clear BoW Database
   oslog::info("[Tracking::ResetActiveMap] !! resetting Database");
-  mpKeyFrameDB->clearMap(pMap);  // Only clear the active map references
+  system()->getVprImplementation()->clearMap(
+      pMap);  // Only clear the active map references
 
   // Clear Map (this erase MapPoints and KeyFrames)
-  mpAtlas->clearMap();
+  getAtlas()->clearMap();
 
-  // KeyFrame::nNextId = mpAtlas->GetLastInitKFid();
+  // KeyFrame::nNextId = getAtlas()->GetLastInitKFid();
   // Frame::nNextId = mnLastInitFrameId;
   mnLastInitFrameId = Frame::nNextId;
   // mnLastRelocFrameId = mnLastInitFrameId;
@@ -3043,7 +3043,7 @@ void Tracking::ResetActiveMap(bool bLocMap) {
   list<bool> lbLost;
   // lbLost.reserve(mlbLost.size());
   unsigned int index = mnFirstFrameId;
-  for (auto const& pMap : mpAtlas->GetAllMaps()) {
+  for (auto const& pMap : getAtlas()->GetAllMaps()) {
     if (pMap->GetAllKeyFrames().size() > 0) {
       if (index > pMap->GetLowerKFID()) index = pMap->GetLowerKFID();
     }
@@ -3077,7 +3077,7 @@ void Tracking::ResetActiveMap(bool bLocMap) {
 
   mbVelocity = false;
 
-  if (mpViewer) mpViewer->Release();
+  if (getViewer()) getViewer()->Release();
 
   oslog::warn("[Tracking::ResetActiveMap] !! End resetting!");
 }
@@ -3210,16 +3210,16 @@ int Tracking::GetMatchesInliers() { return mnMatchesInliers; }
 
 void Tracking::SaveSubTrajectory(string strNameFile_frames,
                                  string strNameFile_kf, string strFolder) {
-  mpSystem->SaveTrajectoryEuRoC(strFolder + strNameFile_frames);
-  // mpSystem->SaveKeyFrameTrajectoryEuRoC(strFolder + strNameFile_kf);
+  system()->SaveTrajectoryEuRoC(strFolder + strNameFile_frames);
+  // system()->SaveKeyFrameTrajectoryEuRoC(strFolder + strNameFile_kf);
 }
 
 void Tracking::SaveSubTrajectory(string strNameFile_frames,
                                  string strNameFile_kf,
                                  const std::shared_ptr<Map>& pMap) {
-  mpSystem->SaveTrajectoryEuRoC(strNameFile_frames, pMap);
+  system()->SaveTrajectoryEuRoC(strNameFile_frames, pMap);
   if (!strNameFile_kf.empty())
-    mpSystem->SaveKeyFrameTrajectoryEuRoC(strNameFile_kf, pMap);
+    system()->SaveKeyFrameTrajectoryEuRoC(strNameFile_kf, pMap);
 }
 
 float Tracking::GetImageScale() { return mImageScale; }

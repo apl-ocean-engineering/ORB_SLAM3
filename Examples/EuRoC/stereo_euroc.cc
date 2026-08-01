@@ -104,7 +104,7 @@ int main(int argc, char **argv) {
     int ni = 0;
 
     for (auto const &imgSet : seq.mvImageSets) {
-      spdlog::info("=== Processing image {} of {} at {:.9}", ni, seq.size(),
+      spdlog::info("=== Processing image {} of {} at {:.12f}", ni, seq.size(),
                    imgSet.mTimestamp);
 
       // Read left and right images from file

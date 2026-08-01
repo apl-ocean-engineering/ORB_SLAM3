@@ -187,9 +187,7 @@ bool System::initialize(bool initFr, const string &strSequence) {
   // (it will live in the main thread of execution, the one that called this
   // constructor)
   oslog::info("Seq. Name: {}", strSequence);
-  mpTracker = std::make_shared<Tracking>(shared_from_this(), mpVocabulary,
-                                         mpFrameDrawer, mpMapDrawer, mpAtlas,
-                                         mpVprImpl, settings_, strSequence);
+  mpTracker = std::make_shared<Tracking>(shared_from_this(), strSequence);
 
   // Initialize the Local Mapping thread and launch
   mpLocalMapper = std::make_shared<LocalMapping>(
@@ -220,8 +218,8 @@ bool System::initialize(bool initFr, const string &strSequence) {
       std::make_unique<thread>(&ORB_SLAM3::LoopClosing::Run, mpLoopCloser);
 
   // Set pointers between threads
-  mpTracker->SetLocalMapper(mpLocalMapper);
-  mpTracker->SetLoopClosing(mpLoopCloser);
+  // mpTracker->SetLocalMapper(mpLocalMapper);
+  // mpTracker->SetLoopClosing(mpLoopCloser);
 
   mpLocalMapper->SetTracker(mpTracker);
   mpLocalMapper->SetLoopCloser(mpLoopCloser);
@@ -232,10 +230,9 @@ bool System::initialize(bool initFr, const string &strSequence) {
   // Initialize the Viewer thread and launch
   oslog::info("Viewer enabled: {}", settings_->useViewer_ ? "YES" : "NO");
   if (settings_->useViewer_) {
-    mpViewer = std::make_shared<Viewer>(this, mpFrameDrawer, mpMapDrawer,
-                                        mpTracker, settings_);
+    mpViewer = std::make_shared<Viewer>(shared_from_this());
     mptViewer = std::make_unique<thread>(&Viewer::Run, mpViewer);
-    mpTracker->SetViewer(mpViewer);
+    // mpTracker->SetViewer(mpViewer);
     mpLoopCloser->mpViewer = mpViewer;
     mpViewer->both = mpFrameDrawer->both;
   }
@@ -1213,9 +1210,7 @@ bool System::LoadAtlas(int type) {
       return false;  // Both are differents
     }
 
-    mpAtlas->SetSystem(shared_from_this());
-    // mpAtlas->SetVprImplementation(mpVprImpl);
-    // mpAtlas->SetORBVocabulary(mpVocabulary);
+    mpAtlas->setSystem(shared_from_this());
     mpAtlas->PostLoad();
 
     return true;

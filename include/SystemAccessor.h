@@ -1,6 +1,7 @@
 /**
  * This file is part of ORB-SLAM3
  *
+ * Copytight (c) 2026 University of Washington
  * Copyright (C) 2017-2021 Carlos Campos, Richard Elvira, Juan J. Gómez
  * Rodríguez, José M.M. Montiel and Juan D. Tardós, University of Zaragoza.
  * Copyright (C) 2014-2016 Raúl Mur-Artal, José M.M. Montiel and Juan D. Tardós,
@@ -22,70 +23,47 @@
 #pragma once
 
 #include <memory>
-#include <mutex>
-
-#include "FrameDrawer.h"
-#include "MapDrawer.h"
-#include "Settings.h"
-#include "System.h"
-#include "Tracking.h"
 
 namespace ORB_SLAM3 {
 
-class Tracking;
+class Atlas;
 class FrameDrawer;
+class LocalMapping;
+class LoopClosing;
 class MapDrawer;
-class System;
 class Settings;
+class System;
+class Tracking;
+class Viewer;
 
-class Viewer : public SystemAccessor {
+class SystemAccessor {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  explicit SystemAccessor(const std::shared_ptr<System> &pSys = nullptr);
 
-  explicit Viewer(const std::shared_ptr<System> &pSystem);
+  // For setting System after construction (when restoring using boost::archive)
+  void setSystem(const std::shared_ptr<System> &pSys);
 
-  // Main thread function. Draw points, keyframes, the current camera pose and
-  // the last processed frame. Drawing is refreshed according to the camera fps.
-  // We use Pangolin.
-  void Run();
+ protected:
+  // System
+  std::shared_ptr<System> system();
 
-  void RequestFinish();
+  std::shared_ptr<Settings> getSettings();
+  std::shared_ptr<LocalMapping> getLocalMapper();
+  std::shared_ptr<LoopClosing> getLoopClosing();
+  std::shared_ptr<Tracking> getTracker();
 
-  void RequestStop();
+  // Drawers
+  std::shared_ptr<Viewer> getViewer();
 
-  bool isFinished();
+  std::shared_ptr<FrameDrawer> getFrameDrawer();
+  std::shared_ptr<MapDrawer> getMapDrawer();
 
-  bool isStopped();
-
-  bool isStepByStep();
-
-  void Release();
-
-  // void SetTrackingPause();
-
-  bool both;
+  // Atlas
+  std::shared_ptr<Atlas> getAtlas();
 
  private:
-  bool Stop();
-
-  // 1/fps in ms
-  double mT;
-  float mImageWidth, mImageHeight;
-  float mImageViewerScale;
-
-  float mViewpointX, mViewpointY, mViewpointZ, mViewpointF;
-
-  bool CheckFinish();
-  void SetFinish();
-  bool mbFinishRequested;
-  bool mbFinished;
-  std::mutex mMutexFinish;
-
-  bool mbStopped;
-  bool mbStopRequested;
-  std::mutex mMutexStop;
-
-  bool mbStopTrack;
+  // System
+  std::shared_ptr<System> mpSystem;
 };
 
 }  // namespace ORB_SLAM3

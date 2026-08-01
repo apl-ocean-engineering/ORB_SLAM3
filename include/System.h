@@ -200,10 +200,23 @@ class System : public std::enable_shared_from_this<System> {
 #endif
 
   // Member accessors
+  std::shared_ptr<Atlas> getAtlas() { return mpAtlas; }
+
   std::shared_ptr<VPRImplementation> getVprImplementation() {
     return mpVprImpl;
   }
   std::shared_ptr<ORBVocabulary> getORBVocabulary() { return mpVocabulary; }
+
+  std::shared_ptr<Settings> getSettings() { return settings_; }
+
+  std::shared_ptr<Tracking> getTracker() { return mpTracker; }
+
+  std::shared_ptr<Viewer> getViewer() { return mpViewer; }
+  std::shared_ptr<FrameDrawer> getFrameDrawer() { return mpFrameDrawer; }
+  std::shared_ptr<MapDrawer> getMapDrawer() { return mpMapDrawer; }
+
+  std::shared_ptr<LocalMapping> getLocalMapping() { return mpLocalMapper; }
+  std::shared_ptr<LoopClosing> getLoopClosing() { return mpLoopCloser; }
 
  protected:
   // Initialize the SLAM system. It launches the Local Mapping, Loop Closing and
@@ -256,7 +269,6 @@ class System : public std::enable_shared_from_this<System> {
 
   // The viewer draws the map and the current camera pose. It uses Pangolin.
   std::shared_ptr<Viewer> mpViewer;
-
   std::shared_ptr<FrameDrawer> mpFrameDrawer;
   std::shared_ptr<MapDrawer> mpMapDrawer;
 

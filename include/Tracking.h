@@ -42,6 +42,7 @@
 #include "ORBextractor.h"
 #include "Settings.h"
 #include "System.h"
+#include "SystemAccessor.h"
 #include "VPRImplementation.h"
 #include "Viewer.h"
 
@@ -55,16 +56,11 @@ class LoopClosing;
 class System;
 class Settings;
 
-class Tracking : public std::enable_shared_from_this<Tracking> {
+class Tracking : public SystemAccessor,
+                 public std::enable_shared_from_this<Tracking> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   Tracking(const std::shared_ptr<System> &pSys,
-           const std::shared_ptr<ORBVocabulary> &pVoc,
-           const std::shared_ptr<FrameDrawer> &pFrameDrawer,
-           const std::shared_ptr<MapDrawer> &pMapDrawer,
-           const std::shared_ptr<Atlas> &pAtlas,
-           const std::shared_ptr<VPRImplementation> &pKFDB,
-           const std::shared_ptr<Settings> &settings,
            const string &_nameSeq = std::string());
 
   ~Tracking();
@@ -80,16 +76,6 @@ class Tracking : public std::enable_shared_from_this<Tracking> {
                                   string filename);
 
   void GrabImuData(const IMU::Point &imuMeasurement);
-
-  void SetLocalMapper(const std::shared_ptr<LocalMapping> &pLocalMapper) {
-    mpLocalMapper = pLocalMapper;
-  }
-
-  void SetLoopClosing(const std::shared_ptr<LoopClosing> &pLoopClosing) {
-    mpLoopClosing = pLoopClosing;
-  }
-
-  void SetViewer(const std::shared_ptr<Viewer> &pViewer) { mpViewer = pViewer; }
 
   void SetStepByStep(bool bSet) { bStepByStep = bSet; }
   bool GetStepByStep() const { return bStepByStep; }
@@ -269,17 +255,9 @@ class Tracking : public std::enable_shared_from_this<Tracking> {
   // localization to the map.
   bool mbVO;
 
-  // Other Thread Pointers
-  std::shared_ptr<LocalMapping> mpLocalMapper;
-  std::shared_ptr<LoopClosing> mpLoopClosing;
-
   // ORB
   std::shared_ptr<ORBextractor> mpORBextractorLeft, mpORBextractorRight;
   std::shared_ptr<ORBextractor> mpIniORBextractor;
-
-  // BoW
-  std::shared_ptr<ORBVocabulary> mpORBVocabulary;
-  std::shared_ptr<VPRImplementation> mpKeyFrameDB;
 
   // Initalization (only for monocular)
   bool mbReadyToInitializate;
@@ -290,17 +268,7 @@ class Tracking : public std::enable_shared_from_this<Tracking> {
   std::vector<std::shared_ptr<KeyFrame>> mvpLocalKeyFrames;
   std::vector<MapPoint *> mvpLocalMapPoints;
 
-  // System
-  std::shared_ptr<System> mpSystem;
-
-  // Drawers
-  std::shared_ptr<Viewer> mpViewer;
-  std::shared_ptr<FrameDrawer> mpFrameDrawer;
-  std::shared_ptr<MapDrawer> mpMapDrawer;
   bool bStepByStep;
-
-  // Atlas
-  std::shared_ptr<Atlas> mpAtlas;
 
   // Calibration matrix
   cv::Mat mK;

@@ -34,10 +34,10 @@
 
 namespace ORB_SLAM3 {
 
-Atlas::Atlas() : mpCurrentMap(nullptr), mpSystem(nullptr) {}
+Atlas::Atlas() : mpCurrentMap(nullptr) {}
 
 Atlas::Atlas(const std::shared_ptr<System> &pSys, int initKFid)
-    : mnLastInitKFidMap(initKFid), mpCurrentMap(nullptr), mpSystem(pSys) {
+    : SystemAccessor(pSys), mnLastInitKFidMap(initKFid), mpCurrentMap(nullptr) {
   CreateNewMap();
 }
 
@@ -254,8 +254,6 @@ void Atlas::PreSave() {
 }
 
 void Atlas::PostLoad() {
-  assert(mpSystem);
-
   map<unsigned int, std::shared_ptr<GeometricCamera>> mpCams;
   for (auto pCam : mvpCameras) {
     mpCams[pCam->GetId()] = pCam;
@@ -265,32 +263,13 @@ void Atlas::PostLoad() {
   unsigned long int numKF = 0, numMP = 0;
   for (auto pMi : mvpBackupMaps) {
     mspMaps.insert(pMi);
-    pMi->PostLoad(TheSystem()->getVprImplementation(),
-                  TheSystem()->getORBVocabulary(), mpCams);
+    pMi->PostLoad(system()->getVprImplementation(),
+                  system()->getORBVocabulary(), mpCams);
     numKF += pMi->GetAllKeyFrames().size();
     numMP += pMi->GetAllMapPoints().size();
   }
   mvpBackupMaps.clear();
 }
-
-void Atlas::SetSystem(const std::shared_ptr<System> &pSys) { mpSystem = pSys; }
-
-// void Atlas::SetVprImplementation(
-//     const std::shared_ptr<VPRImplementation> &pKFDB) {
-//   mpVprImpl = pKFDB;
-// }
-
-// std::shared_ptr<VPRImplementation> Atlas::GetVprImplementation() {
-//   return mpVprImpl;
-// }
-
-// void Atlas::SetORBVocabulary(const std::shared_ptr<ORBVocabulary> &pORBVoc) {
-//   mpORBVocabulary = pORBVoc;
-// }
-
-// std::shared_ptr<ORBVocabulary> Atlas::GetORBVocabulary() {
-//   return mpORBVocabulary;
-// }
 
 long unsigned int Atlas::GetNumLivedKF() {
   unique_lock<mutex> lock(mMutexAtlas);

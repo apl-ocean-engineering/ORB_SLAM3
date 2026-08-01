@@ -35,13 +35,11 @@
 #include "Map.h"
 #include "MapPoint.h"
 #include "Pinhole.h"
+#include "SystemAccessor.h"
 
 namespace ORB_SLAM3 {
-class Viewer;
-class Map;
 class MapPoint;
 class KeyFrame;
-class KeyFrameDatabase;
 class Frame;
 class KannalaBrandt8;
 class Pinhole;
@@ -49,7 +47,7 @@ class Pinhole;
 // BOOST_CLASS_EXPORT_GUID(Pinhole, "Pinhole")
 // BOOST_CLASS_EXPORT_GUID(KannalaBrandt8, "KannalaBrandt8")
 
-class Atlas {
+class Atlas : public SystemAccessor {
   friend class boost::serialization::access;
 
   template <class Archive>
@@ -75,17 +73,17 @@ class Atlas {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
   Atlas();
+
   explicit Atlas(
       const std::shared_ptr<System> &pSys,
       int initKFid);  // When its initialization the first map is created
+
   ~Atlas();
 
   void CreateNewMap();
   void ChangeMap(const std::shared_ptr<Map> &pMap);
 
   unsigned long int GetLastInitKFid();
-
-  void SetViewer(const std::shared_ptr<Viewer> &pViewer);
 
   // Method for change components in the current map
   void AddKeyFrame(const std::shared_ptr<KeyFrame> &pKF);
@@ -134,18 +132,6 @@ class Atlas {
 
   map<long unsigned int, std::shared_ptr<KeyFrame>> GetAtlasKeyframes();
 
-  void SetSystem(const std::shared_ptr<System> &pSys);
-  std::shared_ptr<System> TheSystem() {
-    assert(mpSystem);
-    return mpSystem;
-  }
-
-  // void SetVprImplementation(const std::shared_ptr<VPRImplementation> &pKFDB);
-  // std::shared_ptr<VPRImplementation> GetVprImplementation();
-
-  // void SetORBVocabulary(const std::shared_ptr<ORBVocabulary> &pORBVoc);
-  // std::shared_ptr<ORBVocabulary> GetORBVocabulary();
-
   long unsigned int GetNumLivedKF();
 
   long unsigned int GetNumLivedMP();
@@ -162,13 +148,6 @@ class Atlas {
   std::vector<std::shared_ptr<GeometricCamera>> mvpCameras;
 
   unsigned long int mnLastInitKFidMap;
-
-  std::shared_ptr<System> mpSystem;
-
-  // std::shared_ptr<Viewer> mpViewer;
-  // Class references for the map reconstruction from the save file
-  // std::shared_ptr<VPRImplementation> mpVprImpl;
-  // std::shared_ptr<ORBVocabulary> mpORBVocabulary;
 
   // Mutex
   std::mutex mMutexAtlas;
