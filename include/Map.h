@@ -36,13 +36,14 @@
 
 #include "KeyFrame.h"
 #include "MapPoint.h"
+#include "VPRImplementation.h"
 
 namespace ORB_SLAM3 {
 
 class MapPoint;
 class KeyFrame;
 class Atlas;
-class KeyFrameDatabase;
+class BoWKeyFrameDatabase;
 
 class Map : public std::enable_shared_from_this<Map> {
   friend class boost::serialization::access;
@@ -139,7 +140,7 @@ class Map : public std::enable_shared_from_this<Map> {
 
   void PreSave(std::set<std::shared_ptr<GeometricCamera> >& spCams);
   void PostLoad(
-      const std::shared_ptr<KeyFrameDatabase>& pKFDB,
+      const std::shared_ptr<VPRImplementation>& pKFDB,
       const std::shared_ptr<ORBVocabulary>&
           pORBVoc /*, map<unsigned long int, KeyFrame*>& mpKeyFrameId*/,
       map<unsigned int, std::shared_ptr<GeometricCamera> >& mpCams);

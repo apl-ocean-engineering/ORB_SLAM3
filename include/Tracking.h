@@ -35,7 +35,6 @@
 #include "FrameDrawer.h"
 #include "GeometricCamera.h"
 #include "ImuTypes.h"
-#include "KeyFrameDatabase.h"
 #include "LocalMapping.h"
 #include "LoopClosing.h"
 #include "MapDrawer.h"
@@ -43,6 +42,7 @@
 #include "ORBextractor.h"
 #include "Settings.h"
 #include "System.h"
+#include "VPRImplementation.h"
 #include "Viewer.h"
 
 namespace ORB_SLAM3 {
@@ -63,7 +63,7 @@ class Tracking : public std::enable_shared_from_this<Tracking> {
            const std::shared_ptr<FrameDrawer> &pFrameDrawer,
            const std::shared_ptr<MapDrawer> &pMapDrawer,
            const std::shared_ptr<Atlas> &pAtlas,
-           const std::shared_ptr<KeyFrameDatabase> &pKFDB,
+           const std::shared_ptr<VPRImplementation> &pKFDB,
            const std::shared_ptr<Settings> &settings,
            const string &_nameSeq = std::string());
 
@@ -279,7 +279,7 @@ class Tracking : public std::enable_shared_from_this<Tracking> {
 
   // BoW
   std::shared_ptr<ORBVocabulary> mpORBVocabulary;
-  std::shared_ptr<KeyFrameDatabase> mpKeyFrameDB;
+  std::shared_ptr<VPRImplementation> mpKeyFrameDB;
 
   // Initalization (only for monocular)
   bool mbReadyToInitializate;

@@ -45,7 +45,7 @@ namespace ORB_SLAM3 {
 
 class Tracking;
 class LocalMapping;
-class KeyFrameDatabase;
+class BoWKeyFrameDatabase;
 class Map;
 
 class LoopClosing : public enable_shared_from_this<LoopClosing> {
@@ -62,7 +62,7 @@ class LoopClosing : public enable_shared_from_this<LoopClosing> {
   LoopClosing(const LoopClosing &) = delete;
 
   LoopClosing(const std::shared_ptr<Atlas> &pAtlas,
-              const std::shared_ptr<KeyFrameDatabase> &pDB,
+              const std::shared_ptr<VPRImplementation> &pDB,
               const std::shared_ptr<ORBVocabulary> &pVoc, const bool bFixScale,
               const bool bActiveLC);
 
@@ -186,7 +186,7 @@ class LoopClosing : public enable_shared_from_this<LoopClosing> {
   std::shared_ptr<Atlas> mpAtlas;
   std::shared_ptr<Tracking> mpTracker;
 
-  std::shared_ptr<KeyFrameDatabase> mpKeyFrameDB;
+  std::shared_ptr<VPRImplementation> mpVprImplementation;
   std::shared_ptr<ORBVocabulary> mpORBVocabulary;
 
   std::shared_ptr<LocalMapping> mpLocalMapper;

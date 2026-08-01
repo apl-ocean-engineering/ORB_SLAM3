@@ -76,6 +76,7 @@ class Atlas {
 
   Atlas();
   explicit Atlas(
+      const std::shared_ptr<System> &pSys,
       int initKFid);  // When its initialization the first map is created
   ~Atlas();
 
@@ -133,11 +134,17 @@ class Atlas {
 
   map<long unsigned int, std::shared_ptr<KeyFrame>> GetAtlasKeyframes();
 
-  void SetKeyFrameDababase(const std::shared_ptr<KeyFrameDatabase> &pKFDB);
-  std::shared_ptr<KeyFrameDatabase> GetKeyFrameDatabase();
+  void SetSystem(const std::shared_ptr<System> &pSys);
+  std::shared_ptr<System> TheSystem() {
+    assert(mpSystem);
+    return mpSystem;
+  }
 
-  void SetORBVocabulary(const std::shared_ptr<ORBVocabulary> &pORBVoc);
-  std::shared_ptr<ORBVocabulary> GetORBVocabulary();
+  // void SetVprImplementation(const std::shared_ptr<VPRImplementation> &pKFDB);
+  // std::shared_ptr<VPRImplementation> GetVprImplementation();
+
+  // void SetORBVocabulary(const std::shared_ptr<ORBVocabulary> &pORBVoc);
+  // std::shared_ptr<ORBVocabulary> GetORBVocabulary();
 
   long unsigned int GetNumLivedKF();
 
@@ -156,11 +163,12 @@ class Atlas {
 
   unsigned long int mnLastInitKFidMap;
 
-  std::shared_ptr<Viewer> mpViewer;
+  std::shared_ptr<System> mpSystem;
 
+  // std::shared_ptr<Viewer> mpViewer;
   // Class references for the map reconstruction from the save file
-  std::shared_ptr<KeyFrameDatabase> mpKeyFrameDB;
-  std::shared_ptr<ORBVocabulary> mpORBVocabulary;
+  // std::shared_ptr<VPRImplementation> mpVprImpl;
+  // std::shared_ptr<ORBVocabulary> mpORBVocabulary;
 
   // Mutex
   std::mutex mMutexAtlas;

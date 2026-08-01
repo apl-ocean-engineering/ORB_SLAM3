@@ -34,6 +34,7 @@
 #include "KeyFrame.h"
 #include "Map.h"
 #include "ORBVocabulary.h"
+#include "VPRImplementation.h"
 
 namespace ORB_SLAM3 {
 
@@ -41,7 +42,7 @@ class KeyFrame;
 class Frame;
 class Map;
 
-class KeyFrameDatabase {
+class BoWKeyFrameDatabase : public VPRImplementation {
   friend class boost::serialization::access;
 
   template <class Archive>
@@ -52,36 +53,38 @@ class KeyFrameDatabase {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-  KeyFrameDatabase() = default;
-  explicit KeyFrameDatabase(const std::shared_ptr<ORBVocabulary> &voc);
+  BoWKeyFrameDatabase() = default;
+  explicit BoWKeyFrameDatabase(const std::shared_ptr<ORBVocabulary> &voc);
 
-  void add(const std::shared_ptr<KeyFrame> &pKF);
+  void add(const std::shared_ptr<KeyFrame> &pKF) override;
 
-  void erase(const std::shared_ptr<KeyFrame> &pKF);
+  void erase(const std::shared_ptr<KeyFrame> &pKF) override;
 
-  void clear();
-  void clearMap(const std::shared_ptr<Map> &pMap);
+  void clear() override;
+  void clearMap(const std::shared_ptr<Map> &pMap) override;
 
   // Loop Detection(DEPRECATED)
-  std::vector<std::shared_ptr<KeyFrame>> DetectLoopCandidates(
-      const std::shared_ptr<KeyFrame> &pKF, float minScore);
+  // std::vector<std::shared_ptr<KeyFrame>> DetectLoopCandidates(
+  //     const std::shared_ptr<KeyFrame> &pKF, float minScore);
 
   // Loop and Merge Detection
-  void DetectCandidates(const std::shared_ptr<KeyFrame> &pKF, float minScore,
-                        vector<std::shared_ptr<KeyFrame>> &vpLoopCand,
-                        vector<std::shared_ptr<KeyFrame>> &vpMergeCand);
+  void DetectCandidates(
+      const std::shared_ptr<KeyFrame> &pKF, float minScore,
+      vector<std::shared_ptr<KeyFrame>> &vpLoopCand,
+      vector<std::shared_ptr<KeyFrame>> &vpMergeCand) override;
   void DetectBestCandidates(const std::shared_ptr<KeyFrame> &pKF,
                             vector<std::shared_ptr<KeyFrame>> &vpLoopCand,
                             vector<std::shared_ptr<KeyFrame>> &vpMergeCand,
-                            int nMinWords);
+                            int nMinWords) override;
   void DetectNBestCandidates(const std::shared_ptr<KeyFrame> &pKF,
                              vector<std::shared_ptr<KeyFrame>> &vpLoopCand,
                              vector<std::shared_ptr<KeyFrame>> &vpMergeCand,
-                             size_t nNumCandidates);
+                             size_t nNumCandidates) override;
 
   // Relocalization
   std::vector<std::shared_ptr<KeyFrame>> DetectRelocalizationCandidates(
-      const std::shared_ptr<Frame> &F, const std::shared_ptr<Map> &pMap);
+      const std::shared_ptr<Frame> &F,
+      const std::shared_ptr<Map> &pMap) override;
 
   void PreSave();
   void PostLoad(map<long unsigned int, std::shared_ptr<KeyFrame>> mpKFid);

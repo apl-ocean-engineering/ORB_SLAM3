@@ -379,7 +379,7 @@ void Map::PreSave(std::set<std::shared_ptr<GeometricCamera>>& spCams) {
 }
 
 void Map::PostLoad(
-    const std::shared_ptr<KeyFrameDatabase>& pKFDB,
+    const std::shared_ptr<VPRImplementation>& pKFDB,
     const std::shared_ptr<ORBVocabulary>&
         pORBVoc /*, map<unsigned long int, KeyFrame*>& mpKeyFrameId*/,
     map<unsigned int, std::shared_ptr<GeometricCamera>>& mpCams) {
@@ -402,7 +402,7 @@ void Map::PostLoad(
 
     pKFi->UpdateMap(shared_from_this());
     pKFi->SetORBVocabulary(pORBVoc);
-    pKFi->SetKeyFrameDatabase(pKFDB);
+    pKFi->SetVprImplementation(pKFDB);
     mpKeyFrameId[pKFi->mnId] = pKFi;
   }
 

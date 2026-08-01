@@ -199,6 +199,12 @@ class System : public std::enable_shared_from_this<System> {
   void InsertTrackTime(double &time);
 #endif
 
+  // Member accessors
+  std::shared_ptr<VPRImplementation> getVprImplementation() {
+    return mpVprImpl;
+  }
+  std::shared_ptr<ORBVocabulary> getORBVocabulary() { return mpVocabulary; }
+
  protected:
   // Initialize the SLAM system. It launches the Local Mapping, Loop Closing and
   // Viewer threads.
@@ -228,7 +234,7 @@ class System : public std::enable_shared_from_this<System> {
 
   // KeyFrame database for place recognition (relocalization and loop
   // detection).
-  std::shared_ptr<KeyFrameDatabase> mpKeyFrameDatabase;
+  std::shared_ptr<VPRImplementation> mpVprImpl;
 
   // Map structure that stores the pointers to all KeyFrames and MapPoints.
   // Map* mpMap;

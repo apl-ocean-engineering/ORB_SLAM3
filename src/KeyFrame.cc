@@ -42,7 +42,7 @@ unsigned long int KeyFrame::nNextId = 0;
 
 KeyFrame::KeyFrame(const std::shared_ptr<Frame> &F,
                    const std::shared_ptr<Map> &pMap,
-                   const std::shared_ptr<KeyFrameDatabase> &pKFDB)
+                   const std::shared_ptr<VPRImplementation> &pKFDB)
     : bImu(pMap->isImuInitialized()),
       mnFrameId(F->mnId),
       mTimeStamp(F->mTimeStamp),
@@ -97,7 +97,7 @@ KeyFrame::KeyFrame(const std::shared_ptr<Frame> &F,
       mpBackupImuPreintegrated(std::make_shared<IMU::Preintegrated>()),
       mImuCalib(F->mImuCalib),
       mvpMapPoints(F->mvpMapPoints),
-      mpKeyFrameDB(pKFDB),
+      mpVprImpl(pKFDB),
       mpORBvocabulary(F->mpORBvocabulary),
       mbFirstConnection(true),
       mpParent(NULL),
@@ -674,7 +674,7 @@ void KeyFrame::SetBadFlag() {
   }
 
   mpMap->EraseKeyFrame(shared_from_this());
-  mpKeyFrameDB->erase(shared_from_this());
+  mpVprImpl->erase(shared_from_this());
 }
 
 bool KeyFrame::isBad() {
@@ -1128,9 +1128,9 @@ void KeyFrame::SetORBVocabulary(const std::shared_ptr<ORBVocabulary> &pORBVoc) {
   mpORBvocabulary = pORBVoc;
 }
 
-void KeyFrame::SetKeyFrameDatabase(
-    const std::shared_ptr<KeyFrameDatabase> &pKFDB) {
-  mpKeyFrameDB = pKFDB;
+void KeyFrame::SetVprImplementation(
+    const std::shared_ptr<VPRImplementation> &pKFDB) {
+  mpVprImpl = pKFDB;
 }
 
 }  // namespace ORB_SLAM3

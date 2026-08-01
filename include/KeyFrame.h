@@ -39,7 +39,7 @@
 #include "ImuTypes.h"
 #include "KeyFrameDatabase.h"
 #include "MapPoint.h"
-#include "ORBVocabulary.h"
+// #include "ORBVocabulary.h"
 #include "ORBextractor.h"
 #include "SerializationUtils.h"
 #include "Thirdparty/DBoW2/DBoW2/BowVector.h"
@@ -50,7 +50,7 @@ namespace ORB_SLAM3 {
 class Map;
 class MapPoint;
 class Frame;
-class KeyFrameDatabase;
+class BoWKeyFrameDatabase;
 
 class GeometricCamera;
 
@@ -130,8 +130,8 @@ class KeyFrame : public std::enable_shared_from_this<KeyFrame> {
     ar& const_cast<vector<float>&>(mvDepth);
     serializeMatrix<Archive>(ar, mDescriptors, version);
     // BOW
-    ar & mBowVec;
-    ar & mFeatVec;
+    // ar & mBowVec;
+    // ar & mFeatVec;
     // Pose relative to parent
     serializeSophusSE3<Archive>(ar, mTcp, version);
     // Scale
@@ -200,7 +200,7 @@ class KeyFrame : public std::enable_shared_from_this<KeyFrame> {
 
   KeyFrame() = default;
   KeyFrame(const std::shared_ptr<Frame>& F, const std::shared_ptr<Map>& pMap,
-           const std::shared_ptr<KeyFrameDatabase>& pKFDB);
+           const std::shared_ptr<VPRImplementation>& pKFDB);
 
   // Pose functions
   void SetPose(const Sophus::SE3f& Tcw);
@@ -310,7 +310,7 @@ class KeyFrame : public std::enable_shared_from_this<KeyFrame> {
                 map<unsigned int, std::shared_ptr<GeometricCamera>>& mpCamId);
 
   void SetORBVocabulary(const std::shared_ptr<ORBVocabulary>& pORBVoc);
-  void SetKeyFrameDatabase(const std::shared_ptr<KeyFrameDatabase>& pKFDB);
+  void SetVprImplementation(const std::shared_ptr<VPRImplementation>& pKFDB);
 
   bool bImu;
 
@@ -460,7 +460,7 @@ class KeyFrame : public std::enable_shared_from_this<KeyFrame> {
   std::vector<long long int> mvBackupMapPointsId;
 
   // BoW
-  std::shared_ptr<KeyFrameDatabase> mpKeyFrameDB;
+  std::shared_ptr<VPRImplementation> mpVprImpl;
   std::shared_ptr<ORBVocabulary> mpORBvocabulary;
 
   // Grid over the image to speed up feature matching

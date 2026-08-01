@@ -41,7 +41,7 @@
 namespace ORB_SLAM3 {
 
 LoopClosing::LoopClosing(const std::shared_ptr<Atlas>& pAtlas,
-                         const std::shared_ptr<KeyFrameDatabase>& pDB,
+                         const std::shared_ptr<VPRImplementation>& pDB,
                          const std::shared_ptr<ORBVocabulary>& pVoc,
                          const bool bFixScale, const bool bActiveLC)
     : mbResetRequested(false),
@@ -49,7 +49,7 @@ LoopClosing::LoopClosing(const std::shared_ptr<Atlas>& pAtlas,
       mbFinishRequested(false),
       mbFinished(true),
       mpAtlas(pAtlas),
-      mpKeyFrameDB(pDB),
+      mpVprImplementation(pDB),
       mpORBVocabulary(pVoc),
       mpMatchedKF(NULL),
       mLastLoopKFid(0),
@@ -369,7 +369,7 @@ bool LoopClosing::NewDetectCommonRegions() {
   }
 
   if (mpLastMap->IsInertial() && !mpLastMap->GetInertialBA2()) {
-    mpKeyFrameDB->add(mpCurrentKF);
+    mpVprImplementation->add(mpCurrentKF);
     mpCurrentKF->SetErase();
     return false;
   }
@@ -380,7 +380,7 @@ bool LoopClosing::NewDetectCommonRegions() {
         "[LoopClosing::NewDetectCommonRegions] Stereo KF inserted without "
         "check: {}",
         mpCurrentKF->mnId);
-    mpKeyFrameDB->add(mpCurrentKF);
+    mpVprImplementation->add(mpCurrentKF);
     mpCurrentKF->SetErase();
     return false;
   }
@@ -390,7 +390,7 @@ bool LoopClosing::NewDetectCommonRegions() {
         "[LoopClosing::NewDetectCommonRegions] Stereo KF inserted without "
         "check, map is small: {}",
         mpCurrentKF->mnId);
-    mpKeyFrameDB->add(mpCurrentKF);
+    mpVprImplementation->add(mpCurrentKF);
     mpCurrentKF->SetErase();
     return false;
   }
@@ -433,7 +433,7 @@ bool LoopClosing::NewDetectCommonRegions() {
       mnLoopNumNotFound = 0;
 
       if (!mbLoopDetected) {
-        oslog::info("PR: Loop detected with Reffine Sim3");
+        oslog::info("PR: Loop detected with Refine Sim3");
       }
     } else {
       bLoopDetectedInKF = false;
@@ -504,7 +504,7 @@ bool LoopClosing::NewDetectCommonRegions() {
 #ifdef REGISTER_TIMES
     vdEstSim3_ms.push_back(timeEstSim3);
 #endif
-    mpKeyFrameDB->add(mpCurrentKF);
+    mpVprImplementation->add(mpCurrentKF);
     return true;
   }
 
@@ -517,12 +517,14 @@ bool LoopClosing::NewDetectCommonRegions() {
   vector<std::shared_ptr<KeyFrame>> vpMergeBowCand, vpLoopBowCand;
   if (!bMergeDetectedInKF || !bLoopDetectedInKF) {
     // Search in BoW
+    oslog::info("Trying to find overlapping images using BOW");
+
 #ifdef REGISTER_TIMES
     std::chrono::steady_clock::time_point time_StartQuery =
         std::chrono::steady_clock::now();
 #endif
-    mpKeyFrameDB->DetectNBestCandidates(mpCurrentKF, vpLoopBowCand,
-                                        vpMergeBowCand, 3);
+    mpVprImplementation->DetectNBestCandidates(mpCurrentKF, vpLoopBowCand,
+                                               vpMergeBowCand, 3);
 #ifdef REGISTER_TIMES
     std::chrono::steady_clock::time_point time_EndQuery =
         std::chrono::steady_clock::now();
@@ -564,7 +566,7 @@ bool LoopClosing::NewDetectCommonRegions() {
   vdEstSim3_ms.push_back(timeEstSim3);
 #endif
 
-  mpKeyFrameDB->add(mpCurrentKF);
+  mpVprImplementation->add(mpCurrentKF);
 
   if (mbMergeDetected || mbLoopDetected) {
     return true;

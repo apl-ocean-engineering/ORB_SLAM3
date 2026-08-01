@@ -52,7 +52,7 @@ Tracking::Tracking(const std::shared_ptr<System>& pSys,
                    const std::shared_ptr<FrameDrawer>& pFrameDrawer,
                    const std::shared_ptr<MapDrawer>& pMapDrawer,
                    const std::shared_ptr<Atlas>& pAtlas,
-                   const std::shared_ptr<KeyFrameDatabase>& pKFDB,
+                   const std::shared_ptr<VPRImplementation>& pKFDB,
                    const std::shared_ptr<Settings>& settings,
                    const string& _nameSeq)
     : std::enable_shared_from_this<Tracking>(),

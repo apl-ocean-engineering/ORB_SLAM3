@@ -152,12 +152,12 @@ bool System::initialize(bool initFr, const string &strSequence) {
   oslog::info("Vocabulary loaded!");
 
   // Create KeyFrame Database
-  mpKeyFrameDatabase = std::make_shared<KeyFrameDatabase>(mpVocabulary);
+  mpVprImpl = std::make_shared<BoWKeyFrameDatabase>(mpVocabulary);
 
   if (mStrLoadAtlasFromFile.empty()) {
     // Create the Atlas
     oslog::info("Initializing Atlas from scratch ");
-    mpAtlas = std::make_shared<Atlas>(0);
+    mpAtlas = std::make_shared<Atlas>(shared_from_this(), 0);
   } else {
     // Load the file with an earlier session
     // clock_t start = clock();
@@ -187,9 +187,9 @@ bool System::initialize(bool initFr, const string &strSequence) {
   // (it will live in the main thread of execution, the one that called this
   // constructor)
   oslog::info("Seq. Name: {}", strSequence);
-  mpTracker = std::make_shared<Tracking>(
-      shared_from_this(), mpVocabulary, mpFrameDrawer, mpMapDrawer, mpAtlas,
-      mpKeyFrameDatabase, settings_, strSequence);
+  mpTracker = std::make_shared<Tracking>(shared_from_this(), mpVocabulary,
+                                         mpFrameDrawer, mpMapDrawer, mpAtlas,
+                                         mpVprImpl, settings_, strSequence);
 
   // Initialize the Local Mapping thread and launch
   mpLocalMapper = std::make_shared<LocalMapping>(
@@ -214,8 +214,8 @@ bool System::initialize(bool initFr, const string &strSequence) {
 
   // Initialize the Loop Closing thread and launch
   mpLoopCloser = std::make_shared<LoopClosing>(
-      mpAtlas, mpKeyFrameDatabase, mpVocabulary,
-      sensorType() != SensorType::MONOCULAR, activeLC);
+      mpAtlas, mpVprImpl, mpVocabulary, sensorType() != SensorType::MONOCULAR,
+      activeLC);
   mptLoopClosing =
       std::make_unique<thread>(&ORB_SLAM3::LoopClosing::Run, mpLoopCloser);
 
@@ -1213,8 +1213,9 @@ bool System::LoadAtlas(int type) {
       return false;  // Both are differents
     }
 
-    mpAtlas->SetKeyFrameDababase(mpKeyFrameDatabase);
-    mpAtlas->SetORBVocabulary(mpVocabulary);
+    mpAtlas->SetSystem(shared_from_this());
+    // mpAtlas->SetVprImplementation(mpVprImpl);
+    // mpAtlas->SetORBVocabulary(mpVocabulary);
     mpAtlas->PostLoad();
 
     return true;
