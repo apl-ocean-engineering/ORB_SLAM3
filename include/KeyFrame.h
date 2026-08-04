@@ -193,6 +193,10 @@ class KeyFrame : public std::enable_shared_from_this<KeyFrame> {
     ar& boost::serialization::make_array(mVw.data(), mVw.size());
     ar& boost::serialization::make_array(mOwb.data(), mOwb.size());
     ar & mbHasVelocity;
+
+    // [VPR-BRIDGE] mImGray is intentionally NOT serialized.
+    // It is a transient member used only during live SLAM operation to pass
+    // images to the external VPR node. It is not needed for map save/load.
   }
 
  public:
@@ -391,6 +395,13 @@ class KeyFrame : public std::enable_shared_from_this<KeyFrame> {
   std::vector<float> mvuRight;  // negative value for monocular points
   std::vector<float> mvDepth;   // negative value for monocular points
   cv::Mat mDescriptors;
+
+  // [VPR-BRIDGE] Retained grayscale image for external VPR query publishing.
+  // Populated in Tracking::CreateNewKeyFrame() immediately before the Frame's
+  // image goes out of scope. Not serialized — transient, live-only member.
+  // For stereo builds this holds the left camera image (mImGray from Tracking).
+  cv::Mat mImGray;
+  // [VPR-BRIDGE] end
 
   // BoW
   DBoW2::BowVector mBowVec;

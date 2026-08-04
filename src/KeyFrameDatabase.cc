@@ -94,7 +94,7 @@ vector<std::shared_ptr<KeyFrame>> KeyFrameDatabase::DetectLoopCandidates(
   // Discard keyframes connected to the query keyframe
   {
     unique_lock<mutex> lock(mMutex);
-
+    //only compare against kf that share one visual word...
     for (auto const vit : pKF->mBowVec) {
       auto const& lKFs = mvInvertedFile[vit.first];
 
@@ -165,6 +165,12 @@ vector<std::shared_ptr<KeyFrame>> KeyFrameDatabase::DetectLoopCandidates(
 
     float bestScore = it->first;
     float accScore = it->first;
+
+    std::cout << "  group anchor KF" << pKFi->mnId 
+          << " directScore=" << it->first
+          << " accScore will be=" << accScore
+          << std::endl;
+
     std::shared_ptr<KeyFrame> pBestKF = pKFi;
     for (vector<std::shared_ptr<KeyFrame>>::iterator vit = vpNeighs.begin(),
                                                      vend = vpNeighs.end();
@@ -173,6 +179,10 @@ vector<std::shared_ptr<KeyFrame>> KeyFrameDatabase::DetectLoopCandidates(
       if (pKF2->mnLoopQuery == pKF->mnId &&
           pKF2->mnLoopWords > minCommonWords) {
         accScore += pKF2->mLoopScore;
+        std::cout << "  covis neighbor KF" << pKF2->mnId 
+              << " score=" << pKF2->mLoopScore
+              << " (group anchor: KF" << pKFi->mnId << ")"
+              << std::endl;
         if (pKF2->mLoopScore > bestScore) {
           pBestKF = pKF2;
           bestScore = pKF2->mLoopScore;
@@ -301,13 +311,20 @@ void KeyFrameDatabase::DetectCandidates(
         float bestScore = it->first;
         float accScore = it->first;
         std::shared_ptr<KeyFrame> pBestKF = pKFi;
+        std::cout << "  anchor KF" << pKFi->mnId << " score=" << it->first << std::endl;
         for (vector<std::shared_ptr<KeyFrame>>::iterator vit = vpNeighs.begin(),
                                                          vend = vpNeighs.end();
              vit != vend; vit++) {
           std::shared_ptr<KeyFrame> pKF2 = *vit;
+          std::cout << "    neighbor KF" << pKF2->mnId 
+              << " mnLoopQuery=" << pKF2->mnLoopQuery
+              << " pKF->mnId=" << pKF->mnId
+              << " mnLoopWords=" << pKF2->mnLoopWords
+              << " minCommonWords=" << minCommonWords << std::endl;
           if (pKF2->mnLoopQuery == pKF->mnId &&
               pKF2->mnLoopWords > minCommonWords) {
             accScore += pKF2->mLoopScore;
+            
             if (pKF2->mLoopScore > bestScore) {
               pBestKF = pKF2;
               bestScore = pKF2->mLoopScore;
@@ -356,7 +373,7 @@ void KeyFrameDatabase::DetectCandidates(
     int nscores = 0;
 
     // Compute similarity score. Retain the matches whose score is higher than
-    // minScore
+    // minScore ---THIS IS WHERE WE ARE!!!!
     for (list<std::shared_ptr<KeyFrame>>::iterator
              lit = lKFsSharingWordsMerge.begin(),
              lend = lKFsSharingWordsMerge.end();
@@ -387,10 +404,16 @@ void KeyFrameDatabase::DetectCandidates(
         float bestScore = it->first;
         float accScore = it->first;
         std::shared_ptr<KeyFrame> pBestKF = pKFi;
+        std::cout << "  anchor KF" << pKFi->mnId << " score=" << it->first << std::endl;
         for (vector<std::shared_ptr<KeyFrame>>::iterator vit = vpNeighs.begin(),
                                                          vend = vpNeighs.end();
              vit != vend; vit++) {
           std::shared_ptr<KeyFrame> pKF2 = *vit;
+          std::cout << "    neighbor KF" << pKF2->mnId
+              << " mnMergeQuery=" << pKF2->mnMergeQuery
+              << " pKF->mnId=" << pKF->mnId
+              << " mnMergeWords=" << pKF2->mnMergeWords
+              << " minCommonWords=" << minCommonWords << std::endl;
           if (pKF2->mnMergeQuery == pKF->mnId &&
               pKF2->mnMergeWords > minCommonWords) {
             accScore += pKF2->mMergeScore;
@@ -662,6 +685,78 @@ void KeyFrameDatabase::DetectNBestCandidates(
 
   lAccScoreAndMatch.sort(compFirst);
 
+  std::cout << "---- Place Recognition Candidates for Query KF "
+          << pKF->mnId << " ----" << std::endl;
+  for (auto &p : lAccScoreAndMatch)
+  {
+      float directScore = mpVoc->score(pKF->mBowVec, p.second->mBowVec);
+      std::cout << "KF " << p.second->mnId
+                << "  accScore: " << p.first
+                << "  directScore: " << directScore
+                << std::endl;
+  }
+  std::cout << "-------------------------------------" << std::endl;
+
+  // In NewDetectCommonRegions, after mpCurrentKF is popped from queue
+  // Compare current KF against its last 5 neighbors in the database
+ 
+  static std::ofstream temporalFile("/home/nick/Documents/orbslam3_aquarium/tmp/bow_temporal.csv", std::ios::out);
+  static bool temporalHeaderWritten = false;
+  if (!temporalHeaderWritten) {
+      temporalFile << "kf_id avgNeighborScore\n";
+      temporalHeaderWritten = true;
+  }
+
+  auto allKFs = pKF->GetMap()->GetAllKeyFrames();
+  std::sort(allKFs.begin(), allKFs.end(),
+      [](auto& a, auto& b){ return a->mnId < b->mnId; });
+
+  float neighborScoreSum = 0;
+  int neighborCount = 0;
+  for (auto& pKFi : allKFs) {
+      if (pKFi->mnId >= pKF->mnId) break;
+      if (pKFi->mnId >= pKF->mnId - 5) {
+          float s = mpVoc->score(pKF->mBowVec, pKFi->mBowVec);
+          neighborScoreSum += s;
+          neighborCount++;
+      }
+  }
+  float avgNeighborScore = neighborCount > 0 ? neighborScoreSum / neighborCount : 0.0f;
+
+  temporalFile << pKF->mnId << " " << avgNeighborScore << "\n";
+  temporalFile.flush();
+  std::cout << "[BoW:temporal] KF=" << pKF->mnId 
+            << " avgNeighborScore=" << avgNeighborScore << std::endl;
+
+  // oslog::info("[KF] id={} timestamp={:.6f} tx={:.4f} ty={:.4f} tz={:.4f}",
+  //   pKF->mnId,
+  //   pKF->mTimeStamp,
+  //   pKF->GetPoseInverse().translation()(0),
+  //   pKF->GetPoseInverse().translation()(1),
+  //   pKF->GetPoseInverse().translation()(2));
+
+  // for (auto &p : lScoreAndMatch)
+  // {
+  //     std::shared_ptr<KeyFrame> pCandidate = p.second;
+  //     float score = p.first;
+
+  //     std::cout << "KF " << pKF->mnId
+  //               << " -> KF " << pCandidate->mnId
+  //               << " | BoW score: " << score
+  //               << std::endl;
+  // }
+
+  // for (auto& pKFi : lKFsSharingWords) {
+  //   std::cout << "PRE-FILTER KF " << pKF->mnId 
+  //             << " -> KF " << pKFi->mnId
+  //             << " | words=" << pKFi->mnPlaceRecognitionWords
+  //             << " | minRequired=" << minCommonWords
+  //             << std::endl;
+  // }
+
+
+  std::cout << "------------------------------------\n" << std::endl;
+
   vpLoopCand.reserve(nNumCandidates);
   vpMergeCand.reserve(nNumCandidates);
   set<std::shared_ptr<KeyFrame>> spAlreadyAddedKF;
@@ -687,6 +782,12 @@ void KeyFrameDatabase::DetectNBestCandidates(
     }
     i++;
     it++;
+  }
+    for (auto& pKFi : vpMergeCand) {
+    std::cout << "TOP MERGE CAND: KF " << pKF->mnId 
+              << " -> KF " << pKFi->mnId
+              << " mapId=" << pKFi->GetMap()->GetId()
+              << std::endl;
   }
 }
 

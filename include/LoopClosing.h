@@ -28,11 +28,25 @@
 #include <list>
 #include <memory>
 #include <mutex>
+#include <queue>
 #include <set>
 #include <string>
 #include <thread>
 #include <utility>
 #include <vector>
+
+// [VPR-BRIDGE] ROS2 headers for the external VPR interface.
+// ORB-SLAM3 is a plain CMake project — we use the ROS2 client library directly
+// without wrapping in an ament package.
+// Prerequisites:
+//   1. colcon build orbslam3_vpr_msgs first so generated headers exist
+//   2. source ~/Documents/odometry_ws/install/setup.bash before cmake
+#include <cv_bridge/cv_bridge.hpp>
+#include <rclcpp/rclcpp.hpp>
+#include <sensor_msgs/msg/image.hpp>
+#include <orbslam3_vpr_msgs/msg/key_frame_query.hpp>
+#include <orbslam3_vpr_msgs/msg/vpr_candidate.hpp>
+// [VPR-BRIDGE] end
 
 #include "Atlas.h"
 #include "KeyFrame.h"
@@ -65,6 +79,11 @@ class LoopClosing : public enable_shared_from_this<LoopClosing> {
               const std::shared_ptr<KeyFrameDatabase> &pDB,
               const std::shared_ptr<ORBVocabulary> &pVoc, const bool bFixScale,
               const bool bActiveLC);
+
+  // [VPR-BRIDGE] Destructor cancels the rclcpp executor and joins the spin
+  // thread cleanly. Must be defined in LoopClosing.cc.
+  ~LoopClosing();
+  // [VPR-BRIDGE] end
 
   void SetTracker(const std::shared_ptr<Tracking> &pTracker);
 
@@ -171,6 +190,31 @@ class LoopClosing : public enable_shared_from_this<LoopClosing> {
   void CheckObservations(set<std::shared_ptr<KeyFrame> > &spKFsMap1,
                          set<std::shared_ptr<KeyFrame> > &spKFsMap2);
 
+  // [VPR-BRIDGE] ----------------------------------------------------------
+  // Called once at the end of the constructor. Creates mpVPRNode, sets up
+  // the publisher and subscription, then launches mVPRSpinThread.
+  // Requires rclcpp::init() to have been called beforehand (done in System.cc).
+  void InitVPRBridge();
+
+  // Publish a KeyFrame's grayscale image to the Python VPR node.
+  // Called from NewDetectCommonRegions() in place of the DBoW2 query.
+  // If mImGray is empty the publish is skipped with a warning.
+  void PublishKeyFrameForVPR(const std::shared_ptr<KeyFrame> &pKF);
+
+  // Drain the incoming VPRCandidate queue for the current KF.
+  // Same-map matches → vpLoopCand; different-map matches → vpMergeCand.
+  // Returns true if at least one valid candidate was found in either list.
+  // Entries for other KFs are returned to the queue for future ticks.
+  bool FetchVPRCandidates(
+      std::vector<std::shared_ptr<KeyFrame>> &vpLoopCand,
+      std::vector<std::shared_ptr<KeyFrame>> &vpMergeCand);
+
+  // ROS2 subscription callback — runs on mVPRSpinThread.
+  // Pushes incoming messages into mvVPRCandidateQueue under mMutexVPRQueue.
+  void VPRCandidateCallback(
+      const orbslam3_vpr_msgs::msg::VPRCandidate::SharedPtr msg);
+  // [VPR-BRIDGE] end ------------------------------------------------------
+
   void ResetIfRequested();
   bool mbResetRequested;
   bool mbResetActiveMapRequested;
@@ -262,6 +306,38 @@ class LoopClosing : public enable_shared_from_this<LoopClosing> {
 
   // To (de)activate LC
   bool mbActiveLC = true;
+
+  // [VPR-BRIDGE] ROS2 node, publisher, subscription and executor ----------
+  //
+  // mpVPRNode       — standalone rclcpp::Node owned by LoopClosing.
+  // mVPRImagePub    — publishes KeyFrameQuery to /vpr/keyframe.
+  // mVPRCandidateSub— receives VPRCandidate from /vpr/loop_candidates.
+  // mVPRExecutor    — SingleThreadedExecutor driving mpVPRNode callbacks.
+  // mVPRSpinThread  — dedicated thread that calls mVPRExecutor.spin().
+  //
+  // VPRCandidate    — plain struct used as the inter-thread hand-off type.
+  //                   Keeps the queue independent of the ROS2 message type
+  //                   so the LC thread never touches ROS2 memory directly.
+  //
+  // mvVPRCandidateQueue / mMutexVPRQueue
+  //                 — thread-safe buffer between the rclcpp callback thread
+  //                   and the LoopClosing thread.
+  rclcpp::Node::SharedPtr mpVPRNode;
+  rclcpp::Publisher<orbslam3_vpr_msgs::msg::KeyFrameQuery>::SharedPtr
+      mVPRImagePub;
+  rclcpp::Subscription<orbslam3_vpr_msgs::msg::VPRCandidate>::SharedPtr
+      mVPRCandidateSub;
+  rclcpp::executors::SingleThreadedExecutor mVPRExecutor;
+  std::thread mVPRSpinThread;
+
+  struct VPRCandidate {
+    long unsigned int queryKFId;
+    long unsigned int matchedKFId;
+    float             score;
+  };
+  std::queue<VPRCandidate> mvVPRCandidateQueue;
+  std::mutex               mMutexVPRQueue;
+  // [VPR-BRIDGE] end ------------------------------------------------------
 
 #ifdef REGISTER_LOOP
   string mstrFolderLoop;

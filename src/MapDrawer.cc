@@ -30,6 +30,7 @@
 
 #include "KeyFrame.h"
 #include "MapPoint.h"
+#include <algorithm>
 
 namespace ORB_SLAM3 {
 
@@ -48,7 +49,57 @@ void MapDrawer::newParameterLoader(const std::shared_ptr<Settings> &settings) {
   mCameraLineWidth = settings->cameraLineWidth();
 }
 
+// void MapDrawer::DrawMapPoints() {
+//   std::shared_ptr<Map> pActiveMap = mpAtlas->GetCurrentMap();
+//   if (!pActiveMap) return;
+
+//   const vector<MapPoint *> &vpMPs = pActiveMap->GetAllMapPoints();
+//   const vector<MapPoint *> &vpRefMPs = pActiveMap->GetReferenceMapPoints();
+
+//   set<MapPoint *> spRefMPs(vpRefMPs.begin(), vpRefMPs.end());
+
+//   if (vpMPs.empty()) return;
+
+//   glPointSize(mPointSize);
+//   glBegin(GL_POINTS);
+//   glColor3f(0.0, 0.0, 0.0);
+
+//   for (size_t i = 0, iend = vpMPs.size(); i < iend; i++) {
+//     if (vpMPs[i]->isBad() || spRefMPs.count(vpMPs[i])) continue;
+//     Eigen::Matrix<float, 3, 1> pos = vpMPs[i]->GetWorldPos();
+//     glVertex3f(pos(0), pos(1), pos(2));
+//   }
+//   glEnd();
+
+//   glPointSize(mPointSize);
+//   glBegin(GL_POINTS);
+//   glColor3f(1.0, 0.0, 0.0);
+
+//   for (set<MapPoint *>::iterator sit = spRefMPs.begin(), send = spRefMPs.end();
+//        sit != send; sit++) {
+//     if ((*sit)->isBad()) continue;
+//     Eigen::Matrix<float, 3, 1> pos = (*sit)->GetWorldPos();
+//     glVertex3f(pos(0), pos(1), pos(2));
+//   }
+
+//   glEnd();
+// }
+
+
 void MapDrawer::DrawMapPoints() {
+  // Define colors per map ID (add more as needed)
+  static const float mapColors[][3] = {
+      {0.0f, 0.0f, 0.0f},  // Map 0: Black
+      {0.0f, 0.0f, 1.0f},  // Map 1: Blue
+      {0.0f, 0.8f, 0.0f},  // Map 2: Green
+      {1.0f, 0.5f, 0.0f},  // Map 3: Orange
+      {0.5f, 0.0f, 0.5f},  // Map 4: Purple
+      {0.0f, 0.8f, 0.8f},  // Map 5: Cyan
+      {0.8f, 0.8f, 0.0f},  // Map 6: Yellow
+      {1.0f, 0.0f, 1.0f},  // Map 7: Magenta
+  };
+  static const int numColors = sizeof(mapColors) / sizeof(mapColors[0]);
+
   std::shared_ptr<Map> pActiveMap = mpAtlas->GetCurrentMap();
   if (!pActiveMap) return;
 
@@ -59,24 +110,37 @@ void MapDrawer::DrawMapPoints() {
 
   if (vpMPs.empty()) return;
 
+  // --- Draw non-reference map points colored by map ID ---
   glPointSize(mPointSize);
   glBegin(GL_POINTS);
-  glColor3f(0.0, 0.0, 0.0);
 
   for (size_t i = 0, iend = vpMPs.size(); i < iend; i++) {
     if (vpMPs[i]->isBad() || spRefMPs.count(vpMPs[i])) continue;
+
+    unsigned int mapId = vpMPs[i]->mnOriginMapId % numColors;
+    glColor3f(mapColors[mapId][0], mapColors[mapId][1], mapColors[mapId][2]);
+
     Eigen::Matrix<float, 3, 1> pos = vpMPs[i]->GetWorldPos();
     glVertex3f(pos(0), pos(1), pos(2));
   }
   glEnd();
 
-  glPointSize(mPointSize);
+  // --- Draw reference map points colored by map ID (brighter/larger) ---
+  glPointSize(mPointSize * 1.5f);
   glBegin(GL_POINTS);
-  glColor3f(1.0, 0.0, 0.0);
 
   for (set<MapPoint *>::iterator sit = spRefMPs.begin(), send = spRefMPs.end();
        sit != send; sit++) {
     if ((*sit)->isBad()) continue;
+
+    unsigned int mapId = (*sit)->mnOriginMapId % numColors;
+    // Brighten the reference point color slightly to distinguish it
+    glColor3f(
+        std::min(mapColors[mapId][0] + 0.3f, 1.0f),
+        std::min(mapColors[mapId][1] + 0.3f, 1.0f),
+        std::min(mapColors[mapId][2] + 0.3f, 1.0f)
+    );
+
     Eigen::Matrix<float, 3, 1> pos = (*sit)->GetWorldPos();
     glVertex3f(pos(0), pos(1), pos(2));
   }

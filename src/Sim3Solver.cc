@@ -85,9 +85,12 @@ Sim3Solver::Sim3Solver(const std::shared_ptr<KeyFrame> &pKF1,
       if (pMP1->isBad() || pMP2->isBad()) continue;
 
       if (bDifferentKFs) pKFm = vpKeyFrameMatchedMP[i1];
+      //if (!bDifferentKFs) pKFm = vpKeyFrameMatchedMP[i1]; //recommended fix?
+      //oslog::info("Sim3Solver ctor: vpKeyFrameMatchedMP.size()=" + to_string(vpKeyFrameMatchedMP.size()) + " bDifferentKFs=" + to_string(bDifferentKFs));
 
       int indexKF1 = get<0>(pMP1->GetIndexInKeyFrame(pKF1));
       int indexKF2 = get<0>(pMP2->GetIndexInKeyFrame(pKFm));
+      //oslog::info("point " + to_string(i1) + " indexKF2=" + to_string(indexKF2) + " pKFm=" + to_string(pKFm->mnId));
 
       if (indexKF1 < 0 || indexKF2 < 0) continue;
 
@@ -132,7 +135,7 @@ void Sim3Solver::SetRansacParameters(double probability, int minInliers,
   mvbInliersi.resize(N);
 
   // Adjust Parameters according to number of correspondences
-  float epsilon = static_cast<float>(mRansacMinInliers / N);
+  float epsilon = static_cast<float>(mRansacMinInliers) / static_cast<float>(N);
 
   // Set RANSAC iterations according to probability, epsilon, and max iterations
   int nIterations;
@@ -205,7 +208,7 @@ Eigen::Matrix4f Sim3Solver::iterate(int nIterations, bool &bNoMore,
   }
 
   if (mnIterations >= mRansacMaxIts) bNoMore = true;
-
+  
   return Eigen::Matrix4f::Identity();
 }
 
@@ -217,7 +220,10 @@ Eigen::Matrix4f Sim3Solver::iterate(int nIterations, bool &bNoMore,
   vbInliers = vector<bool>(mN1, false);
   nInliers = 0;
 
+  oslog::info("RANSAC start: N=" + to_string(N) + " mRansacMinInliers=" + to_string(mRansacMinInliers) + " mRansacMaxIts=" + to_string(mRansacMaxIts));
+
   if (N < mRansacMinInliers) {
+    oslog::info("RANSAC early exit: N=" + to_string(N) + " < mRansacMinInliers=" + to_string(mRansacMinInliers));
     bNoMore = true;
     return Eigen::Matrix4f::Identity();
   }
@@ -255,27 +261,30 @@ Eigen::Matrix4f Sim3Solver::iterate(int nIterations, bool &bNoMore,
     CheckInliers();
 
     if (mnInliersi >= mnBestInliers) {
+      //oslog::info("[BC] bconverge 1st cond satisfied" +to_string(mnInliersi) + "is greater than" +to_string(mnBestInliers));
       mvbBestInliers = mvbInliersi;
       mnBestInliers = mnInliersi;
       mBestT12 = mT12i;
       mBestRotation = mR12i;
       mBestTranslation = mt12i;
       mBestScale = ms12i;
-
+      //oslog::info("[BC] mnInliersi =" +to_string(mnInliersi) + "is greater than" +to_string(mRansacMinInliers));
       if (mnInliersi > mRansacMinInliers) {
         nInliers = mnInliersi;
         for (int i = 0; i < N; i++)
           if (mvbInliersi[i]) vbInliers[mvnIndices1[i]] = true;
-        bConverge = true;
+        bConverge = true;    //where bConverge is set...
         return mBestT12;
       } else {
         bestSim3 = mBestT12;
       }
     }
   }
-
+  
+  oslog::info("RANSAC final: bestInliers=" + to_string(mnBestInliers) + " needed=" + to_string(mRansacMinInliers) + " N=" + to_string(N));
+  oslog::info("RANSAC final: mnIterations=" + to_string(mnIterations) + " needs to be >= " + to_string(mRansacMaxIts) + " for bNoMore=true");
   if (mnIterations >= mRansacMaxIts) bNoMore = true;
-
+    oslog::info("bNoMore=" + to_string(bNoMore));
   return bestSim3;
 }
 
@@ -397,23 +406,67 @@ void Sim3Solver::ComputeSim3(Eigen::Matrix3f &P1, Eigen::Matrix3f &P2) {
 void Sim3Solver::CheckInliers() {
   vector<Eigen::Vector2f> vP1im2, vP2im1;
   Project(mvX3Dc2, vP2im1, mT12i, pCamera1);
-  Project(mvX3Dc1, vP1im2, mT21i, pCamera2);
+  Project(mvX3Dc1, vP1im2, mT21i, pCamera2); //reprojecting...
+
+  // float scale = mT12i.block<3,3>(0,0).col(0).norm();
+  // std::cout << "[SCALE] Sim3 scale: " << scale << std::endl;
+
+  // if(!mvX3Dc2.empty())
+  // {
+  //     Eigen::Vector3f test = (mT12i.block<3,3>(0,0) * mvX3Dc2[0]) 
+  //                           + mT12i.block<3,1>(0,3);
+  //     std::cout << "Transformed Z: " << test(2) << std::endl;
+  // }
+  
 
   mnInliersi = 0;
 
   for (size_t i = 0; i < mvP1im1.size(); i++) {
     Eigen::Vector2f dist1 = mvP1im1[i] - vP2im1[i];
-    Eigen::Vector2f dist2 = vP1im2[i] - mvP2im2[i];
+    Eigen::Vector2f dist2 = vP1im2[i] - mvP2im2[i]; //calc reprojection error
 
     const float err1 = dist1.dot(dist1);
-    const float err2 = dist2.dot(dist2);
+    const float err2 = dist2.dot(dist2);  //squared error computation
 
+    
+
+    // if (i < 10)   // only print first few to avoid spam
+    // {
+    //     std::cout << "i: " << i
+    //               << " | err1: " << err1
+    //               << " | sqrt(err1): " << std::sqrt(err1)
+    //               << " | thresh1: " << mvnMaxError1[i]
+    //               << " | sqrt(thresh1): " << std::sqrt(mvnMaxError1[i])
+    //               << std::endl;
+    // }
+    // oslog::info("[CI]err1: " + to_string(err1) + "err2: " + to_string(err2));
     if (err1 < mvnMaxError1[i] && err2 < mvnMaxError2[i]) {
       mvbInliersi[i] = true;
       mnInliersi++;
     } else {
       mvbInliersi[i] = false;
     }
+    // if (i < 5) {
+    // oslog::info("[CI] i=" + to_string(i) 
+    //     + " observed=(" + to_string(mvP1im1[i](0)) + "," + to_string(mvP1im1[i](1)) + ")"
+    //     + " projected=(" + to_string(vP2im1[i](0)) + "," + to_string(vP2im1[i](1)) + ")"
+    //     + " err1=" + to_string(std::sqrt(err1)) + " thresh=" + to_string(std::sqrt(mvnMaxError1[i])));
+    // }
+
+    // if (i >= mvP1im1.size() - 5) {
+    // oslog::info("[CI] i=" + to_string(i) 
+    //     + " observed=(" + to_string(mvP1im1[i](0)) + "," + to_string(mvP1im1[i](1)) + ")"
+    //     + " projected=(" + to_string(vP2im1[i](0)) + "," + to_string(vP2im1[i](1)) + ")"
+    //     + " err1=" + to_string(std::sqrt(err1)) + " thresh=" + to_string(std::sqrt(mvnMaxError1[i])));
+    // }
+
+
+    // if (mvbInliersi[i] == true) {
+    // oslog::info("[CI] INLIER i=" + to_string(i) 
+    //     + " observed=(" + to_string(mvP1im1[i](0)) + "," + to_string(mvP1im1[i](1)) + ")"
+    //     + " projected=(" + to_string(vP2im1[i](0)) + "," + to_string(vP2im1[i](1)) + ")"
+    //     + " err1=" + to_string(std::sqrt(err1)) + " thresh=" + to_string(std::sqrt(mvnMaxError1[i])));
+    // }
   }
 }
 

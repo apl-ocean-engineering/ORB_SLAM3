@@ -1,0 +1,1949 @@
+1770331146 [euroc   ] [  info] Loading 1 sequences
+1770331146 [euroc   ] [  info] Loading images for sequence 0 ....
+1770331146 [euroc   ] [  info] ------
+1770331146 [orbslam3] [  info] Loading settings from aquarium_resize.yaml
+1770331146 [orbslam3] [  info] 	-Loaded camera 1
+1770331146 [orbslam3] [  info] 	-Loaded camera 2
+1770331146 [orbslam3] [  info] 	-Loaded image info
+1770331146 [orbslam3] [  info] 	-Loaded ORB settings
+Viewer.imageViewScale optional parameter does not exist...
+1770331146 [orbslam3] [  info] 	-Loaded viewer settings
+System.SaveAtlasToFile optional parameter does not exist...
+1770331146 [orbslam3] [  info] 	-Loaded Atlas settings
+1770331146 [orbslam3] [  info] 	-Loaded misc parameters
+1770331146 [orbslam3] [  info] ----------------------------------
+1770331146 [orbslam3] [  info] 	-Computed rectification maps
+
+ORB-SLAM3 Copyright (C) 2017-2020 Carlos Campos, Richard Elvira, Juan J. Gómez, José M.M. Montiel and Juan D. Tardós, University of Zaragoza.
+ORB-SLAM2 Copyright (C) 2014-2016 Raúl Mur-Artal, José M.M. Montiel and Juan D. Tardós, University of Zaragoza.
+This program comes with ABSOLUTELY NO WARRANTY;
+This is free software, and you are welcome to redistribute it
+under certain conditions. See LICENSE.txt.
+
+1770331146 [orbslam3] [  info] Input sensor is type Stereo
+SLAM settings: 
+	-Camera 1 parameters (Pinhole): [ 1061.91 1065.08 778.194 553.857 ]
+	-Camera 1 distortion parameters: [  -0.259389 0.203687 0.00066 0.003063 -0.0845 ]
+	-Camera 2 parameters (Pinhole: [ 1060.22 1063.51 782.091 582.528 ]
+	-Camera 2 distortion parameters: [  -0.263264 0.215493 -0.003977 0.000629 -0.0902 ]
+	-Original image size: [ 1440 , 1080 ]
+	-Current image size: [ 720 , 540 ]
+	-Camera 1 parameters after rectification: [  532.149 532.149 363.28 278.334 ]
+	-Stereo baseline: 0.0548454
+	-Stereo depth threshold : 5
+	-Features per image: 4000
+	-ORB scale factor: 1.2
+	-ORB number of scales: 9
+	-Initial FAST threshold: 5
+	-Min FAST threshold: 2
+	-Loop closing: YES
+
+1770331146 [orbslam3] [  info] Loading ORB Vocabulary. This could take a while...
+1770331151 [orbslam3] [  info] Vocabulary loaded!
+1770331151 [orbslam3] [  info] Initializing Atlas from file: ./atlas
+Starting to read the save binary file
+Finished loading the saved binary file
+1770331153 [orbslam3] [  info] Creation of new map with id: 1
+1770331153 [orbslam3] [  info] Creation of new map with last KF id: 326
+1770331153 [orbslam3] [  info] Seq. Name: 
+1770331153 [orbslam3] [ debug] There are 2 cameras in the atlas
+1770331153 [orbslam3] [ debug] Camera 2 is pinhole
+1770331153 [orbslam3] [ debug] Camera 2 is pinhole
+1770331153 [orbslam3] [  info] LocalMapping will discard points further than 20 m from current camera
+1770331153 [orbslam3] [  info] Viewer enabled: YES
+1770331153 [euroc   ] [  info] === Processing image 0 of 1634 at 1.74801545e+09
+1770331153 [orbslam3] [ debug] [System] Current FPS estimate 0.000000
+1770331153 [orbslam3] [ debug] Frame 1634.  Kept 1942 stereo matches of 2085 features
+1770331153 [orbslam3] [  info] [Tracking::StereoInitialization]
+1770331153 [orbslam3] [  info] [Tracking::StereoInitialization] Initializing map with 4011 points
+1770331153 [orbslam3] [  info] [Map::AddKeyFrame] First KF: 326; Map init KF: 326
+1770331153 [orbslam3] [ debug] [Tracking::StereoInitialization] No camera2, checking 4011 points
+1770331153 [orbslam3] [critic] [Tracking::StereoInitialization] New Map created with 1942 points
+1770331153 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.469, frame_creation 89.1, track 5.476
+1770331153 [euroc   ] [  info] === Processing image 1 of 1634 at 1.74801545e+09
+1770331153 [orbslam3] [  info] LoopClosing: Pushing KF 326 into queue, which is length 1
+1770331153 [orbslam3] [  info] LoopClosing: Have new frames to check
+1770331153 [orbslam3] [  info] [LoopClosing::NewDetectCommonRegions] Stereo KF inserted without check: 326
+1770331153 [orbslam3] [ debug] [System] Current FPS estimate 10.144057
+1770331153 [orbslam3] [ debug] Frame 1635.  Kept 1930 stereo matches of 2078 features
+1770331153 [orbslam3] [  info] TRACK: Track with respect to the reference KF
+1770331153 [orbslam3] [  info] [Frame::ComputeBoW] Computing BoW for 4011 x 32 descriptors
+1770331153 [orbslam3] [  info] [Frame::ComputeBoW]  ... BoW vector size 3938, feature vector size 100
+1770331153 [orbslam3] [  info] [ORBmatcher::SearchByBoW] 100 feature vector in Keyframe, 100 in Frame
+1770331153 [orbslam3] [  info]   Due to orientation check, 688 matches -> 685
+1770331153 [orbslam3] [ debug] Tracking::TrackReferenceKeyFrame:  Got 685 matches
+1770331153 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  15.760485 ms 
+1770331153 [orbslam3] [  info] Before optimization, 1323 map points, 0 outliers
+1770331153 [orbslam3] [  info] After optimization, 1323 map points, 40 outliers
+1770331153 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1283
+1770331153 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.3939, search local points 13.2, pose optimization 7.524 everything else 0.04969
+1770331153 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 21.172159 ms 
+1770331153 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 4
+1770331153 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1283; nRefMatches: 1942; thRefRatio: 0.4
+1770331153 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=false; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331153 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.488, frame_creation 74.54, track 38.38
+1770331153 [euroc   ] [  info] === Processing image 2 of 1634 at 1.74801545e+09
+1770331153 [orbslam3] [ debug] [System] Current FPS estimate 10.050112
+1770331153 [orbslam3] [ debug] Frame 1636.  Kept 1910 stereo matches of 2065 features
+1770331153 [orbslam3] [  info] TRACK: Track with motion model
+1770331153 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 1112 matches in first pass
+1770331153 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 1036 matches against the map
+1770331153 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  23.737941 ms 
+1770331153 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331153 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  23.825387 ms 
+1770331153 [orbslam3] [  info] Before optimization, 1381 map points, 0 outliers
+1770331153 [orbslam3] [  info] After optimization, 1381 map points, 38 outliers
+1770331153 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1343
+1770331153 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.5721, search local points 8.586, pose optimization 9.117 everything else 0.05834
+1770331153 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 18.338322 ms 
+1770331153 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 5
+1770331153 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1343; nRefMatches: 1942; thRefRatio: 0.4
+1770331153 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=false; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331153 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.671, frame_creation 44.07, track 44.16
+1770331153 [euroc   ] [  info] === Processing image 3 of 1634 at 1.74801545e+09
+1770331153 [orbslam3] [ debug] [System] Current FPS estimate 10.060895
+1770331153 [orbslam3] [ debug] Frame 1637.  Kept 1935 stereo matches of 2069 features
+1770331153 [orbslam3] [  info] TRACK: Track with motion model
+1770331153 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 1141 matches in first pass
+1770331153 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 1055 matches against the map
+1770331153 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  14.048371 ms 
+1770331153 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331153 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  14.151726 ms 
+1770331153 [orbslam3] [  info] Before optimization, 1354 map points, 0 outliers
+1770331153 [orbslam3] [  info] After optimization, 1354 map points, 39 outliers
+1770331153 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1315
+1770331153 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.5079, search local points 3.463, pose optimization 10.07 everything else 0.07727
+1770331153 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 14.123071 ms 
+1770331153 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 6
+1770331153 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1315; nRefMatches: 1942; thRefRatio: 0.4
+1770331153 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=false; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331153 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 2.039, frame_creation 49.11, track 29.56
+1770331153 [euroc   ] [  info] === Processing image 4 of 1634 at 1.74801545e+09
+1770331153 [orbslam3] [ debug] [System] Current FPS estimate 10.048167
+1770331153 [orbslam3] [ debug] Frame 1638.  Kept 1938 stereo matches of 2072 features
+1770331153 [orbslam3] [  info] TRACK: Track with motion model
+1770331153 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 1128 matches in first pass
+1770331153 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 1065 matches against the map
+1770331153 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  13.266027 ms 
+1770331153 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331153 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  13.354925 ms 
+1770331153 [orbslam3] [  info] Before optimization, 1352 map points, 0 outliers
+1770331154 [orbslam3] [  info] After optimization, 1352 map points, 47 outliers
+1770331154 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1305
+1770331154 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.6513, search local points 2.867, pose optimization 6.376 everything else 0.04559
+1770331154 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 9.94405 ms 
+1770331154 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 7
+1770331154 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1305; nRefMatches: 1942; thRefRatio: 0.4
+1770331154 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=false; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331154 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.588, frame_creation 42.12, track 24.61
+1770331154 [euroc   ] [  info] === Processing image 5 of 1634 at 1.74801545e+09
+1770331154 [orbslam3] [ debug] [System] Current FPS estimate 8.913126
+1770331154 [orbslam3] [ debug] Frame 1639.  Kept 1935 stereo matches of 2055 features
+1770331154 [orbslam3] [  info] TRACK: Track with motion model
+1770331154 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 1084 matches in first pass
+1770331154 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 949 matches against the map
+1770331154 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  15.694832 ms 
+1770331154 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331154 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  15.799509 ms 
+1770331154 [orbslam3] [  info] Before optimization, 1238 map points, 0 outliers
+1770331154 [orbslam3] [  info] After optimization, 1238 map points, 42 outliers
+1770331154 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1196
+1770331154 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.5505, search local points 4.121, pose optimization 8.766 everything else 0.1011
+1770331154 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 13.54379 ms 
+1770331154 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 2; non tracked close points: 3
+1770331154 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1196; nRefMatches: 1942; thRefRatio: 0.4
+1770331154 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=false; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331154 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.729, frame_creation 44.42, track 30.8
+1770331154 [euroc   ] [  info] === Processing image 6 of 1634 at 1.74801545e+09
+1770331154 [orbslam3] [ debug] [System] Current FPS estimate 9.234582
+1770331154 [orbslam3] [ debug] Frame 1640.  Kept 1951 stereo matches of 2088 features
+1770331154 [orbslam3] [  info] TRACK: Track with motion model
+1770331154 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 991 matches in first pass
+1770331154 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 911 matches against the map
+1770331154 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  17.761224 ms 
+1770331154 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331154 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  17.856524 ms 
+1770331154 [orbslam3] [  info] Before optimization, 1229 map points, 0 outliers
+1770331154 [orbslam3] [  info] After optimization, 1229 map points, 29 outliers
+1770331154 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1200
+1770331154 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.5574, search local points 4.344, pose optimization 10.05 everything else 0.1081
+1770331154 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 15.069204 ms 
+1770331154 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 2; non tracked close points: 6
+1770331154 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1200; nRefMatches: 1942; thRefRatio: 0.4
+1770331154 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=false; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331154 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.682, frame_creation 48.87, track 34.74
+1770331154 [euroc   ] [  info] === Processing image 7 of 1634 at 1.74801545e+09
+1770331154 [orbslam3] [ debug] [System] Current FPS estimate 9.525384
+1770331154 [orbslam3] [ debug] Frame 1641.  Kept 1947 stereo matches of 2071 features
+1770331154 [orbslam3] [  info] TRACK: Track with motion model
+1770331154 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 1034 matches in first pass
+1770331154 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 938 matches against the map
+1770331154 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  15.801453 ms 
+1770331154 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331154 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  15.952327 ms 
+1770331154 [orbslam3] [  info] Before optimization, 1232 map points, 0 outliers
+1770331154 [orbslam3] [  info] After optimization, 1232 map points, 37 outliers
+1770331154 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1195
+1770331154 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.5682, search local points 6.092, pose optimization 6.534 everything else 0.1111
+1770331154 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 13.311503 ms 
+1770331154 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 1; non tracked close points: 3
+1770331154 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1195; nRefMatches: 1942; thRefRatio: 0.4
+1770331154 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=false; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331154 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.706, frame_creation 53.93, track 32.87
+1770331154 [euroc   ] [  info] === Processing image 8 of 1634 at 1.74801545e+09
+1770331154 [orbslam3] [ debug] [System] Current FPS estimate 9.402370
+1770331154 [orbslam3] [ debug] Frame 1642.  Kept 1931 stereo matches of 2044 features
+1770331154 [orbslam3] [  info] TRACK: Track with motion model
+1770331154 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 1020 matches in first pass
+1770331154 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 929 matches against the map
+1770331154 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  17.204686 ms 
+1770331154 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331154 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  17.317849 ms 
+1770331154 [orbslam3] [  info] Before optimization, 1187 map points, 0 outliers
+1770331154 [orbslam3] [  info] After optimization, 1187 map points, 37 outliers
+1770331154 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1150
+1770331154 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.5589, search local points 4.434, pose optimization 8.809 everything else 0.09619
+1770331154 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 13.903237 ms 
+1770331154 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 2; non tracked close points: 5
+1770331154 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1150; nRefMatches: 1942; thRefRatio: 0.4
+1770331154 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=false; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331154 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.641, frame_creation 52.85, track 32.95
+1770331154 [euroc   ] [  info] === Processing image 9 of 1634 at 1.74801545e+09
+1770331154 [orbslam3] [ debug] [System] Current FPS estimate 9.852568
+1770331154 [orbslam3] [ debug] Frame 1643.  Kept 1910 stereo matches of 2018 features
+1770331154 [orbslam3] [  info] TRACK: Track with motion model
+1770331154 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 952 matches in first pass
+1770331154 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 888 matches against the map
+1770331154 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  15.091084 ms 
+1770331154 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331154 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  15.177368 ms 
+1770331154 [orbslam3] [  info] Before optimization, 1162 map points, 0 outliers
+1770331154 [orbslam3] [  info] After optimization, 1162 map points, 32 outliers
+1770331154 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1130
+1770331154 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.5408, search local points 6.356, pose optimization 9.442 everything else 0.1014
+1770331154 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 16.445246 ms 
+1770331154 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 1; non tracked close points: 8
+1770331154 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1130; nRefMatches: 1942; thRefRatio: 0.4
+1770331154 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331154 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 2.246, frame_creation 50.73, track 33.34
+1770331154 [euroc   ] [  info] === Processing image 10 of 1634 at 1.74801545e+09
+1770331154 [orbslam3] [ debug] [System] Current FPS estimate 9.860831
+1770331154 [orbslam3] [ debug] Frame 1644.  Kept 1847 stereo matches of 1945 features
+1770331154 [orbslam3] [  info] TRACK: Track with motion model
+1770331154 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 975 matches in first pass
+1770331154 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 896 matches against the map
+1770331154 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  12.893706 ms 
+1770331154 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331154 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  12.995779 ms 
+1770331154 [orbslam3] [  info] Before optimization, 1147 map points, 0 outliers
+1770331154 [orbslam3] [  info] After optimization, 1147 map points, 27 outliers
+1770331154 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1120
+1770331154 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.5141, search local points 6.242, pose optimization 9.252 everything else 0.105
+1770331154 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 16.119272 ms 
+1770331154 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 2; non tracked close points: 5
+1770331154 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1120; nRefMatches: 1942; thRefRatio: 0.4
+1770331154 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331154 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.681, frame_creation 52.99, track 31.02
+1770331154 [euroc   ] [  info] === Processing image 11 of 1634 at 1.74801545e+09
+1770331154 [orbslam3] [ debug] [System] Current FPS estimate 9.884079
+1770331154 [orbslam3] [ debug] Frame 1645.  Kept 1875 stereo matches of 1989 features
+1770331154 [orbslam3] [  info] TRACK: Track with motion model
+1770331154 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 920 matches in first pass
+1770331155 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 853 matches against the map
+1770331155 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  12.273518 ms 
+1770331155 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331155 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  12.357817 ms 
+1770331155 [orbslam3] [  info] Before optimization, 1135 map points, 0 outliers
+1770331155 [orbslam3] [  info] After optimization, 1135 map points, 33 outliers
+1770331155 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1102
+1770331155 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.5027, search local points 4.226, pose optimization 8.753 everything else 0.08275
+1770331155 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 13.569489 ms 
+1770331155 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 1; non tracked close points: 6
+1770331155 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1102; nRefMatches: 1942; thRefRatio: 0.4
+1770331155 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331155 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.66, frame_creation 51.54, track 27.62
+1770331155 [euroc   ] [  info] === Processing image 12 of 1634 at 1.74801545e+09
+1770331155 [orbslam3] [ debug] [System] Current FPS estimate 9.856056
+1770331155 [orbslam3] [ debug] Frame 1646.  Kept 1865 stereo matches of 1974 features
+1770331155 [orbslam3] [  info] TRACK: Track with motion model
+1770331155 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 896 matches in first pass
+1770331155 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 830 matches against the map
+1770331155 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  14.185809 ms 
+1770331155 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331155 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  14.275278 ms 
+1770331155 [orbslam3] [  info] Before optimization, 1123 map points, 0 outliers
+1770331155 [orbslam3] [  info] After optimization, 1123 map points, 34 outliers
+1770331155 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1089
+1770331155 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.5037, search local points 5.182, pose optimization 9.898 everything else 0.1148
+1770331155 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 15.703398 ms 
+1770331155 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 2; non tracked close points: 3
+1770331155 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1089; nRefMatches: 1942; thRefRatio: 0.4
+1770331155 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331155 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.656, frame_creation 53.35, track 31.79
+1770331155 [euroc   ] [  info] === Processing image 13 of 1634 at 1.74801545e+09
+1770331155 [orbslam3] [ debug] [System] Current FPS estimate 9.890874
+1770331155 [orbslam3] [ debug] Frame 1647.  Kept 1914 stereo matches of 2019 features
+1770331155 [orbslam3] [  info] TRACK: Track with motion model
+1770331155 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 942 matches in first pass
+1770331155 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 862 matches against the map
+1770331155 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  17.231496 ms 
+1770331155 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331155 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  17.319953 ms 
+1770331155 [orbslam3] [  info] Before optimization, 1118 map points, 0 outliers
+1770331155 [orbslam3] [  info] After optimization, 1118 map points, 33 outliers
+1770331155 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1085
+1770331155 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.5697, search local points 7.785, pose optimization 9.26 everything else 0.119
+1770331155 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 17.73787 ms 
+1770331155 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 3; non tracked close points: 8
+1770331155 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1085; nRefMatches: 1942; thRefRatio: 0.4
+1770331155 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331155 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.882, frame_creation 53.02, track 36.91
+1770331155 [euroc   ] [  info] === Processing image 14 of 1634 at 1.74801545e+09
+1770331155 [orbslam3] [ debug] [System] Current FPS estimate 9.526526
+1770331155 [orbslam3] [ debug] Frame 1648.  Kept 1874 stereo matches of 1996 features
+1770331155 [orbslam3] [  info] TRACK: Track with motion model
+1770331155 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 924 matches in first pass
+1770331155 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 833 matches against the map
+1770331155 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  14.325432 ms 
+1770331155 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331155 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  14.414861 ms 
+1770331155 [orbslam3] [  info] Before optimization, 1091 map points, 0 outliers
+1770331155 [orbslam3] [  info] After optimization, 1091 map points, 36 outliers
+1770331155 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1055
+1770331155 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.5008, search local points 2.83, pose optimization 8.05 everything else 0.079
+1770331155 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 11.465475 ms 
+1770331155 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 5
+1770331155 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1055; nRefMatches: 1942; thRefRatio: 0.4
+1770331155 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331155 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.826, frame_creation 54.75, track 27.58
+1770331155 [euroc   ] [  info] === Processing image 15 of 1634 at 1.74801545e+09
+1770331155 [orbslam3] [ debug] [System] Current FPS estimate 9.121805
+1770331155 [orbslam3] [ debug] Frame 1649.  Kept 1866 stereo matches of 1988 features
+1770331155 [orbslam3] [  info] TRACK: Track with motion model
+1770331155 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 893 matches in first pass
+1770331155 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 802 matches against the map
+1770331155 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  14.67962 ms 
+1770331155 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331155 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  14.765081 ms 
+1770331155 [orbslam3] [  info] Before optimization, 1070 map points, 0 outliers
+1770331155 [orbslam3] [  info] After optimization, 1070 map points, 48 outliers
+1770331155 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1022
+1770331155 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.4652, search local points 5.573, pose optimization 7.721 everything else 0.08323
+1770331155 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 13.847792 ms 
+1770331155 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 5
+1770331155 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1022; nRefMatches: 1942; thRefRatio: 0.4
+1770331155 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331155 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.71, frame_creation 53.96, track 30.39
+1770331155 [euroc   ] [  info] === Processing image 16 of 1634 at 1.74801545e+09
+1770331155 [orbslam3] [ debug] [System] Current FPS estimate 9.180182
+1770331155 [orbslam3] [ debug] Frame 1650.  Kept 1872 stereo matches of 1994 features
+1770331155 [orbslam3] [  info] TRACK: Track with motion model
+1770331155 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 882 matches in first pass
+1770331155 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 807 matches against the map
+1770331155 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  13.301234 ms 
+1770331155 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331155 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  13.381775 ms 
+1770331155 [orbslam3] [  info] Before optimization, 1089 map points, 0 outliers
+1770331155 [orbslam3] [  info] After optimization, 1089 map points, 79 outliers
+1770331155 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1010
+1770331155 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.4876, search local points 2.988, pose optimization 7.117 everything else 0.06238
+1770331155 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 10.659879 ms 
+1770331155 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 3
+1770331155 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1010; nRefMatches: 1942; thRefRatio: 0.4
+1770331155 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331155 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.799, frame_creation 50.55, track 25.81
+1770331155 [euroc   ] [  info] === Processing image 17 of 1634 at 1.74801545e+09
+1770331155 [orbslam3] [ debug] [System] Current FPS estimate 9.226324
+1770331155 [orbslam3] [ debug] Frame 1651.  Kept 1891 stereo matches of 2002 features
+1770331155 [orbslam3] [  info] TRACK: Track with motion model
+1770331155 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 887 matches in first pass
+1770331155 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 811 matches against the map
+1770331155 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  10.879592 ms 
+1770331155 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331155 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  10.965925 ms 
+1770331155 [orbslam3] [  info] Before optimization, 1092 map points, 0 outliers
+1770331155 [orbslam3] [  info] After optimization, 1092 map points, 96 outliers
+1770331155 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 996
+1770331155 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.5014, search local points 7.737, pose optimization 7.923 everything else 0.09115
+1770331155 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 16.257932 ms 
+1770331155 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 6
+1770331155 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 996; nRefMatches: 1942; thRefRatio: 0.4
+1770331155 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331155 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.668, frame_creation 54.65, track 28.91
+1770331155 [euroc   ] [  info] === Processing image 18 of 1634 at 1.74801545e+09
+1770331155 [orbslam3] [ debug] [System] Current FPS estimate 9.266165
+1770331155 [orbslam3] [ debug] Frame 1652.  Kept 1831 stereo matches of 1962 features
+1770331155 [orbslam3] [  info] TRACK: Track with motion model
+1770331155 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 883 matches in first pass
+1770331156 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 814 matches against the map
+1770331156 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  15.113577 ms 
+1770331156 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331156 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  15.190803 ms 
+1770331156 [orbslam3] [  info] Before optimization, 1103 map points, 0 outliers
+1770331156 [orbslam3] [  info] After optimization, 1103 map points, 95 outliers
+1770331156 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1008
+1770331156 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.5008, search local points 14.72, pose optimization 7.549 everything else 0.08556
+1770331156 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 22.861811 ms 
+1770331156 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 4
+1770331156 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1008; nRefMatches: 1942; thRefRatio: 0.4
+1770331156 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331156 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.614, frame_creation 53.7, track 39.86
+1770331156 [euroc   ] [  info] === Processing image 19 of 1634 at 1.74801545e+09
+1770331156 [orbslam3] [ debug] [System] Current FPS estimate 9.305079
+1770331156 [orbslam3] [ debug] Frame 1653.  Kept 1927 stereo matches of 2050 features
+1770331156 [orbslam3] [  info] TRACK: Track with motion model
+1770331156 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 837 matches in first pass
+1770331156 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 783 matches against the map
+1770331156 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  11.946572 ms 
+1770331156 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331156 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  12.030771 ms 
+1770331156 [orbslam3] [  info] Before optimization, 1087 map points, 0 outliers
+1770331156 [orbslam3] [  info] After optimization, 1087 map points, 100 outliers
+1770331156 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 987
+1770331156 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.4728, search local points 7.975, pose optimization 6.81 everything else 0.09051
+1770331156 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 15.353419 ms 
+1770331156 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 2
+1770331156 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 987; nRefMatches: 1942; thRefRatio: 0.4
+1770331156 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331156 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 4.852, frame_creation 79.43, track 29.16
+1770331156 [euroc   ] [  info] === Processing image 20 of 1634 at 1.74801545e+09
+1770331156 [orbslam3] [ debug] [System] Current FPS estimate 9.329141
+1770331156 [orbslam3] [ debug] Frame 1654.  Kept 1917 stereo matches of 2038 features
+1770331156 [orbslam3] [  info] TRACK: Track with motion model
+1770331156 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 833 matches in first pass
+1770331156 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 760 matches against the map
+1770331156 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  15.961524 ms 
+1770331156 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331156 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  16.042467 ms 
+1770331156 [orbslam3] [  info] Before optimization, 1092 map points, 0 outliers
+1770331156 [orbslam3] [  info] After optimization, 1092 map points, 125 outliers
+1770331156 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 967
+1770331156 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.4846, search local points 8.726, pose optimization 8.204 everything else 0.09281
+1770331156 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 17.512396 ms 
+1770331156 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 3
+1770331156 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 967; nRefMatches: 1942; thRefRatio: 0.4
+1770331156 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=true; c2=false; c3=false; c4=false
+1770331156 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 4.585, frame_creation 58.17, track 35.41
+1770331156 [euroc   ] [  info] === Processing image 21 of 1634 at 1.74801545e+09
+1770331156 [orbslam3] [ debug] [System] Current FPS estimate 9.258730
+1770331156 [orbslam3] [ debug] Frame 1655.  Kept 1908 stereo matches of 2036 features
+1770331156 [orbslam3] [  info] TRACK: Track with motion model
+1770331156 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 806 matches in first pass
+1770331156 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 745 matches against the map
+1770331156 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  14.683137 ms 
+1770331156 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331156 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  14.768508 ms 
+1770331156 [orbslam3] [  info] Before optimization, 1106 map points, 0 outliers
+1770331156 [orbslam3] [  info] After optimization, 1106 map points, 132 outliers
+1770331156 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 974
+1770331156 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.4702, search local points 6.177, pose optimization 8.886 everything else 0.09089
+1770331156 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 15.628808 ms 
+1770331156 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 4
+1770331156 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 974; nRefMatches: 1942; thRefRatio: 0.4
+1770331156 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331156 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.968, frame_creation 55.46, track 32.1
+1770331156 [euroc   ] [  info] === Processing image 22 of 1634 at 1.74801545e+09
+1770331156 [orbslam3] [ debug] [System] Current FPS estimate 9.480714
+1770331156 [orbslam3] [ debug] Frame 1656.  Kept 1947 stereo matches of 2067 features
+1770331156 [orbslam3] [  info] TRACK: Track with motion model
+1770331156 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 852 matches in first pass
+1770331156 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 770 matches against the map
+1770331156 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  14.074089 ms 
+1770331156 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331156 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  14.153629 ms 
+1770331156 [orbslam3] [  info] Before optimization, 1117 map points, 0 outliers
+1770331156 [orbslam3] [  info] After optimization, 1117 map points, 143 outliers
+1770331156 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 974
+1770331156 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.5211, search local points 5.563, pose optimization 8.932 everything else 0.08169
+1770331156 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 15.102777 ms 
+1770331156 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 5
+1770331156 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 974; nRefMatches: 1942; thRefRatio: 0.4
+1770331156 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331156 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.654, frame_creation 54.7, track 35.03
+1770331156 [euroc   ] [  info] === Processing image 23 of 1634 at 1.74801545e+09
+1770331156 [orbslam3] [ debug] [System] Current FPS estimate 9.418078
+1770331156 [orbslam3] [ debug] Frame 1657.  Kept 1957 stereo matches of 2072 features
+1770331156 [orbslam3] [  info] TRACK: Track with motion model
+1770331156 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 807 matches in first pass
+1770331156 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 747 matches against the map
+1770331156 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  15.722414 ms 
+1770331156 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331156 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  15.81103 ms 
+1770331156 [orbslam3] [  info] Before optimization, 1130 map points, 0 outliers
+1770331156 [orbslam3] [  info] After optimization, 1130 map points, 127 outliers
+1770331156 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1003
+1770331156 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.4889, search local points 6.229, pose optimization 9.223 everything else 0.08754
+1770331156 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 16.032838 ms 
+1770331156 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 2
+1770331156 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1003; nRefMatches: 1942; thRefRatio: 0.4
+1770331156 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331156 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 3.294, frame_creation 57.37, track 33.59
+1770331156 [euroc   ] [  info] === Processing image 24 of 1634 at 1.74801545e+09
+1770331156 [orbslam3] [ debug] [System] Current FPS estimate 9.575588
+1770331156 [orbslam3] [ debug] Frame 1658.  Kept 1953 stereo matches of 2066 features
+1770331156 [orbslam3] [  info] TRACK: Track with motion model
+1770331156 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 871 matches in first pass
+1770331156 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 785 matches against the map
+1770331156 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  11.240151 ms 
+1770331156 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331156 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  11.316746 ms 
+1770331156 [orbslam3] [  info] Before optimization, 1116 map points, 0 outliers
+1770331156 [orbslam3] [  info] After optimization, 1116 map points, 131 outliers
+1770331156 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 985
+1770331156 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.4947, search local points 8.416, pose optimization 8.872 everything else 0.1104
+1770331156 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 17.898312 ms 
+1770331156 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 4
+1770331156 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 985; nRefMatches: 1942; thRefRatio: 0.4
+1770331156 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331156 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.629, frame_creation 51.61, track 31.24
+1770331156 [euroc   ] [  info] === Processing image 25 of 1634 at 1.74801545e+09
+1770331156 [orbslam3] [ debug] [System] Current FPS estimate 9.572141
+1770331156 [orbslam3] [ debug] Frame 1659.  Kept 1958 stereo matches of 2081 features
+1770331157 [orbslam3] [  info] TRACK: Track with motion model
+1770331157 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 814 matches in first pass
+1770331157 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 759 matches against the map
+1770331157 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  12.333881 ms 
+1770331157 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331157 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  12.424813 ms 
+1770331157 [orbslam3] [  info] Before optimization, 1145 map points, 0 outliers
+1770331157 [orbslam3] [  info] After optimization, 1145 map points, 128 outliers
+1770331157 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1017
+1770331157 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.4557, search local points 5.438, pose optimization 9.164 everything else 0.08446
+1770331157 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 15.146149 ms 
+1770331157 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 5
+1770331157 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1017; nRefMatches: 1942; thRefRatio: 0.4
+1770331157 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331157 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.759, frame_creation 54.64, track 29.42
+1770331157 [euroc   ] [  info] === Processing image 26 of 1634 at 1.74801545e+09
+1770331157 [orbslam3] [ debug] [System] Current FPS estimate 9.602911
+1770331157 [orbslam3] [ debug] Frame 1660.  Kept 2040 stereo matches of 2153 features
+1770331157 [orbslam3] [  info] TRACK: Track with motion model
+1770331157 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 850 matches in first pass
+1770331157 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 783 matches against the map
+1770331157 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  12.836308 ms 
+1770331157 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331157 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  12.913353 ms 
+1770331157 [orbslam3] [  info] Before optimization, 1160 map points, 0 outliers
+1770331157 [orbslam3] [  info] After optimization, 1160 map points, 128 outliers
+1770331157 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1032
+1770331157 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.4841, search local points 3.702, pose optimization 7.86 everything else 0.07411
+1770331157 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 12.125278 ms 
+1770331157 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 8
+1770331157 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1032; nRefMatches: 1942; thRefRatio: 0.4
+1770331157 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331157 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 3.395, frame_creation 56.39, track 26.77
+1770331157 [euroc   ] [  info] === Processing image 27 of 1634 at 1.74801545e+09
+1770331157 [orbslam3] [ debug] [System] Current FPS estimate 9.626085
+1770331157 [orbslam3] [ debug] Frame 1661.  Kept 1989 stereo matches of 2120 features
+1770331157 [orbslam3] [  info] TRACK: Track with motion model
+1770331157 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 869 matches in first pass
+1770331157 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 816 matches against the map
+1770331157 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  19.063908 ms 
+1770331157 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331157 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  19.14988 ms 
+1770331157 [orbslam3] [  info] Before optimization, 1142 map points, 0 outliers
+1770331157 [orbslam3] [  info] After optimization, 1142 map points, 120 outliers
+1770331157 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1022
+1770331157 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.5718, search local points 6.184, pose optimization 7.446 everything else 0.09361
+1770331157 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 14.301207 ms 
+1770331157 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 3
+1770331157 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1022; nRefMatches: 1942; thRefRatio: 0.4
+1770331157 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331157 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.629, frame_creation 52.01, track 35.38
+1770331157 [euroc   ] [  info] === Processing image 28 of 1634 at 1.74801545e+09
+1770331157 [orbslam3] [ debug] [System] Current FPS estimate 9.634087
+1770331157 [orbslam3] [ debug] Frame 1662.  Kept 1990 stereo matches of 2109 features
+1770331157 [orbslam3] [  info] TRACK: Track with motion model
+1770331157 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 876 matches in first pass
+1770331157 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 819 matches against the map
+1770331157 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  13.677492 ms 
+1770331157 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331157 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  13.757703 ms 
+1770331157 [orbslam3] [  info] Before optimization, 1178 map points, 0 outliers
+1770331157 [orbslam3] [  info] After optimization, 1178 map points, 123 outliers
+1770331157 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1055
+1770331157 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.5, search local points 5.047, pose optimization 9.393 everything else 0.09172
+1770331157 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 15.037122 ms 
+1770331157 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 5
+1770331157 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1055; nRefMatches: 1942; thRefRatio: 0.4
+1770331157 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331157 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.671, frame_creation 52.99, track 30.63
+1770331157 [euroc   ] [  info] === Processing image 29 of 1634 at 1.74801545e+09
+1770331157 [orbslam3] [ debug] [System] Current FPS estimate 9.645041
+1770331157 [orbslam3] [ debug] Frame 1663.  Kept 1989 stereo matches of 2114 features
+1770331157 [orbslam3] [  info] TRACK: Track with motion model
+1770331157 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 882 matches in first pass
+1770331157 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 814 matches against the map
+1770331157 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  12.513911 ms 
+1770331157 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331157 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  12.594653 ms 
+1770331157 [orbslam3] [  info] Before optimization, 1170 map points, 0 outliers
+1770331157 [orbslam3] [  info] After optimization, 1170 map points, 129 outliers
+1770331157 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1041
+1770331157 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.4692, search local points 5.787, pose optimization 9.381 everything else 0.09846
+1770331157 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 15.74116 ms 
+1770331157 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 4
+1770331157 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1041; nRefMatches: 1942; thRefRatio: 0.4
+1770331157 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331157 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.64, frame_creation 52.96, track 30.23
+1770331157 [euroc   ] [  info] === Processing image 30 of 1634 at 1.74801545e+09
+1770331157 [orbslam3] [ debug] [System] Current FPS estimate 9.669569
+1770331157 [orbslam3] [ debug] Frame 1664.  Kept 2014 stereo matches of 2135 features
+1770331157 [orbslam3] [  info] TRACK: Track with motion model
+1770331157 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 912 matches in first pass
+1770331157 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 831 matches against the map
+1770331157 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  18.936417 ms 
+1770331157 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331157 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  19.021187 ms 
+1770331157 [orbslam3] [  info] Before optimization, 1175 map points, 0 outliers
+1770331157 [orbslam3] [  info] After optimization, 1175 map points, 126 outliers
+1770331157 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1049
+1770331157 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.5278, search local points 5.675, pose optimization 7.79 everything else 0.08634
+1770331157 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 14.08467 ms 
+1770331157 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 5
+1770331157 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1049; nRefMatches: 1942; thRefRatio: 0.4
+1770331157 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331157 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.671, frame_creation 55.32, track 34.96
+1770331157 [euroc   ] [  info] === Processing image 31 of 1634 at 1.74801545e+09
+1770331157 [orbslam3] [ debug] [System] Current FPS estimate 9.677199
+1770331157 [orbslam3] [ debug] Frame 1665.  Kept 1983 stereo matches of 2102 features
+1770331157 [orbslam3] [  info] TRACK: Track with motion model
+1770331157 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 872 matches in first pass
+1770331157 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 800 matches against the map
+1770331157 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  14.076404 ms 
+1770331157 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331157 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  14.163378 ms 
+1770331157 [orbslam3] [  info] Before optimization, 1167 map points, 0 outliers
+1770331157 [orbslam3] [  info] After optimization, 1167 map points, 112 outliers
+1770331157 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1055
+1770331157 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.505, search local points 5.788, pose optimization 7.952 everything else 0.08701
+1770331157 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 14.337635 ms 
+1770331157 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 3
+1770331157 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1055; nRefMatches: 1942; thRefRatio: 0.4
+1770331157 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331157 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.813, frame_creation 48.67, track 30.33
+1770331157 [euroc   ] [  info] === Processing image 32 of 1634 at 1.74801545e+09
+1770331157 [orbslam3] [ debug] [System] Current FPS estimate 9.479016
+1770331158 [orbslam3] [ debug] Frame 1666.  Kept 1979 stereo matches of 2112 features
+1770331158 [orbslam3] [  info] TRACK: Track with motion model
+1770331158 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 877 matches in first pass
+1770331158 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 772 matches against the map
+1770331158 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  12.463155 ms 
+1770331158 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331158 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  12.548076 ms 
+1770331158 [orbslam3] [  info] Before optimization, 1151 map points, 0 outliers
+1770331158 [orbslam3] [  info] After optimization, 1151 map points, 123 outliers
+1770331158 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1028
+1770331158 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.4927, search local points 5.572, pose optimization 8.751 everything else 0.08572
+1770331158 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 14.906517 ms 
+1770331158 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 10
+1770331158 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1028; nRefMatches: 1942; thRefRatio: 0.4
+1770331158 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331158 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 2.157, frame_creation 60.36, track 29.29
+1770331158 [euroc   ] [  info] === Processing image 33 of 1634 at 1.74801545e+09
+1770331158 [orbslam3] [ debug] [System] Current FPS estimate 9.491015
+1770331158 [orbslam3] [ debug] Frame 1667.  Kept 1961 stereo matches of 2111 features
+1770331158 [orbslam3] [  info] TRACK: Track with motion model
+1770331158 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 840 matches in first pass
+1770331158 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 768 matches against the map
+1770331158 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  15.393574 ms 
+1770331158 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331158 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  15.477132 ms 
+1770331158 [orbslam3] [  info] Before optimization, 1158 map points, 0 outliers
+1770331158 [orbslam3] [  info] After optimization, 1158 map points, 146 outliers
+1770331158 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1012
+1770331158 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.4831, search local points 3.669, pose optimization 7.988 everything else 0.0641
+1770331158 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 12.208775 ms 
+1770331158 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 0
+1770331158 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1012; nRefMatches: 1942; thRefRatio: 0.4
+1770331158 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331158 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 2.447, frame_creation 53.77, track 29.46
+1770331158 [euroc   ] [  info] === Processing image 34 of 1634 at 1.74801545e+09
+1770331158 [orbslam3] [ debug] [System] Current FPS estimate 9.359396
+1770331158 [orbslam3] [ debug] Frame 1668.  Kept 1972 stereo matches of 2097 features
+1770331158 [orbslam3] [  info] TRACK: Track with motion model
+1770331158 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 842 matches in first pass
+1770331158 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 741 matches against the map
+1770331158 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  11.005158 ms 
+1770331158 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331158 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  11.095549 ms 
+1770331158 [orbslam3] [  info] Before optimization, 1127 map points, 0 outliers
+1770331158 [orbslam3] [  info] After optimization, 1127 map points, 144 outliers
+1770331158 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 983
+1770331158 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.4279, search local points 5.228, pose optimization 7.818 everything else 0.07964
+1770331158 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 13.558859 ms 
+1770331158 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 3
+1770331158 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 983; nRefMatches: 1942; thRefRatio: 0.4
+1770331158 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331158 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.703, frame_creation 55.2, track 26.49
+1770331158 [euroc   ] [  info] === Processing image 35 of 1634 at 1.74801545e+09
+1770331158 [orbslam3] [ debug] [System] Current FPS estimate 9.371618
+1770331158 [orbslam3] [ debug] Frame 1669.  Kept 1986 stereo matches of 2128 features
+1770331158 [orbslam3] [  info] TRACK: Track with motion model
+1770331158 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 860 matches in first pass
+1770331158 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 789 matches against the map
+1770331158 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  11.597344 ms 
+1770331158 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331158 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  11.670432 ms 
+1770331158 [orbslam3] [  info] Before optimization, 1128 map points, 0 outliers
+1770331158 [orbslam3] [  info] After optimization, 1128 map points, 140 outliers
+1770331158 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 988
+1770331158 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.5055, search local points 15.33, pose optimization 9.323 everything else 0.09828
+1770331158 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 25.257825 ms 
+1770331158 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 9
+1770331158 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 988; nRefMatches: 1942; thRefRatio: 0.4
+1770331158 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331158 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 4.613, frame_creation 51.19, track 38.88
+1770331158 [euroc   ] [  info] === Processing image 36 of 1634 at 1.74801545e+09
+1770331158 [orbslam3] [ debug] [System] Current FPS estimate 9.236560
+1770331158 [orbslam3] [ debug] Frame 1670.  Kept 2012 stereo matches of 2150 features
+1770331158 [orbslam3] [  info] TRACK: Track with motion model
+1770331158 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 849 matches in first pass
+1770331158 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 766 matches against the map
+1770331158 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  17.017353 ms 
+1770331158 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331158 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  17.096612 ms 
+1770331158 [orbslam3] [  info] Before optimization, 1125 map points, 0 outliers
+1770331158 [orbslam3] [  info] After optimization, 1125 map points, 118 outliers
+1770331158 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1007
+1770331158 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.4982, search local points 7.248, pose optimization 8.002 everything else 0.08987
+1770331158 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 15.843471 ms 
+1770331158 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 6
+1770331158 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1007; nRefMatches: 1942; thRefRatio: 0.4
+1770331158 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331158 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.629, frame_creation 54.37, track 34.79
+1770331158 [euroc   ] [  info] === Processing image 37 of 1634 at 1.74801545e+09
+1770331158 [orbslam3] [ debug] [System] Current FPS estimate 9.342315
+1770331158 [orbslam3] [ debug] Frame 1671.  Kept 2061 stereo matches of 2191 features
+1770331158 [orbslam3] [  info] TRACK: Track with motion model
+1770331158 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 893 matches in first pass
+1770331158 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 802 matches against the map
+1770331158 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  11.124263 ms 
+1770331158 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331158 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  11.203002 ms 
+1770331158 [orbslam3] [  info] Before optimization, 1118 map points, 0 outliers
+1770331158 [orbslam3] [  info] After optimization, 1118 map points, 123 outliers
+1770331158 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 995
+1770331158 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.4676, search local points 3.17, pose optimization 8.079 everything else 0.06896
+1770331158 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 11.790518 ms 
+1770331158 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 6
+1770331158 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 995; nRefMatches: 1942; thRefRatio: 0.4
+1770331158 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331158 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 2.861, frame_creation 50.11, track 27.26
+1770331158 [euroc   ] [  info] === Processing image 38 of 1634 at 1.74801545e+09
+1770331158 [orbslam3] [ debug] [System] Current FPS estimate 9.360815
+1770331158 [orbslam3] [ debug] Frame 1672.  Kept 2069 stereo matches of 2228 features
+1770331158 [orbslam3] [  info] TRACK: Track with motion model
+1770331158 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 860 matches in first pass
+1770331158 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 767 matches against the map
+1770331158 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  14.01575 ms 
+1770331158 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331158 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  14.094548 ms 
+1770331158 [orbslam3] [  info] Before optimization, 1100 map points, 0 outliers
+1770331158 [orbslam3] [  info] After optimization, 1100 map points, 116 outliers
+1770331158 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 984
+1770331158 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.5074, search local points 7.419, pose optimization 8.857 everything else 0.08287
+1770331158 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 16.871789 ms 
+1770331158 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 2
+1770331158 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 984; nRefMatches: 1942; thRefRatio: 0.4
+1770331158 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331158 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.642, frame_creation 49.81, track 32.69
+1770331158 [euroc   ] [  info] === Processing image 39 of 1634 at 1.74801545e+09
+1770331158 [orbslam3] [ debug] [System] Current FPS estimate 9.376119
+1770331158 [orbslam3] [ debug] Frame 1673.  Kept 2080 stereo matches of 2236 features
+1770331158 [orbslam3] [  info] TRACK: Track with motion model
+1770331158 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 843 matches in first pass
+1770331158 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 754 matches against the map
+1770331158 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  14.487868 ms 
+1770331158 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331158 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  14.574011 ms 
+1770331158 [orbslam3] [  info] Before optimization, 1068 map points, 0 outliers
+1770331159 [orbslam3] [  info] After optimization, 1068 map points, 136 outliers
+1770331159 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 932
+1770331159 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.464, search local points 4.792, pose optimization 6.512 everything else 0.07232
+1770331159 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 11.845311 ms 
+1770331159 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 2
+1770331159 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 932; nRefMatches: 1942; thRefRatio: 0.4
+1770331159 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=true; c2=false; c3=false; c4=false
+1770331159 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.694, frame_creation 47.25, track 28.2
+1770331159 [euroc   ] [  info] === Processing image 40 of 1634 at 1.74801545e+09
+1770331159 [orbslam3] [ debug] [System] Current FPS estimate 9.393008
+1770331159 [orbslam3] [ debug] Frame 1674.  Kept 2013 stereo matches of 2165 features
+1770331159 [orbslam3] [  info] TRACK: Track with motion model
+1770331159 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 805 matches in first pass
+1770331159 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 735 matches against the map
+1770331159 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  12.892554 ms 
+1770331159 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331159 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  12.973336 ms 
+1770331159 [orbslam3] [  info] Before optimization, 1063 map points, 0 outliers
+1770331159 [orbslam3] [  info] After optimization, 1063 map points, 126 outliers
+1770331159 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 937
+1770331159 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.4743, search local points 5.62, pose optimization 7.771 everything else 0.07923
+1770331159 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 13.949825 ms 
+1770331159 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 3
+1770331159 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 937; nRefMatches: 1942; thRefRatio: 0.4
+1770331159 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=true; c2=false; c3=false; c4=false
+1770331159 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 2.089, frame_creation 54.9, track 30.92
+1770331159 [euroc   ] [  info] === Processing image 41 of 1634 at 1.74801545e+09
+1770331159 [orbslam3] [ debug] [System] Current FPS estimate 9.407557
+1770331159 [orbslam3] [ debug] Frame 1675.  Kept 2093 stereo matches of 2228 features
+1770331159 [orbslam3] [  info] TRACK: Track with motion model
+1770331159 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 798 matches in first pass
+1770331159 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 753 matches against the map
+1770331159 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  12.756207 ms 
+1770331159 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331159 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  12.844393 ms 
+1770331159 [orbslam3] [  info] Before optimization, 1100 map points, 0 outliers
+1770331159 [orbslam3] [  info] After optimization, 1100 map points, 139 outliers
+1770331159 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 961
+1770331159 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.5082, search local points 5.839, pose optimization 8.168 everything else 0.0894
+1770331159 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 14.609057 ms 
+1770331159 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 5
+1770331159 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 961; nRefMatches: 1942; thRefRatio: 0.4
+1770331159 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=true; c2=false; c3=false; c4=false
+1770331159 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 2.115, frame_creation 47.83, track 29.44
+1770331159 [euroc   ] [  info] === Processing image 42 of 1634 at 1.74801545e+09
+1770331159 [orbslam3] [ debug] [System] Current FPS estimate 9.420607
+1770331159 [orbslam3] [ debug] Frame 1676.  Kept 2066 stereo matches of 2215 features
+1770331159 [orbslam3] [  info] TRACK: Track with motion model
+1770331159 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 815 matches in first pass
+1770331159 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 759 matches against the map
+1770331159 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  10.221042 ms 
+1770331159 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331159 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  10.293749 ms 
+1770331159 [orbslam3] [  info] Before optimization, 1123 map points, 0 outliers
+1770331159 [orbslam3] [  info] After optimization, 1123 map points, 143 outliers
+1770331159 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 980
+1770331159 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.4885, search local points 5.226, pose optimization 8.365 everything else 0.06944
+1770331159 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 14.154541 ms 
+1770331159 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 3
+1770331159 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 980; nRefMatches: 1942; thRefRatio: 0.4
+1770331159 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331159 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.668, frame_creation 50.34, track 26.22
+1770331159 [euroc   ] [  info] === Processing image 43 of 1634 at 1.74801545e+09
+1770331159 [orbslam3] [ debug] [System] Current FPS estimate 9.433845
+1770331159 [orbslam3] [ debug] Frame 1677.  Kept 2059 stereo matches of 2209 features
+1770331159 [orbslam3] [  info] TRACK: Track with motion model
+1770331159 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 847 matches in first pass
+1770331159 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 779 matches against the map
+1770331159 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  13.276818 ms 
+1770331159 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331159 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  13.358532 ms 
+1770331159 [orbslam3] [  info] Before optimization, 1113 map points, 0 outliers
+1770331159 [orbslam3] [  info] After optimization, 1113 map points, 142 outliers
+1770331159 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 971
+1770331159 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.4747, search local points 5.794, pose optimization 8.766 everything else 0.08487
+1770331159 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 15.124809 ms 
+1770331159 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 4
+1770331159 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 971; nRefMatches: 1942; thRefRatio: 0.4
+1770331159 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331159 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 2.029, frame_creation 60.99, track 30.57
+1770331159 [euroc   ] [  info] === Processing image 44 of 1634 at 1.74801545e+09
+1770331159 [orbslam3] [ debug] [System] Current FPS estimate 9.444606
+1770331159 [orbslam3] [ debug] Frame 1678.  Kept 2090 stereo matches of 2254 features
+1770331159 [orbslam3] [  info] TRACK: Track with motion model
+1770331159 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 842 matches in first pass
+1770331159 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 765 matches against the map
+1770331159 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  13.988308 ms 
+1770331159 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331159 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  14.075432 ms 
+1770331159 [orbslam3] [  info] Before optimization, 1120 map points, 0 outliers
+1770331159 [orbslam3] [  info] After optimization, 1120 map points, 126 outliers
+1770331159 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 994
+1770331159 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.4978, search local points 8.853, pose optimization 8.836 everything else 0.08743
+1770331159 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 18.278969 ms 
+1770331159 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 4
+1770331159 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 994; nRefMatches: 1942; thRefRatio: 0.4
+1770331159 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331159 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 4.218, frame_creation 47.53, track 34.19
+1770331159 [euroc   ] [  info] === Processing image 45 of 1634 at 1.74801545e+09
+1770331159 [orbslam3] [ debug] [System] Current FPS estimate 9.447783
+1770331159 [orbslam3] [ debug] Frame 1679.  Kept 2035 stereo matches of 2173 features
+1770331159 [orbslam3] [  info] TRACK: Track with motion model
+1770331159 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 825 matches in first pass
+1770331159 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 756 matches against the map
+1770331159 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  12.46048 ms 
+1770331159 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331159 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  12.542124 ms 
+1770331159 [orbslam3] [  info] Before optimization, 1192 map points, 0 outliers
+1770331159 [orbslam3] [  info] After optimization, 1192 map points, 135 outliers
+1770331159 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1057
+1770331159 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.4669, search local points 5.6, pose optimization 9.133 everything else 0.08836
+1770331159 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 15.293997 ms 
+1770331159 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 6
+1770331159 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1057; nRefMatches: 1942; thRefRatio: 0.4
+1770331159 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331159 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.67, frame_creation 57.12, track 29.75
+1770331159 [euroc   ] [  info] === Processing image 46 of 1634 at 1.74801545e+09
+1770331159 [orbslam3] [ debug] [System] Current FPS estimate 9.469427
+1770331159 [orbslam3] [ debug] Frame 1680.  Kept 2060 stereo matches of 2206 features
+1770331159 [orbslam3] [  info] TRACK: Track with motion model
+1770331159 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 879 matches in first pass
+1770331159 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 778 matches against the map
+1770331159 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  15.543978 ms 
+1770331159 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331159 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  15.681607 ms 
+1770331159 [orbslam3] [  info] Before optimization, 1149 map points, 0 outliers
+1770331160 [orbslam3] [  info] After optimization, 1149 map points, 110 outliers
+1770331160 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1039
+1770331160 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.5002, search local points 5.149, pose optimization 9.034 everything else 0.08558
+1770331160 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 14.773877 ms 
+1770331160 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 7
+1770331160 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1039; nRefMatches: 1942; thRefRatio: 0.4
+1770331160 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331160 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.712, frame_creation 51.9, track 32.32
+1770331160 [euroc   ] [  info] === Processing image 47 of 1634 at 1.74801545e+09
+1770331160 [orbslam3] [ debug] [System] Current FPS estimate 9.472588
+1770331160 [orbslam3] [ debug] Frame 1681.  Kept 2075 stereo matches of 2203 features
+1770331160 [orbslam3] [  info] TRACK: Track with motion model
+1770331160 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 863 matches in first pass
+1770331160 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 777 matches against the map
+1770331160 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  18.320407 ms 
+1770331160 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331160 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  18.407752 ms 
+1770331160 [orbslam3] [  info] Before optimization, 1155 map points, 0 outliers
+1770331160 [orbslam3] [  info] After optimization, 1155 map points, 65 outliers
+1770331160 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1090
+1770331160 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.481, search local points 5.53, pose optimization 11.26 everything else 0.1077
+1770331160 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 17.380347 ms 
+1770331160 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 4
+1770331160 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1090; nRefMatches: 1942; thRefRatio: 0.4
+1770331160 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331160 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.67, frame_creation 55.85, track 37.79
+1770331160 [euroc   ] [  info] === Processing image 48 of 1634 at 1.74801545e+09
+1770331160 [orbslam3] [ debug] [System] Current FPS estimate 9.491206
+1770331160 [orbslam3] [ debug] Frame 1682.  Kept 2021 stereo matches of 2165 features
+1770331160 [orbslam3] [  info] TRACK: Track with motion model
+1770331160 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 923 matches in first pass
+1770331160 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 831 matches against the map
+1770331160 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  14.678468 ms 
+1770331160 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331160 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  14.758609 ms 
+1770331160 [orbslam3] [  info] Before optimization, 1208 map points, 0 outliers
+1770331160 [orbslam3] [  info] After optimization, 1208 map points, 31 outliers
+1770331160 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1177
+1770331160 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.5361, search local points 5.043, pose optimization 9.383 everything else 0.1109
+1770331160 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 15.077809 ms 
+1770331160 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 6
+1770331160 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1177; nRefMatches: 1942; thRefRatio: 0.4
+1770331160 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331160 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.651, frame_creation 46.43, track 31.69
+1770331160 [euroc   ] [  info] === Processing image 49 of 1634 at 1.74801545e+09
+1770331160 [orbslam3] [ debug] [System] Current FPS estimate 9.488533
+1770331160 [orbslam3] [ debug] Frame 1683.  Kept 1960 stereo matches of 2115 features
+1770331160 [orbslam3] [  info] TRACK: Track with motion model
+1770331160 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 986 matches in first pass
+1770331160 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 873 matches against the map
+1770331160 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  18.434291 ms 
+1770331160 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331160 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  18.52396 ms 
+1770331160 [orbslam3] [  info] Before optimization, 1227 map points, 0 outliers
+1770331160 [orbslam3] [  info] After optimization, 1227 map points, 45 outliers
+1770331160 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1182
+1770331160 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.5326, search local points 5.41, pose optimization 6.696 everything else 0.07747
+1770331160 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 12.72101 ms 
+1770331160 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 6
+1770331160 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1182; nRefMatches: 1942; thRefRatio: 0.4
+1770331160 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331160 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.605, frame_creation 53.22, track 33.04
+1770331160 [euroc   ] [  info] === Processing image 50 of 1634 at 1.74801545e+09
+1770331160 [orbslam3] [ debug] [System] Current FPS estimate 9.505053
+1770331160 [orbslam3] [ debug] Frame 1684.  Kept 1926 stereo matches of 2068 features
+1770331160 [orbslam3] [  info] TRACK: Track with motion model
+1770331160 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 990 matches in first pass
+1770331160 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 903 matches against the map
+1770331160 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  20.082256 ms 
+1770331160 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331160 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  20.176082 ms 
+1770331160 [orbslam3] [  info] Before optimization, 1251 map points, 0 outliers
+1770331160 [orbslam3] [  info] After optimization, 1251 map points, 48 outliers
+1770331160 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1203
+1770331160 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.5804, search local points 7.753, pose optimization 7.848 everything else 0.09882
+1770331160 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 16.285895 ms 
+1770331160 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 4
+1770331160 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1203; nRefMatches: 1942; thRefRatio: 0.4
+1770331160 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331160 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.625, frame_creation 49.28, track 40.81
+1770331160 [euroc   ] [  info] === Processing image 51 of 1634 at 1.74801545e+09
+1770331160 [orbslam3] [ debug] [System] Current FPS estimate 9.500264
+1770331160 [orbslam3] [ debug] Frame 1685.  Kept 1935 stereo matches of 2052 features
+1770331160 [orbslam3] [  info] TRACK: Track with motion model
+1770331160 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 1036 matches in first pass
+1770331160 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 923 matches against the map
+1770331160 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  15.514362 ms 
+1770331160 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331160 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  15.601276 ms 
+1770331160 [orbslam3] [  info] Before optimization, 1283 map points, 0 outliers
+1770331160 [orbslam3] [  info] After optimization, 1283 map points, 41 outliers
+1770331160 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1242
+1770331160 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.577, search local points 7.577, pose optimization 10.97 everything else 0.103
+1770331160 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 19.236664 ms 
+1770331160 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 2
+1770331160 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1242; nRefMatches: 1942; thRefRatio: 0.4
+1770331160 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331160 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 3.526, frame_creation 57.72, track 36.8
+1770331160 [euroc   ] [  info] === Processing image 52 of 1634 at 1.74801545e+09
+1770331160 [orbslam3] [ debug] [System] Current FPS estimate 9.493731
+1770331160 [orbslam3] [ debug] Frame 1686.  Kept 1913 stereo matches of 2040 features
+1770331160 [orbslam3] [  info] TRACK: Track with motion model
+1770331160 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 1003 matches in first pass
+1770331160 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 880 matches against the map
+1770331160 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  17.159571 ms 
+1770331160 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331160 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  17.250773 ms 
+1770331160 [orbslam3] [  info] Before optimization, 1245 map points, 0 outliers
+1770331160 [orbslam3] [  info] After optimization, 1245 map points, 44 outliers
+1770331160 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1201
+1770331160 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.531, search local points 6.144, pose optimization 10.39 everything else 0.111
+1770331160 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 17.18007 ms 
+1770331160 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 4
+1770331160 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1201; nRefMatches: 1942; thRefRatio: 0.4
+1770331160 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331160 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 2.088, frame_creation 51.09, track 36.28
+1770331160 [euroc   ] [  info] === Processing image 53 of 1634 at 1.74801545e+09
+1770331160 [orbslam3] [ debug] [System] Current FPS estimate 9.516133
+1770331160 [orbslam3] [ debug] Frame 1687.  Kept 1896 stereo matches of 2031 features
+1770331160 [orbslam3] [  info] TRACK: Track with motion model
+1770331160 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 972 matches in first pass
+1770331160 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 864 matches against the map
+1770331160 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  15.886823 ms 
+1770331160 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331160 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  15.977534 ms 
+1770331160 [orbslam3] [  info] Before optimization, 1162 map points, 0 outliers
+1770331161 [orbslam3] [  info] After optimization, 1162 map points, 33 outliers
+1770331161 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1129
+1770331161 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.5648, search local points 7.136, pose optimization 7.097 everything else 0.08998
+1770331161 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 14.89254 ms 
+1770331161 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 2
+1770331161 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1129; nRefMatches: 1942; thRefRatio: 0.4
+1770331161 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331161 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.646, frame_creation 59.13, track 32.64
+1770331161 [euroc   ] [  info] === Processing image 54 of 1634 at 1.74801545e+09
+1770331161 [orbslam3] [ debug] [System] Current FPS estimate 9.514760
+1770331161 [orbslam3] [ debug] Frame 1688.  Kept 1895 stereo matches of 2037 features
+1770331161 [orbslam3] [  info] TRACK: Track with motion model
+1770331161 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 913 matches in first pass
+1770331161 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 807 matches against the map
+1770331161 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  13.382597 ms 
+1770331161 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331161 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  13.474039 ms 
+1770331161 [orbslam3] [  info] Before optimization, 1131 map points, 0 outliers
+1770331161 [orbslam3] [  info] After optimization, 1131 map points, 85 outliers
+1770331161 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1046
+1770331161 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.5148, search local points 6.924, pose optimization 7.626 everything else 0.08664
+1770331161 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 15.157089 ms 
+1770331161 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 7
+1770331161 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1046; nRefMatches: 1942; thRefRatio: 0.4
+1770331161 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331161 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.831, frame_creation 57.28, track 30.44
+1770331161 [euroc   ] [  info] === Processing image 55 of 1634 at 1.74801545e+09
+1770331161 [orbslam3] [ debug] [System] Current FPS estimate 9.624465
+1770331161 [orbslam3] [ debug] Frame 1689.  Kept 1935 stereo matches of 2064 features
+1770331161 [orbslam3] [  info] TRACK: Track with motion model
+1770331161 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 849 matches in first pass
+1770331161 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 735 matches against the map
+1770331161 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  10.468959 ms 
+1770331161 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331161 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  10.54955 ms 
+1770331161 [orbslam3] [  info] Before optimization, 1128 map points, 0 outliers
+1770331161 [orbslam3] [  info] After optimization, 1128 map points, 124 outliers
+1770331161 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1004
+1770331161 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.489, search local points 9.309, pose optimization 9.127 everything else 0.09836
+1770331161 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 19.028781 ms 
+1770331161 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 16
+1770331161 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1004; nRefMatches: 1942; thRefRatio: 0.4
+1770331161 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331161 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.659, frame_creation 50.04, track 31.31
+1770331161 [euroc   ] [  info] === Processing image 56 of 1634 at 1.74801545e+09
+1770331161 [orbslam3] [ debug] [System] Current FPS estimate 9.610181
+1770331161 [orbslam3] [ debug] Frame 1690.  Kept 1900 stereo matches of 2027 features
+1770331161 [orbslam3] [  info] TRACK: Track with motion model
+1770331161 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 812 matches in first pass
+1770331161 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 710 matches against the map
+1770331161 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  16.020796 ms 
+1770331161 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331161 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  16.097892 ms 
+1770331161 [orbslam3] [  info] Before optimization, 1084 map points, 0 outliers
+1770331161 [orbslam3] [  info] After optimization, 1084 map points, 115 outliers
+1770331161 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 969
+1770331161 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.4854, search local points 6.352, pose optimization 8.291 everything else 0.0811
+1770331161 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 15.214167 ms 
+1770331161 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 6
+1770331161 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 969; nRefMatches: 1942; thRefRatio: 0.4
+1770331161 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=true; c2=false; c3=false; c4=false
+1770331161 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 2.185, frame_creation 57.44, track 33.21
+1770331161 [euroc   ] [  info] === Processing image 57 of 1634 at 1.74801545e+09
+1770331161 [orbslam3] [ debug] [System] Current FPS estimate 9.584311
+1770331161 [orbslam3] [ debug] Frame 1691.  Kept 1886 stereo matches of 2006 features
+1770331161 [orbslam3] [  info] TRACK: Track with motion model
+1770331161 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 731 matches in first pass
+1770331161 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 652 matches against the map
+1770331161 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  13.550162 ms 
+1770331161 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331161 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  13.634301 ms 
+1770331161 [orbslam3] [  info] Before optimization, 1045 map points, 0 outliers
+1770331161 [orbslam3] [  info] After optimization, 1045 map points, 119 outliers
+1770331161 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 926
+1770331161 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.4484, search local points 3.732, pose optimization 7.525 everything else 0.06067
+1770331161 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 11.770851 ms 
+1770331161 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 9
+1770331161 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 926; nRefMatches: 1942; thRefRatio: 0.4
+1770331161 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=true; c2=false; c3=false; c4=false
+1770331161 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.614, frame_creation 61.1, track 27.12
+1770331161 [euroc   ] [  info] === Processing image 58 of 1634 at 1.74801545e+09
+1770331161 [orbslam3] [ debug] [System] Current FPS estimate 9.615980
+1770331161 [orbslam3] [ debug] Frame 1692.  Kept 1920 stereo matches of 2036 features
+1770331161 [orbslam3] [  info] TRACK: Track with motion model
+1770331161 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 734 matches in first pass
+1770331161 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 651 matches against the map
+1770331161 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  13.135671 ms 
+1770331161 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331161 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  13.207748 ms 
+1770331161 [orbslam3] [  info] Before optimization, 1010 map points, 0 outliers
+1770331161 [orbslam3] [  info] After optimization, 1010 map points, 126 outliers
+1770331161 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 884
+1770331161 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.412, search local points 5.793, pose optimization 7.681 everything else 0.07368
+1770331161 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 13.964192 ms 
+1770331161 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 10
+1770331161 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 884; nRefMatches: 1942; thRefRatio: 0.4
+1770331161 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=true; c2=false; c3=false; c4=false
+1770331161 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.899, frame_creation 58.11, track 28.98
+1770331161 [euroc   ] [  info] === Processing image 59 of 1634 at 1.74801545e+09
+1770331161 [orbslam3] [ debug] [System] Current FPS estimate 9.546158
+1770331161 [orbslam3] [ debug] Frame 1693.  Kept 1894 stereo matches of 2012 features
+1770331161 [orbslam3] [  info] TRACK: Track with motion model
+1770331161 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 707 matches in first pass
+1770331161 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 602 matches against the map
+1770331161 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  12.389987 ms 
+1770331161 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331161 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  12.463115 ms 
+1770331161 [orbslam3] [  info] Before optimization, 911 map points, 0 outliers
+1770331161 [orbslam3] [  info] After optimization, 911 map points, 117 outliers
+1770331161 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 794
+1770331161 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.4086, search local points 6.214, pose optimization 4.689 everything else 0.06213
+1770331161 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 11.379193 ms 
+1770331161 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 15
+1770331161 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 794; nRefMatches: 1942; thRefRatio: 0.4
+1770331161 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=true; c2=false; c3=false; c4=false
+1770331161 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 4.716, frame_creation 65.36, track 25.65
+1770331161 [euroc   ] [  info] === Processing image 60 of 1634 at 1.74801545e+09
+1770331161 [orbslam3] [ debug] [System] Current FPS estimate 9.533643
+1770331161 [orbslam3] [ debug] Frame 1694.  Kept 1924 stereo matches of 2055 features
+1770331161 [orbslam3] [  info] TRACK: Track with motion model
+1770331161 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 619 matches in first pass
+1770331161 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 531 matches against the map
+1770331161 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  11.926123 ms 
+1770331161 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331161 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  11.998269 ms 
+1770331161 [orbslam3] [  info] Before optimization, 878 map points, 0 outliers
+1770331161 [orbslam3] [  info] After optimization, 878 map points, 118 outliers
+1770331161 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 760
+1770331161 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.3637, search local points 3.798, pose optimization 6.022 everything else 0.05631
+1770331161 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 10.244185 ms 
+1770331161 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 22
+1770331161 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 760; nRefMatches: 1942; thRefRatio: 0.4
+1770331161 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=true; c1b=true; c1c=true; c2=true; c3=false; c4=false
+1770331161 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] !!! Create a new keyframe!
+1770331161 [orbslam3] [  info] [Tracking::CreateNewKeyFrame] New stereo KF with 101 points
+1770331161 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.691, frame_creation 58.52, track 27.19
+1770331162 [euroc   ] [  info] === Processing image 61 of 1634 at 1.74801545e+09
+1770331162 [orbslam3] [  info] LoopClosing: Pushing KF 327 into queue, which is length 1
+1770331162 [orbslam3] [  info] LoopClosing: Have new frames to check
+1770331162 [orbslam3] [  info] [LoopClosing::NewDetectCommonRegions] Stereo KF inserted without check: 327
+1770331162 [orbslam3] [ debug] [System] Current FPS estimate 9.547730
+1770331162 [orbslam3] [ debug] Frame 1695.  Kept 1873 stereo matches of 1995 features
+1770331162 [orbslam3] [  info] TRACK: Track with motion model
+1770331162 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 688 matches in first pass
+1770331162 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 618 matches against the map
+1770331162 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  16.07633 ms 
+1770331162 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331162 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  16.154037 ms 
+1770331162 [orbslam3] [  info] Before optimization, 903 map points, 0 outliers
+1770331162 [orbslam3] [  info] After optimization, 903 map points, 83 outliers
+1770331162 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 820
+1770331162 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.6449, search local points 7.32, pose optimization 7.106 everything else 0.07204
+1770331162 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 15.148011 ms 
+1770331162 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 10; non tracked close points: 18
+1770331162 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 820; nRefMatches: 937; thRefRatio: 0.75
+1770331162 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=false; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331162 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.645, frame_creation 51.69, track 33.04
+1770331162 [euroc   ] [  info] === Processing image 62 of 1634 at 1.74801545e+09
+1770331162 [orbslam3] [ debug] [System] Current FPS estimate 9.554275
+1770331162 [orbslam3] [ debug] Frame 1696.  Kept 1924 stereo matches of 2036 features
+1770331162 [orbslam3] [  info] TRACK: Track with motion model
+1770331162 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 634 matches in first pass
+1770331162 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 571 matches against the map
+1770331162 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  13.828897 ms 
+1770331162 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331162 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  13.90476 ms 
+1770331162 [orbslam3] [  info] Before optimization, 859 map points, 0 outliers
+1770331162 [orbslam3] [  info] After optimization, 859 map points, 81 outliers
+1770331162 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 778
+1770331162 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.6262, search local points 3.043, pose optimization 5.189 everything else 0.03844
+1770331162 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 8.901306 ms 
+1770331162 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 5; non tracked close points: 21
+1770331162 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 778; nRefMatches: 1697; thRefRatio: 0.75
+1770331162 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=false; c1b=true; c1c=true; c2=true; c3=false; c4=false
+1770331162 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] !!! Create a new keyframe!
+1770331162 [orbslam3] [  info] [Tracking::CreateNewKeyFrame] New stereo KF with 101 points
+1770331162 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.94, frame_creation 59.42, track 25.1
+1770331162 [euroc   ] [  info] === Processing image 63 of 1634 at 1.74801545e+09
+1770331162 [orbslam3] [  info] LoopClosing: Pushing KF 328 into queue, which is length 1
+1770331162 [orbslam3] [  info] LoopClosing: Have new frames to check
+1770331162 [orbslam3] [  info] [LoopClosing::NewDetectCommonRegions] Stereo KF inserted without check: 328
+1770331162 [orbslam3] [ debug] [System] Current FPS estimate 9.537882
+1770331162 [orbslam3] [ debug] Frame 1697.  Kept 1887 stereo matches of 2017 features
+1770331162 [orbslam3] [  info] TRACK: Track with motion model
+1770331162 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 645 matches in first pass
+1770331162 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 587 matches against the map
+1770331162 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  10.697409 ms 
+1770331162 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331162 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  10.773572 ms 
+1770331162 [orbslam3] [  info] Before optimization, 758 map points, 0 outliers
+1770331162 [orbslam3] [  info] After optimization, 758 map points, 47 outliers
+1770331162 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 711
+1770331162 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.7806, search local points 1.592, pose optimization 3.208 everything else 0.02875
+1770331162 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 5.614736 ms 
+1770331162 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 11; non tracked close points: 30
+1770331162 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 711; nRefMatches: 874; thRefRatio: 0.75
+1770331162 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=false; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331162 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.587, frame_creation 57.53, track 17.9
+1770331162 [euroc   ] [  info] === Processing image 64 of 1634 at 1.74801545e+09
+1770331162 [orbslam3] [ debug] [System] Current FPS estimate 9.644283
+1770331162 [orbslam3] [ debug] Frame 1698.  Kept 1910 stereo matches of 2023 features
+1770331162 [orbslam3] [  info] TRACK: Track with motion model
+1770331162 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 570 matches in first pass
+1770331162 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 537 matches against the map
+1770331162 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  7.085686 ms 
+1770331162 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331162 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  7.149466 ms 
+1770331162 [orbslam3] [  info] Before optimization, 748 map points, 0 outliers
+1770331162 [orbslam3] [  info] After optimization, 748 map points, 37 outliers
+1770331162 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 711
+1770331162 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.6934, search local points 1.654, pose optimization 5.425 everything else 0.03
+1770331162 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 7.807235 ms 
+1770331162 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 10; non tracked close points: 39
+1770331162 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 711; nRefMatches: 932; thRefRatio: 0.75
+1770331162 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=false; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331162 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.617, frame_creation 65.45, track 16.63
+1770331162 [euroc   ] [  info] === Processing image 65 of 1634 at 1.74801545e+09
+1770331162 [orbslam3] [ debug] [System] Current FPS estimate 9.783233
+1770331162 [orbslam3] [ debug] Frame 1699.  Kept 1908 stereo matches of 2017 features
+1770331162 [orbslam3] [  info] TRACK: Track with motion model
+1770331162 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 567 matches in first pass
+1770331162 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 526 matches against the map
+1770331162 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  10.685456 ms 
+1770331162 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331162 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  10.7565 ms 
+1770331162 [orbslam3] [  info] Before optimization, 692 map points, 0 outliers
+1770331162 [orbslam3] [  info] After optimization, 692 map points, 36 outliers
+1770331162 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 656
+1770331162 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.727, search local points 4.091, pose optimization 4.191 everything else 0.035
+1770331162 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 9.049125 ms 
+1770331162 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 6; non tracked close points: 32
+1770331162 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 656; nRefMatches: 932; thRefRatio: 0.75
+1770331162 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=false; c1b=true; c1c=false; c2=true; c3=false; c4=false
+1770331162 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] !!! Create a new keyframe!
+1770331162 [orbslam3] [  info] [Tracking::CreateNewKeyFrame] New stereo KF with 101 points
+1770331162 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.802, frame_creation 63.4, track 22.04
+1770331162 [euroc   ] [  info] === Processing image 66 of 1634 at 1.74801545e+09
+1770331162 [orbslam3] [  info] LoopClosing: Pushing KF 329 into queue, which is length 1
+1770331162 [orbslam3] [ debug] [System] Current FPS estimate 9.785674
+1770331162 [orbslam3] [  info] LoopClosing: Have new frames to check
+1770331162 [orbslam3] [  info] [LoopClosing::NewDetectCommonRegions] Stereo KF inserted without check: 329
+1770331162 [orbslam3] [ debug] Frame 1700.  Kept 1932 stereo matches of 2040 features
+1770331162 [orbslam3] [  info] TRACK: Track with motion model
+1770331162 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 574 matches in first pass
+1770331162 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 534 matches against the map
+1770331162 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  7.880634 ms 
+1770331162 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331162 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  7.949122 ms 
+1770331162 [orbslam3] [  info] Before optimization, 735 map points, 0 outliers
+1770331162 [orbslam3] [  info] After optimization, 735 map points, 46 outliers
+1770331162 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 689
+1770331162 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.9079, search local points 1.743, pose optimization 4.229 everything else 0.03424
+1770331162 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 6.919052 ms 
+1770331162 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 18; non tracked close points: 25
+1770331162 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 689; nRefMatches: 772; thRefRatio: 0.75
+1770331162 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=false; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331162 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.647, frame_creation 59.09, track 16.35
+1770331162 [euroc   ] [  info] === Processing image 67 of 1634 at 1.74801545e+09
+1770331162 [orbslam3] [ debug] [System] Current FPS estimate 9.786266
+1770331162 [orbslam3] [ debug] Frame 1701.  Kept 1887 stereo matches of 2002 features
+1770331162 [orbslam3] [  info] TRACK: Track with motion model
+1770331162 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 556 matches in first pass
+1770331162 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 526 matches against the map
+1770331162 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  10.475992 ms 
+1770331162 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331162 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  10.540583 ms 
+1770331162 [orbslam3] [  info] Before optimization, 744 map points, 0 outliers
+1770331162 [orbslam3] [  info] After optimization, 744 map points, 63 outliers
+1770331162 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 681
+1770331162 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.889, search local points 3.729, pose optimization 4.295 everything else 0.03261
+1770331162 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 8.950378 ms 
+1770331162 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 19; non tracked close points: 23
+1770331162 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 681; nRefMatches: 930; thRefRatio: 0.75
+1770331162 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=false; c1b=true; c1c=false; c2=true; c3=false; c4=false
+1770331162 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] !!! Create a new keyframe!
+1770331162 [orbslam3] [  info] [Tracking::CreateNewKeyFrame] New stereo KF with 101 points
+1770331162 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.639, frame_creation 58.1, track 21.72
+1770331163 [euroc   ] [  info] === Processing image 68 of 1634 at 1.74801546e+09
+1770331163 [orbslam3] [  info] LoopClosing: Pushing KF 330 into queue, which is length 1
+1770331163 [orbslam3] [  info] LoopClosing: Have new frames to check
+1770331163 [orbslam3] [  info] [LoopClosing::NewDetectCommonRegions] Stereo KF inserted without check, map is small: 330
+1770331163 [orbslam3] [ debug] [System] Current FPS estimate 9.765617
+1770331163 [orbslam3] [ debug] Frame 1702.  Kept 1902 stereo matches of 1993 features
+1770331163 [orbslam3] [  info] TRACK: Track with motion model
+1770331163 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 569 matches in first pass
+1770331163 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 530 matches against the map
+1770331163 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  7.717636 ms 
+1770331163 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331163 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  7.789131 ms 
+1770331163 [orbslam3] [  info] Before optimization, 712 map points, 0 outliers
+1770331163 [orbslam3] [  info] After optimization, 712 map points, 47 outliers
+1770331163 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 665
+1770331163 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.9797, search local points 1.76, pose optimization 4.302 everything else 0.02923
+1770331163 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 7.075687 ms 
+1770331163 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 18; non tracked close points: 20
+1770331163 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 665; nRefMatches: 764; thRefRatio: 0.75
+1770331163 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=false; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331163 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.668, frame_creation 53.79, track 16.3
+1770331163 [euroc   ] [  info] === Processing image 69 of 1634 at 1.74801546e+09
+1770331163 [orbslam3] [ debug] [System] Current FPS estimate 9.725743
+1770331163 [orbslam3] [ debug] Frame 1703.  Kept 1914 stereo matches of 2039 features
+1770331163 [orbslam3] [  info] TRACK: Track with motion model
+1770331163 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 539 matches in first pass
+1770331163 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 499 matches against the map
+1770331163 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  10.319958 ms 
+1770331163 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331163 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  10.392444 ms 
+1770331163 [orbslam3] [  info] Before optimization, 708 map points, 0 outliers
+1770331163 [orbslam3] [  info] After optimization, 708 map points, 35 outliers
+1770331163 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 673
+1770331163 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.9437, search local points 1.948, pose optimization 8.37 everything else 0.06333
+1770331163 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 11.330862 ms 
+1770331163 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 18; non tracked close points: 32
+1770331163 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 673; nRefMatches: 764; thRefRatio: 0.75
+1770331163 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=false; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331163 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.651, frame_creation 58.32, track 23.27
+1770331163 [euroc   ] [  info] === Processing image 70 of 1634 at 1.74801546e+09
+1770331163 [orbslam3] [ debug] [System] Current FPS estimate 9.753809
+1770331163 [orbslam3] [ debug] Frame 1704.  Kept 1918 stereo matches of 2028 features
+1770331163 [orbslam3] [  info] TRACK: Track with motion model
+1770331163 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 537 matches in first pass
+1770331163 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 496 matches against the map
+1770331163 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  11.296267 ms 
+1770331163 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331163 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  11.368774 ms 
+1770331163 [orbslam3] [  info] Before optimization, 705 map points, 0 outliers
+1770331163 [orbslam3] [  info] After optimization, 705 map points, 51 outliers
+1770331163 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 654
+1770331163 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 0.953, search local points 4.345, pose optimization 4.04 everything else 0.05453
+1770331163 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 9.399715 ms 
+1770331163 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 14; non tracked close points: 33
+1770331163 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 654; nRefMatches: 915; thRefRatio: 0.75
+1770331163 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=false; c1b=true; c1c=false; c2=true; c3=false; c4=false
+1770331163 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] !!! Create a new keyframe!
+1770331163 [orbslam3] [  info] [Tracking::CreateNewKeyFrame] New stereo KF with 101 points
+1770331163 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.88, frame_creation 63.78, track 22.95
+1770331163 [euroc   ] [  info] === Processing image 71 of 1634 at 1.74801546e+09
+1770331163 [orbslam3] [ debug] [System] Current FPS estimate 9.827374
+1770331163 [orbslam3] [  info] LoopClosing: Pushing KF 331 into queue, which is length 1
+1770331163 [orbslam3] [  info] LoopClosing: Have new frames to check
+1770331163 [orbslam3] [  info] [LoopClosing::NewDetectCommonRegions] Stereo KF inserted without check, map is small: 331
+1770331163 [orbslam3] [ debug] Frame 1705.  Kept 1913 stereo matches of 2008 features
+1770331163 [orbslam3] [  info] TRACK: Track with motion model
+1770331163 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 590 matches in first pass
+1770331163 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 530 matches against the map
+1770331163 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  9.570426 ms 
+1770331163 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331163 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  9.618497 ms 
+1770331163 [orbslam3] [  info] Before optimization, 915 map points, 0 outliers
+1770331163 [orbslam3] [  info] After optimization, 915 map points, 67 outliers
+1770331163 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 848
+1770331163 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 1.263, search local points 4.533, pose optimization 5.336 everything else 0.0707
+1770331163 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 11.20795 ms 
+1770331163 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 17; non tracked close points: 25
+1770331163 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 848; nRefMatches: 1053; thRefRatio: 0.75
+1770331163 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=false; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331163 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.697, frame_creation 53.43, track 22.46
+1770331163 [euroc   ] [  info] === Processing image 72 of 1634 at 1.74801546e+09
+1770331163 [orbslam3] [ debug] [System] Current FPS estimate 9.749894
+1770331163 [orbslam3] [ debug] Frame 1706.  Kept 1917 stereo matches of 2033 features
+1770331163 [orbslam3] [  info] TRACK: Track with motion model
+1770331163 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 670 matches in first pass
+1770331163 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 630 matches against the map
+1770331163 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  11.923559 ms 
+1770331163 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331163 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  12.003539 ms 
+1770331163 [orbslam3] [  info] Before optimization, 890 map points, 0 outliers
+1770331163 [orbslam3] [  info] After optimization, 890 map points, 64 outliers
+1770331163 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 826
+1770331163 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 1.362, search local points 4.858, pose optimization 7.178 everything else 0.0744
+1770331163 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 13.477345 ms 
+1770331163 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 10; non tracked close points: 33
+1770331163 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 826; nRefMatches: 1053; thRefRatio: 0.75
+1770331163 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=false; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331163 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 2.122, frame_creation 57.34, track 27.45
+1770331163 [euroc   ] [  info] === Processing image 73 of 1634 at 1.74801546e+09
+1770331163 [orbslam3] [ debug] [System] Current FPS estimate 9.694685
+1770331163 [orbslam3] [ debug] Frame 1707.  Kept 1892 stereo matches of 2006 features
+1770331163 [orbslam3] [  info] TRACK: Track with motion model
+1770331163 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 633 matches in first pass
+1770331163 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 568 matches against the map
+1770331163 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  11.076723 ms 
+1770331163 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331163 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  11.153568 ms 
+1770331163 [orbslam3] [  info] Before optimization, 799 map points, 0 outliers
+1770331163 [orbslam3] [  info] After optimization, 799 map points, 58 outliers
+1770331163 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 741
+1770331163 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 1.255, search local points 2.463, pose optimization 6.106 everything else 0.04013
+1770331163 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 9.868388 ms 
+1770331163 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 6; non tracked close points: 31
+1770331163 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 741; nRefMatches: 1053; thRefRatio: 0.75
+1770331163 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=false; c1b=true; c1c=false; c2=true; c3=false; c4=false
+1770331163 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] !!! Create a new keyframe!
+1770331163 [orbslam3] [  info] [Tracking::CreateNewKeyFrame] New stereo KF with 101 points
+1770331163 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.64, frame_creation 58.83, track 23.7
+1770331163 [euroc   ] [  info] === Processing image 74 of 1634 at 1.74801546e+09
+1770331163 [orbslam3] [ debug] [System] Current FPS estimate 9.528143
+1770331163 [orbslam3] [ debug] Frame 1708.  Kept 1938 stereo matches of 2038 features
+1770331163 [orbslam3] [  info] TRACK: Track with motion model
+1770331163 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 634 matches in first pass
+1770331163 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 554 matches against the map
+1770331163 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  10.499356 ms 
+1770331163 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331163 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  10.574598 ms 
+1770331163 [orbslam3] [  info] Before optimization, 1061 map points, 0 outliers
+1770331163 [orbslam3] [  info] After optimization, 1061 map points, 87 outliers
+1770331163 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 974
+1770331163 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 1.395, search local points 6.3, pose optimization 6.762 everything else 0.0837
+1770331163 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 14.545136 ms 
+1770331163 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 9; non tracked close points: 26
+1770331163 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 974; nRefMatches: 1268; thRefRatio: 0.75
+1770331163 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=false; c1b=false; c1c=false; c2=false; c3=false; c4=false
+1770331163 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.721, frame_creation 53.65, track 26.85
+1770331164 [orbslam3] [  info] LoopClosing: Pushing KF 332 into queue, which is length 1
+1770331164 [euroc   ] [  info] === Processing image 75 of 1634 at 1.74801546e+09
+1770331164 [orbslam3] [  info] LoopClosing: Have new frames to check
+1770331164 [orbslam3] [  info] [LoopClosing::NewDetectCommonRegions] Stereo KF inserted without check, map is small: 332
+1770331164 [orbslam3] [ debug] [System] Current FPS estimate 9.544660
+1770331164 [orbslam3] [ debug] Frame 1709.  Kept 2006 stereo matches of 2105 features
+1770331164 [orbslam3] [  info] TRACK: Track with motion model
+1770331164 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 787 matches in first pass
+1770331164 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 711 matches against the map
+1770331164 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  13.74562 ms 
+1770331164 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331164 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  13.831563 ms 
+1770331164 [orbslam3] [  info] Before optimization, 1054 map points, 0 outliers
+1770331164 [orbslam3] [  info] After optimization, 1054 map points, 91 outliers
+1770331164 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 963
+1770331164 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 1.576, search local points 7.143, pose optimization 8.536 everything else 0.09214
+1770331164 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 17.353496 ms 
+1770331164 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 10; non tracked close points: 28
+1770331164 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 963; nRefMatches: 1268; thRefRatio: 0.75
+1770331164 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=false; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331164 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 2.178, frame_creation 54.91, track 35.6
+1770331164 [euroc   ] [  info] === Processing image 76 of 1634 at 1.74801546e+09
+1770331164 [orbslam3] [ debug] [System] Current FPS estimate 9.536357
+1770331164 [orbslam3] [ debug] Frame 1710.  Kept 2007 stereo matches of 2114 features
+1770331164 [orbslam3] [  info] TRACK: Track with motion model
+1770331164 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 784 matches in first pass
+1770331164 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 719 matches against the map
+1770331164 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  12.815929 ms 
+1770331164 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331164 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  12.892564 ms 
+1770331164 [orbslam3] [  info] Before optimization, 1014 map points, 0 outliers
+1770331164 [orbslam3] [  info] After optimization, 1014 map points, 85 outliers
+1770331164 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 929
+1770331164 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 1.615, search local points 5.457, pose optimization 7.9 everything else 0.09653
+1770331164 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 15.073251 ms 
+1770331164 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 2; non tracked close points: 26
+1770331164 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 929; nRefMatches: 1268; thRefRatio: 0.75
+1770331164 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=false; c1b=true; c1c=false; c2=true; c3=false; c4=false
+1770331164 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] !!! Create a new keyframe!
+1770331164 [orbslam3] [  info] [Tracking::CreateNewKeyFrame] New stereo KF with 101 points
+1770331164 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.623, frame_creation 54.08, track 30.82
+1770331164 [euroc   ] [  info] === Processing image 77 of 1634 at 1.74801546e+09
+1770331164 [orbslam3] [ debug] [System] Current FPS estimate 9.534133
+1770331164 [orbslam3] [ debug] Frame 1711.  Kept 1969 stereo matches of 2082 features
+1770331164 [orbslam3] [  info] TRACK: Track with motion model
+1770331164 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 825 matches in first pass
+1770331164 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 743 matches against the map
+1770331164 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  11.479592 ms 
+1770331164 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331164 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  11.559402 ms 
+1770331164 [orbslam3] [  info] Before optimization, 1221 map points, 0 outliers
+1770331164 [orbslam3] [  info] After optimization, 1221 map points, 100 outliers
+1770331164 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1121
+1770331164 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 2.013, search local points 5.188, pose optimization 8.077 everything else 0.1131
+1770331164 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 15.395869 ms 
+1770331164 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 7; non tracked close points: 16
+1770331164 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1121; nRefMatches: 1369; thRefRatio: 0.75
+1770331164 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=false; c1b=false; c1c=false; c2=false; c3=false; c4=false
+1770331164 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.724, frame_creation 53.22, track 28.76
+1770331164 [euroc   ] [  info] === Processing image 78 of 1634 at 1.74801546e+09
+1770331164 [orbslam3] [  info] LoopClosing: Pushing KF 333 into queue, which is length 1
+1770331164 [orbslam3] [  info] LoopClosing: Have new frames to check
+1770331164 [orbslam3] [  info] [LoopClosing::NewDetectCommonRegions] Stereo KF inserted without check, map is small: 333
+1770331164 [orbslam3] [ debug] [System] Current FPS estimate 9.536163
+1770331164 [orbslam3] [ debug] Frame 1712.  Kept 1999 stereo matches of 2107 features
+1770331164 [orbslam3] [  info] TRACK: Track with motion model
+1770331164 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 912 matches in first pass
+1770331164 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 826 matches against the map
+1770331164 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  18.428611 ms 
+1770331164 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331164 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  18.527097 ms 
+1770331164 [orbslam3] [  info] Before optimization, 1204 map points, 0 outliers
+1770331164 [orbslam3] [  info] After optimization, 1204 map points, 90 outliers
+1770331164 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1114
+1770331164 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 1.717, search local points 8.144, pose optimization 9.034 everything else 0.109
+1770331164 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 19.009225 ms 
+1770331164 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 6; non tracked close points: 8
+1770331164 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1114; nRefMatches: 1367; thRefRatio: 0.75
+1770331164 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=false; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331164 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.598, frame_creation 58.29, track 39.39
+1770331164 [euroc   ] [  info] === Processing image 79 of 1634 at 1.74801546e+09
+1770331164 [orbslam3] [ debug] [System] Current FPS estimate 9.510414
+1770331164 [orbslam3] [ debug] Frame 1713.  Kept 2111 stereo matches of 2164 features
+1770331164 [orbslam3] [  info] TRACK: Track with motion model
+1770331164 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 840 matches in first pass
+1770331164 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 780 matches against the map
+1770331164 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  18.542456 ms 
+1770331164 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331164 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  18.64564 ms 
+1770331164 [orbslam3] [  info] Before optimization, 1159 map points, 0 outliers
+1770331164 [orbslam3] [  info] After optimization, 1159 map points, 91 outliers
+1770331164 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1068
+1770331164 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 1.763, search local points 6.958, pose optimization 11.01 everything else 0.1106
+1770331164 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 19.846862 ms 
+1770331164 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 6
+1770331164 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1068; nRefMatches: 1367; thRefRatio: 0.75
+1770331164 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=false; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331164 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.619, frame_creation 50.89, track 40.77
+1770331164 [euroc   ] [  info] === Processing image 80 of 1634 at 1.74801546e+09
+1770331164 [orbslam3] [ debug] [System] Current FPS estimate 9.535523
+1770331164 [orbslam3] [ debug] Frame 1714.  Kept 2004 stereo matches of 2120 features
+1770331164 [orbslam3] [  info] TRACK: Track with motion model
+1770331164 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 837 matches in first pass
+1770331164 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 753 matches against the map
+1770331164 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  14.349248 ms 
+1770331164 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331164 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  14.448464 ms 
+1770331164 [orbslam3] [  info] Before optimization, 1138 map points, 0 outliers
+1770331164 [orbslam3] [  info] After optimization, 1138 map points, 109 outliers
+1770331164 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1029
+1770331164 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 1.625, search local points 4.032, pose optimization 6.745 everything else 0.06794
+1770331164 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 12.474727 ms 
+1770331164 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 1; non tracked close points: 13
+1770331164 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1029; nRefMatches: 1367; thRefRatio: 0.75
+1770331164 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=false; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331164 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.676, frame_creation 52.21, track 28.81
+1770331164 [euroc   ] [  info] === Processing image 81 of 1634 at 1.74801546e+09
+1770331164 [orbslam3] [ debug] [System] Current FPS estimate 9.471971
+1770331164 [orbslam3] [ debug] Frame 1715.  Kept 2025 stereo matches of 2140 features
+1770331164 [orbslam3] [  info] TRACK: Track with motion model
+1770331164 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 834 matches in first pass
+1770331164 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 738 matches against the map
+1770331164 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  19.655892 ms 
+1770331164 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331164 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  19.753196 ms 
+1770331165 [orbslam3] [  info] Before optimization, 1130 map points, 0 outliers
+1770331165 [orbslam3] [  info] After optimization, 1130 map points, 105 outliers
+1770331165 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1025
+1770331165 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 1.818, search local points 6.429, pose optimization 6.677 everything else 0.09209
+1770331165 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 15.022486 ms 
+1770331165 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 12
+1770331165 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1025; nRefMatches: 1367; thRefRatio: 0.75
+1770331165 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=false; c1b=true; c1c=false; c2=true; c3=false; c4=false
+1770331165 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] !!! Create a new keyframe!
+1770331165 [orbslam3] [  info] [Tracking::CreateNewKeyFrame] New stereo KF with 101 points
+1770331165 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 2.348, frame_creation 57.03, track 37.42
+1770331165 [euroc   ] [  info] === Processing image 82 of 1634 at 1.74801546e+09
+1770331165 [orbslam3] [ debug] [System] Current FPS estimate 9.785535
+1770331165 [orbslam3] [ debug] Frame 1716.  Kept 2077 stereo matches of 2186 features
+1770331165 [orbslam3] [  info] TRACK: Track with motion model
+1770331165 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 851 matches in first pass
+1770331165 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 760 matches against the map
+1770331165 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  11.721187 ms 
+1770331165 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331165 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  11.760101 ms 
+1770331165 [orbslam3] [  info] Before optimization, 1345 map points, 0 outliers
+1770331165 [orbslam3] [  info] After optimization, 1345 map points, 126 outliers
+1770331165 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1219
+1770331165 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 1.803, search local points 6.844, pose optimization 7.861 everything else 0.1225
+1770331165 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 16.635724 ms 
+1770331165 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 5
+1770331165 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1219; nRefMatches: 1554; thRefRatio: 0.75
+1770331165 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=false; c1b=false; c1c=false; c2=false; c3=false; c4=false
+1770331165 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 3.093, frame_creation 56.77, track 30.53
+1770331165 [euroc   ] [  info] === Processing image 83 of 1634 at 1.74801546e+09
+1770331165 [orbslam3] [ debug] [System] Current FPS estimate 9.797546
+1770331165 [orbslam3] [  info] LoopClosing: Pushing KF 334 into queue, which is length 1
+1770331165 [orbslam3] [  info] LoopClosing: Have new frames to check
+1770331165 [orbslam3] [  info] [LoopClosing::NewDetectCommonRegions] Stereo KF inserted without check, map is small: 334
+1770331165 [orbslam3] [ debug] Frame 1717.  Kept 2160 stereo matches of 2248 features
+1770331165 [orbslam3] [  info] TRACK: Track with motion model
+1770331165 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 1006 matches in first pass
+1770331165 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 886 matches against the map
+1770331165 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  23.631912 ms 
+1770331165 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331165 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  23.747219 ms 
+1770331165 [orbslam3] [  info] Before optimization, 1295 map points, 0 outliers
+1770331165 [orbslam3] [  info] After optimization, 1295 map points, 98 outliers
+1770331165 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1197
+1770331165 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 1.909, search local points 6.258, pose optimization 10.72 everything else 0.1071
+1770331165 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 19.003755 ms 
+1770331165 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 3
+1770331165 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1197; nRefMatches: 1553; thRefRatio: 0.75
+1770331165 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=false; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331165 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.678, frame_creation 53.55, track 44.83
+1770331165 [euroc   ] [  info] === Processing image 84 of 1634 at 1.74801546e+09
+1770331165 [orbslam3] [ debug] [System] Current FPS estimate 9.896456
+1770331165 [orbslam3] [ debug] Frame 1718.  Kept 2134 stereo matches of 2247 features
+1770331165 [orbslam3] [  info] TRACK: Track with motion model
+1770331165 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 978 matches in first pass
+1770331165 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 877 matches against the map
+1770331165 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  14.353024 ms 
+1770331165 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331165 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  14.449967 ms 
+1770331165 [orbslam3] [  info] Before optimization, 1280 map points, 0 outliers
+1770331165 [orbslam3] [  info] After optimization, 1280 map points, 107 outliers
+1770331165 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1173
+1770331165 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 1.996, search local points 6.362, pose optimization 9.851 everything else 0.1072
+1770331165 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 18.322712 ms 
+1770331165 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 5
+1770331165 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1173; nRefMatches: 1553; thRefRatio: 0.75
+1770331165 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=false; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331165 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.676, frame_creation 52.01, track 34.99
+1770331165 [euroc   ] [  info] === Processing image 85 of 1634 at 1.74801546e+09
+1770331165 [orbslam3] [ debug] [System] Current FPS estimate 9.899303
+1770331165 [orbslam3] [ debug] Frame 1719.  Kept 2089 stereo matches of 2192 features
+1770331165 [orbslam3] [  info] TRACK: Track with motion model
+1770331165 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 899 matches in first pass
+1770331165 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 820 matches against the map
+1770331165 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  10.983959 ms 
+1770331165 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331165 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  11.08011 ms 
+1770331165 [orbslam3] [  info] Before optimization, 1254 map points, 0 outliers
+1770331165 [orbslam3] [  info] After optimization, 1254 map points, 114 outliers
+1770331165 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1140
+1770331165 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 1.801, search local points 6.218, pose optimization 9.042 everything else 0.1032
+1770331165 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 17.169169 ms 
+1770331165 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 9
+1770331165 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1140; nRefMatches: 1553; thRefRatio: 0.75
+1770331165 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=false; c1b=true; c1c=false; c2=true; c3=false; c4=false
+1770331165 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] !!! Create a new keyframe!
+1770331165 [orbslam3] [  info] [Tracking::CreateNewKeyFrame] New stereo KF with 101 points
+1770331165 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.669, frame_creation 49.74, track 30.9
+1770331165 [euroc   ] [  info] === Processing image 86 of 1634 at 1.74801546e+09
+1770331165 [orbslam3] [ debug] [System] Current FPS estimate 10.010900
+1770331165 [orbslam3] [ debug] Frame 1720.  Kept 2145 stereo matches of 2257 features
+1770331165 [orbslam3] [  info] TRACK: Track with motion model
+1770331165 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 994 matches in first pass
+1770331165 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 882 matches against the map
+1770331165 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  14.613886 ms 
+1770331165 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331165 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  14.662938 ms 
+1770331165 [orbslam3] [  info] Before optimization, 1475 map points, 0 outliers
+1770331165 [orbslam3] [  info] After optimization, 1475 map points, 146 outliers
+1770331165 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1329
+1770331165 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 2.588, search local points 6.797, pose optimization 11.64 everything else 0.1342
+1770331165 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 21.159585 ms 
+1770331165 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 5
+1770331165 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1329; nRefMatches: 1632; thRefRatio: 0.75
+1770331165 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=false; c1b=false; c1c=false; c2=false; c3=false; c4=false
+1770331165 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.664, frame_creation 57.08, track 37.91
+1770331165 [euroc   ] [  info] === Processing image 87 of 1634 at 1.74801546e+09
+1770331165 [orbslam3] [ debug] [System] Current FPS estimate 9.945563
+1770331165 [orbslam3] [ debug] Frame 1721.  Kept 2137 stereo matches of 2248 features
+1770331165 [orbslam3] [  info] TRACK: Track with motion model
+1770331165 [orbslam3] [  info] LoopClosing: Pushing KF 335 into queue, which is length 1
+1770331165 [orbslam3] [  info] LoopClosing: Have new frames to check
+1770331165 [orbslam3] [  info] [LoopClosing::NewDetectCommonRegions] Stereo KF inserted without check, map is small: 335
+1770331165 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 1043 matches in first pass
+1770331165 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 960 matches against the map
+1770331165 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  20.586355 ms 
+1770331165 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331165 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  20.698075 ms 
+1770331165 [orbslam3] [  info] Before optimization, 1439 map points, 0 outliers
+1770331165 [orbslam3] [  info] After optimization, 1439 map points, 127 outliers
+1770331165 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1312
+1770331165 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 2.097, search local points 6.839, pose optimization 11.85 everything else 0.1235
+1770331165 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 20.919453 ms 
+1770331165 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 5
+1770331165 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1312; nRefMatches: 1631; thRefRatio: 0.75
+1770331165 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=false; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331165 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 2.403, frame_creation 51.85, track 43.77
+1770331165 [euroc   ] [  info] === Processing image 88 of 1634 at 1.74801546e+09
+1770331165 [orbslam3] [ debug] [System] Current FPS estimate 9.929561
+1770331165 [orbslam3] [ debug] Frame 1722.  Kept 2195 stereo matches of 2297 features
+1770331165 [orbslam3] [  info] TRACK: Track with motion model
+1770331165 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 1033 matches in first pass
+1770331165 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 952 matches against the map
+1770331165 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  17.039484 ms 
+1770331165 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331165 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  17.147849 ms 
+1770331165 [orbslam3] [  info] Before optimization, 1431 map points, 0 outliers
+1770331166 [orbslam3] [  info] After optimization, 1431 map points, 115 outliers
+1770331166 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1316
+1770331166 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 2.135, search local points 6.63, pose optimization 10.63 everything else 0.1283
+1770331166 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 19.529676 ms 
+1770331166 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 3
+1770331166 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1316; nRefMatches: 1631; thRefRatio: 0.75
+1770331166 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=false; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331166 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 2.289, frame_creation 49.98, track 39.07
+1770331166 [euroc   ] [  info] === Processing image 89 of 1634 at 1.74801546e+09
+1770331166 [orbslam3] [ debug] [System] Current FPS estimate 9.949320
+1770331166 [orbslam3] [ debug] Frame 1723.  Kept 2158 stereo matches of 2268 features
+1770331166 [orbslam3] [  info] TRACK: Track with motion model
+1770331166 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 1064 matches in first pass
+1770331166 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 964 matches against the map
+1770331166 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  18.294167 ms 
+1770331166 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331166 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  18.419794 ms 
+1770331166 [orbslam3] [  info] Before optimization, 1367 map points, 0 outliers
+1770331166 [orbslam3] [  info] After optimization, 1367 map points, 119 outliers
+1770331166 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1248
+1770331166 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 2.265, search local points 4.938, pose optimization 8.17 everything else 0.08905
+1770331166 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 15.467383 ms 
+1770331166 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 6
+1770331166 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1248; nRefMatches: 1631; thRefRatio: 0.75
+1770331166 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=false; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331166 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 3.09, frame_creation 52.05, track 35.93
+1770331166 [euroc   ] [  info] === Processing image 90 of 1634 at 1.74801546e+09
+1770331166 [orbslam3] [ debug] [System] Current FPS estimate 9.949063
+1770331166 [orbslam3] [ debug] Frame 1724.  Kept 2202 stereo matches of 2318 features
+1770331166 [orbslam3] [  info] TRACK: Track with motion model
+1770331166 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 1014 matches in first pass
+1770331166 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 929 matches against the map
+1770331166 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  20.288073 ms 
+1770331166 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331166 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  20.39252 ms 
+1770331166 [orbslam3] [  info] Before optimization, 1340 map points, 0 outliers
+1770331166 [orbslam3] [  info] After optimization, 1340 map points, 98 outliers
+1770331166 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1242
+1770331166 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 2.127, search local points 4.809, pose optimization 10.98 everything else 0.1022
+1770331166 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 18.022697 ms 
+1770331166 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 0
+1770331166 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1242; nRefMatches: 1631; thRefRatio: 0.75
+1770331166 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=false; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331166 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 2.09, frame_creation 56.31, track 40.52
+1770331166 [euroc   ] [  info] === Processing image 91 of 1634 at 1.74801546e+09
+1770331166 [orbslam3] [ debug] [System] Current FPS estimate 9.943875
+1770331166 [orbslam3] [ debug] Frame 1725.  Kept 2178 stereo matches of 2289 features
+1770331166 [orbslam3] [  info] TRACK: Track with motion model
+1770331166 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 1003 matches in first pass
+1770331166 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 901 matches against the map
+1770331166 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  19.842785 ms 
+1770331166 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331166 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  19.941341 ms 
+1770331166 [orbslam3] [  info] Before optimization, 1300 map points, 0 outliers
+1770331166 [orbslam3] [  info] After optimization, 1300 map points, 84 outliers
+1770331166 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1216
+1770331166 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 2.138, search local points 7.45, pose optimization 9.28 everything else 0.09893
+1770331166 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 18.972255 ms 
+1770331166 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 5
+1770331166 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1216; nRefMatches: 1631; thRefRatio: 0.75
+1770331166 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=false; c1b=true; c1c=false; c2=true; c3=false; c4=false
+1770331166 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] !!! Create a new keyframe!
+1770331166 [orbslam3] [  info] [Tracking::CreateNewKeyFrame] New stereo KF with 101 points
+1770331166 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 2.047, frame_creation 54.67, track 41.78
+1770331166 [euroc   ] [  info] === Processing image 92 of 1634 at 1.74801546e+09
+1770331166 [orbslam3] [ debug] [System] Current FPS estimate 9.949960
+1770331166 [orbslam3] [ debug] Frame 1726.  Kept 2192 stereo matches of 2299 features
+1770331166 [orbslam3] [  info] TRACK: Track with motion model
+1770331166 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 1019 matches in first pass
+1770331166 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 900 matches against the map
+1770331166 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  15.115501 ms 
+1770331166 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331166 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  15.174082 ms 
+1770331166 [orbslam3] [  info] Before optimization, 1466 map points, 0 outliers
+1770331166 [orbslam3] [  info] After optimization, 1466 map points, 121 outliers
+1770331166 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1345
+1770331166 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 2.238, search local points 8.516, pose optimization 11.08 everything else 0.1337
+1770331166 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 21.968248 ms 
+1770331166 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 1
+1770331166 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1345; nRefMatches: 1647; thRefRatio: 0.75
+1770331166 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=false; c1b=false; c1c=false; c2=false; c3=false; c4=false
+1770331166 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 3.078, frame_creation 57.92, track 39.51
+1770331166 [euroc   ] [  info] === Processing image 93 of 1634 at 1.74801546e+09
+1770331166 [orbslam3] [ debug] [System] Current FPS estimate 9.950976
+1770331166 [orbslam3] [ debug] Frame 1727.  Kept 2246 stereo matches of 2336 features
+1770331166 [orbslam3] [  info] TRACK: Track with motion model
+1770331166 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 1101 matches in first pass
+1770331166 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 967 matches against the map
+1770331166 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  17.591354 ms 
+1770331166 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331166 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  17.708194 ms 
+1770331166 [orbslam3] [  info] Before optimization, 1398 map points, 0 outliers
+1770331166 [orbslam3] [  info] After optimization, 1398 map points, 118 outliers
+1770331166 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1280
+1770331166 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 2.334, search local points 7.122, pose optimization 13.01 everything else 0.1392
+1770331166 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 22.615867 ms 
+1770331166 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 9
+1770331166 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1280; nRefMatches: 1647; thRefRatio: 0.75
+1770331166 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=false; c1b=false; c1c=false; c2=false; c3=false; c4=false
+1770331166 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.924, frame_creation 51.44, track 42.64
+1770331166 [euroc   ] [  info] === Processing image 94 of 1634 at 1.74801546e+09
+1770331166 [orbslam3] [  info] LoopClosing: Pushing KF 336 into queue, which is length 1
+1770331166 [orbslam3] [  info] LoopClosing: Have new frames to check
+1770331166 [orbslam3] [  info] [LoopClosing::NewDetectCommonRegions] Stereo KF inserted without check, map is small: 336
+1770331166 [orbslam3] [ debug] [System] Current FPS estimate 9.947210
+1770331166 [orbslam3] [ debug] Frame 1728.  Kept 2245 stereo matches of 2330 features
+1770331166 [orbslam3] [  info] TRACK: Track with motion model
+1770331166 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 996 matches in first pass
+1770331166 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 920 matches against the map
+1770331166 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  16.576442 ms 
+1770331166 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331166 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  16.679276 ms 
+1770331166 [orbslam3] [  info] Before optimization, 1390 map points, 0 outliers
+1770331166 [orbslam3] [  info] After optimization, 1390 map points, 134 outliers
+1770331166 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1256
+1770331166 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 2.522, search local points 13.08, pose optimization 10.88 everything else 0.1237
+1770331166 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 26.613307 ms 
+1770331166 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 3
+1770331166 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1256; nRefMatches: 1647; thRefRatio: 0.75
+1770331166 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=false; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331166 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.957, frame_creation 56.95, track 45.96
+1770331166 [euroc   ] [  info] === Processing image 95 of 1634 at 1.74801546e+09
+1770331166 [orbslam3] [ debug] [System] Current FPS estimate 9.960893
+1770331166 [orbslam3] [ debug] Frame 1729.  Kept 2239 stereo matches of 2322 features
+1770331166 [orbslam3] [  info] TRACK: Track with motion model
+1770331166 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 985 matches in first pass
+1770331166 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 909 matches against the map
+1770331167 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  15.527607 ms 
+1770331167 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331167 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  15.633065 ms 
+1770331167 [orbslam3] [  info] Before optimization, 1388 map points, 0 outliers
+1770331167 [orbslam3] [  info] After optimization, 1388 map points, 109 outliers
+1770331167 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1279
+1770331167 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 2.287, search local points 7.874, pose optimization 11.56 everything else 0.1207
+1770331167 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 21.844966 ms 
+1770331167 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 5
+1770331167 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1279; nRefMatches: 1647; thRefRatio: 0.75
+1770331167 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=false; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331167 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.634, frame_creation 53.52, track 39.78
+1770331167 [euroc   ] [  info] === Processing image 96 of 1634 at 1.74801546e+09
+1770331167 [orbslam3] [ debug] [System] Current FPS estimate 9.952877
+1770331167 [orbslam3] [ debug] Frame 1730.  Kept 2238 stereo matches of 2322 features
+1770331167 [orbslam3] [  info] TRACK: Track with motion model
+1770331167 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 1011 matches in first pass
+1770331167 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 896 matches against the map
+1770331167 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  14.230263 ms 
+1770331167 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331167 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  14.415111 ms 
+1770331167 [orbslam3] [  info] Before optimization, 1323 map points, 0 outliers
+1770331167 [orbslam3] [  info] After optimization, 1323 map points, 118 outliers
+1770331167 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1205
+1770331167 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 2.31, search local points 8.947, pose optimization 12.24 everything else 0.1227
+1770331167 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 23.621282 ms 
+1770331167 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 4
+1770331167 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1205; nRefMatches: 1647; thRefRatio: 0.75
+1770331167 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=false; c1b=true; c1c=false; c2=true; c3=false; c4=false
+1770331167 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] !!! Create a new keyframe!
+1770331167 [orbslam3] [  info] [Tracking::CreateNewKeyFrame] New stereo KF with 101 points
+1770331167 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.897, frame_creation 48.08, track 41.3
+1770331167 [euroc   ] [  info] === Processing image 97 of 1634 at 1.74801546e+09
+1770331167 [orbslam3] [ debug] [System] Current FPS estimate 9.956778
+1770331167 [orbslam3] [ debug] Frame 1731.  Kept 2296 stereo matches of 2389 features
+1770331167 [orbslam3] [  info] TRACK: Track with motion model
+1770331167 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 999 matches in first pass
+1770331167 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 906 matches against the map
+1770331167 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  14.574321 ms 
+1770331167 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331167 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  14.634354 ms 
+1770331167 [orbslam3] [  info] Before optimization, 1507 map points, 0 outliers
+1770331167 [orbslam3] [  info] After optimization, 1507 map points, 128 outliers
+1770331167 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1379
+1770331167 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 2.318, search local points 10.94, pose optimization 11.39 everything else 0.1351
+1770331167 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 24.79412 ms 
+1770331167 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 11
+1770331167 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1379; nRefMatches: 1578; thRefRatio: 0.75
+1770331167 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=false; c1b=false; c1c=false; c2=false; c3=false; c4=false
+1770331167 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.745, frame_creation 65.41, track 43.61
+1770331167 [euroc   ] [  info] === Processing image 98 of 1634 at 1.74801546e+09
+1770331167 [orbslam3] [ debug] [System] Current FPS estimate 9.953434
+1770331167 [orbslam3] [ debug] Frame 1732.  Kept 2244 stereo matches of 2339 features
+1770331167 [orbslam3] [  info] TRACK: Track with motion model
+1770331167 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 1038 matches in first pass
+1770331167 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 936 matches against the map
+1770331167 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  26.059915 ms 
+1770331167 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331167 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  26.177857 ms 
+1770331167 [orbslam3] [  info] Before optimization, 1425 map points, 0 outliers
+1770331167 [orbslam3] [  info] After optimization, 1425 map points, 121 outliers
+1770331167 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1304
+1770331167 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 2.481, search local points 11.66, pose optimization 12.29 everything else 0.1366
+1770331167 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 26.576388 ms 
+1770331167 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 4
+1770331167 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1304; nRefMatches: 1578; thRefRatio: 0.75
+1770331167 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=false; c1b=false; c1c=false; c2=false; c3=false; c4=false
+1770331167 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 1.689, frame_creation 53.87, track 57.98
+1770331167 [euroc   ] [  info] === Processing image 99 of 1634 at 1.74801546e+09
+1770331167 [orbslam3] [  info] LoopClosing: Pushing KF 337 into queue, which is length 1
+1770331167 [orbslam3] [  info] LoopClosing: Have new frames to check
+1770331167 [orbslam3] [  info] [LoopClosing::NewDetectCommonRegions] Checking KF: 337
+1770331167 [orbslam3] [ debug] [System] Current FPS estimate 9.965089
+1770331167 [orbslam3] [ debug] Frame 1733.  Kept 2310 stereo matches of 2392 features
+1770331167 [orbslam3] [  info] TRACK: Track with motion model
+1770331167 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 1018 matches in first pass
+1770331167 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 919 matches against the map
+1770331167 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  18.861787 ms 
+1770331167 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331167 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  18.981522 ms 
+1770331167 [orbslam3] [  info] Before optimization, 1367 map points, 0 outliers
+1770331167 [orbslam3] [  info] After optimization, 1367 map points, 114 outliers
+1770331167 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1253
+1770331167 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 2.601, search local points 7.322, pose optimization 13.23 everything else 0.1457
+1770331167 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 23.305307 ms 
+1770331167 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] tracked close points: 0; non tracked close points: 6
+1770331167 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] mnMatchesInliers: 1253; nRefMatches: 1578; thRefRatio: 0.75
+1770331167 [orbslam3] [ debug] [Tracking::NeedNewKeyFrame] c1a=false; c1b=true; c1c=false; c2=false; c3=false; c4=false
+1770331167 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 2.714, frame_creation 55.63, track 45.06
+1770331167 [euroc   ] [  info] === Processing image 100 of 1634 at 1.74801546e+09
+1770331167 [orbslam3] [ debug] [System] Current FPS estimate 9.960387
+1770331167 [orbslam3] [ debug] Frame 1734.  Kept 2238 stereo matches of 2318 features
+1770331167 [orbslam3] [  info] TRACK: Track with motion model
+1770331167 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 978 matches in first pass
+1770331167 [orbslam3] [critic] *Merge detected
+Local Mapping STOP
+1770331167 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 885 matches against the map
+1770331167 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  15.995648 ms 
+1770331167 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331167 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  16.104463 ms 
+1770331167 [orbslam3] [  info] Before optimization, 1337 map points, 0 outliers
+1770331167 [orbslam3] [  info] After optimization, 1337 map points, 111 outliers
+1770331167 [orbslam3] [ debug] [Tracking::TrackLocalMap] mnMatchesInliers: 1226
+1770331167 [orbslam3] [  info] [Tracking::TrackLocalMap] Elapsed time: Update local map 2.579, search local points 9.936, pose optimization 8.317 everything else 0.1157
+1770331167 [orbslam3] [  info] [Tracking::Track] TrackLocalMap took 20.951934 ms 
+1770331167 [orbslam3] [  info] [Tracking::NeedNewKeyFrame] Not adding KF because localmap is stopped
+1770331167 [orbslam3] [  info] [Tracking::GrabImageStereo] Elapsed time (ms): image_conversion 2.271, frame_creation 52, track 39.21
+1770331167 [orbslam3] [  info] Change to map with id: 0
+1770331167 [euroc   ] [  info] === Processing image 101 of 1634 at 1.74801546e+09
+1770331167 [orbslam3] [ debug] [System] Current FPS estimate 9.961093
+1770331167 [orbslam3] [ debug] Frame 1735.  Kept 2243 stereo matches of 2328 features
+1770331167 [orbslam3] [  info] TRACK: Track with motion model
+1770331167 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] found 955 matches in first pass
+1770331167 [orbslam3] [ debug] [Tracking::TrackWithMotionModel] this led to 864 matches against the map
+1770331167 [orbslam3] [  info] [Tracking::TrackWithMotionModel]  14.04782 ms 
+1770331167 [orbslam3] [  info] [Tracking::TrackWithMotionModel] tracking is GOOD
+1770331167 [orbslam3] [  info] [Tracking::Track] !mbOnlyTracking  14.160101 ms 
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==1740208==ERROR: AddressSanitizer: SEGV on unknown address 0x503f019c6948 (pc 0x7c122c17d4a5 bp 0x000000000042 sp 0x7ffc2c6fcf90 T0)
+==1740208==The signal is caused by a READ memory access.
+    #0 0x7c122c17d4a5 in ORB_SLAM3::ORBmatcher::SearchByProjection(std::shared_ptr<ORB_SLAM3::Frame> const&, std::vector<ORB_SLAM3::MapPoint*, std::allocator<ORB_SLAM3::MapPoint*> > const&, float, bool, float) /home/nick/Documents/orbslam3.1/src/ORBmatcher.cc:251
+    #1 0x7c122c21d415 in ORB_SLAM3::Tracking::SearchLocalPoints() /home/nick/Documents/orbslam3.1/src/Tracking.cc:2635
+    #2 0x7c122c22ce60 in ORB_SLAM3::Tracking::TrackLocalMap() /home/nick/Documents/orbslam3.1/src/Tracking.cc:2149
+    #3 0x7c122c2325de in ORB_SLAM3::Tracking::Track() /home/nick/Documents/orbslam3.1/src/Tracking.cc:1314
+    #4 0x7c122c2344e9 in ORB_SLAM3::Tracking::GrabImageStereo(cv::Mat const&, cv::Mat const&, double const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) /home/nick/Documents/orbslam3.1/src/Tracking.cc:711
+    #5 0x7c122c1bc86e in ORB_SLAM3::System::TrackStereo(cv::Mat const&, cv::Mat const&, double const&, std::vector<ORB_SLAM3::IMU::Point, std::allocator<ORB_SLAM3::IMU::Point> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) /home/nick/Documents/orbslam3.1/src/System.cc:290
+    #6 0x573a213242ee in main /home/nick/Documents/orbslam3.1/Examples/EuRoC/stereo_euroc.cc:128
+    #7 0x7c122882a1c9 in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #8 0x7c122882a28a in __libc_start_main_impl ../csu/libc-start.c:360
+    #9 0x573a213250e4 in _start (/home/nick/Documents/orbslam3.1/Examples/EuRoC/RelWithDebInfo/stereo_euroc+0xd0e4) (BuildId: 7d516555fce70a8a454d60fd10315669bab6d522)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /home/nick/Documents/orbslam3.1/src/ORBmatcher.cc:251 in ORB_SLAM3::ORBmatcher::SearchByProjection(std::shared_ptr<ORB_SLAM3::Frame> const&, std::vector<ORB_SLAM3::MapPoint*, std::allocator<ORB_SLAM3::MapPoint*> > const&, float, bool, float)
+==1740208==ABORTING

@@ -28,22 +28,29 @@ if(DO_SANITIZE)
         )
 endif()
 
-#add_compile_definitions(EIGEN_DONT_VECTORIZE EIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT)
-
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+
+add_compile_definitions(BOOST_NO_CXX17_HDR_VARIANT)
 
 LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules)
 
 find_package(OpenCV 4.4)
 if(NOT OpenCV_FOUND)
-message(FATAL_ERROR "OpenCV > 4.4 not found.")
+  message(FATAL_ERROR "OpenCV > 4.4 not found.")
 endif()
 
 MESSAGE("OPENCV VERSION:")
 MESSAGE(${OpenCV_VERSION})
 
 find_package(Eigen3 CONFIG REQUIRED)
+
+# [VPR-BRIDGE] glog must be found before Sophus, because Sophus pulls in Ceres
+# which pulls in glog::glog. If the target isn't already defined when Ceres
+# tries to reference it, CMake errors with "target not found".
+find_package(glog REQUIRED)
+# [VPR-BRIDGE] end
+
 find_package(Pangolin CONFIG REQUIRED)
 find_package(Sophus CONFIG REQUIRED)
 find_package(g2o CONFIG REQUIRED)
@@ -52,14 +59,39 @@ find_package(spdlog REQUIRED)
 find_package(OpenSSL REQUIRED)
 find_package(Boost REQUIRED COMPONENTS serialization)
 
+# [VPR-BRIDGE] ROS2 dependencies ─────────────────────────────────────────────
+# ORB-SLAM3 is a plain CMake project, not an ament package. We locate ROS2
+# packages via find_package with ament_cmake paths, which requires:
+#   source ~/Documents/odometry_ws/install/setup.bash
+# in your shell before running cmake.
+#
+# colcon build the orbslam3_vpr_msgs package first:
+#   cd ~/Documents/odometry_ws
+#   colcon build --packages-select orbslam3_vpr_msgs
+#   source install/setup.bash
+find_package(rclcpp REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(cv_bridge REQUIRED)
+find_package(orbslam3_vpr_msgs REQUIRED)
+
+MESSAGE("[VPR-BRIDGE] rclcpp include dirs:              ${rclcpp_INCLUDE_DIRS}")
+MESSAGE("[VPR-BRIDGE] orbslam3_vpr_msgs include dirs:   ${orbslam3_vpr_msgs_INCLUDE_DIRS}")
+# [VPR-BRIDGE] end ────────────────────────────────────────────────────────────
+
 add_subdirectory(Thirdparty/DBoW2)
 
 include_directories(
-${PROJECT_SOURCE_DIR}
-${PROJECT_SOURCE_DIR}/include
-${PROJECT_SOURCE_DIR}/include/CameraModels
-${EIGEN3_INCLUDE_DIR}
-${Pangolin_INCLUDE_DIRS}
+  ${PROJECT_SOURCE_DIR}
+  ${PROJECT_SOURCE_DIR}/include
+  ${PROJECT_SOURCE_DIR}/include/CameraModels
+  ${EIGEN3_INCLUDE_DIR}
+  ${Pangolin_INCLUDE_DIRS}
+  # [VPR-BRIDGE] ROS2 headers — modern ament packages use targets rather than
+  # _INCLUDE_DIRS variables, so we add the ROS2 install root directly.
+  # This covers rclcpp, sensor_msgs, cv_bridge, and all generated message headers.
+  /opt/ros/kilted/include
+  ${orbslam3_vpr_msgs_INCLUDE_DIRS}
+  # [VPR-BRIDGE] end
 )
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
@@ -116,6 +148,13 @@ target_link_libraries(${PROJECT_NAME}
         spdlog::spdlog
         Boost::boost
         Boost::serialization
+        # [VPR-BRIDGE] ROS2 libraries
+        # Placed PUBLIC so any example binary linking ORB_SLAM3 also gets them.
+        ${rclcpp_LIBRARIES}
+        ${sensor_msgs_LIBRARIES}
+        cv_bridge::cv_bridge
+        ${orbslam3_vpr_msgs_LIBRARIES}
+        # [VPR-BRIDGE] end
         PRIVATE
         OpenSSL::Crypto
         Eigen3::Eigen
@@ -123,9 +162,8 @@ target_link_libraries(${PROJECT_NAME}
         g2o::core
         g2o::types_sim3
         g2o::types_slam3d
+        glog::glog
 )
-
-# Build examples
 
 # ===============================================
 # EuRoC examples
@@ -136,12 +174,6 @@ add_executable(stereo_euroc
         Examples/EuRoC/stereo_euroc.cc
         Examples/EuRoC/euroc_common.cc)
 target_link_libraries(stereo_euroc ${PROJECT_NAME})
-
-# Not ported yet...
-# add_executable(stereo_inertial_euroc
-#         Examples/EuRoC/stereo_inertial_euroc.cc
-#         Examples/EuRoC/euroc_common.cc)
-# target_link_libraries(stereo_inertial_euroc ${PROJECT_NAME})
 
 add_executable(mono_euroc
         Examples/EuRoC/mono_euroc.cc
@@ -175,7 +207,6 @@ add_executable(rgbd_tum
         Examples/TUM/rgbd_tum.cc)
 target_link_libraries(rgbd_tum ${PROJECT_NAME})
 
-
 add_executable(mono_tum
         Examples/TUM/mono_tum.cc)
 target_link_libraries(mono_tum ${PROJECT_NAME})
@@ -195,3 +226,9 @@ target_link_libraries(mono_inertial_tum_vi ${PROJECT_NAME})
 add_executable(stereo_inertial_tum_vi
         Examples/TUM/stereo_inertial_tum_vi.cc)
 target_link_libraries(stereo_inertial_tum_vi ${PROJECT_NAME})
+
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/Examples/EuRoC)
+add_executable(stereo_single_image_test
+        Examples/EuRoC/stereo_single_image_test.cc)
+target_link_libraries(stereo_single_image_test ${PROJECT_NAME})

@@ -1,0 +1,2 @@
+./Examples/EuRoC/RelWithDebInfo/stereo_euroc     Examples/EuRoC/euroc2.yaml     Vocabulary/ORBvoc.txt     ~/Documents/Datasets/euroc2/rosbag2_2025_05_23-08_50_46     ~/Documents/Datasets/euroc2/rosbag2_2025_05_23-08_50_46/mav0/cam0/data_timestamps.csv     my_stereo_run
+

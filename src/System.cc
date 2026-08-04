@@ -43,6 +43,10 @@
 #include <thread>
 #include <vector>
 
+// [VPR-BRIDGE] rclcpp must be initialized before LoopClosing is constructed.
+#include <rclcpp/rclcpp.hpp>
+// [VPR-BRIDGE] end
+
 #include "Converter.h"
 
 namespace ORB_SLAM3 {
@@ -110,7 +114,6 @@ bool System::initialize(bool initFr, const string &strSequence) {
     mpAtlas = std::make_shared<Atlas>(0);
   } else {
     // Load the file with an earlier session
-    // clock_t start = clock();
     oslog::info("Initializing Atlas from file: {}", mStrLoadAtlasFromFile);
     bool isRead = LoadAtlas(FileType::BINARY_FILE);
 
@@ -134,8 +137,6 @@ bool System::initialize(bool initFr, const string &strSequence) {
   mpMapDrawer = std::make_shared<MapDrawer>(mpAtlas, settings_);
 
   // Initialize the Tracking thread
-  // (it will live in the main thread of execution, the one that called this
-  // constructor)
   oslog::info("Seq. Name: {}", strSequence);
   mpTracker = std::make_shared<Tracking>(
       shared_from_this(), mpVocabulary, mpFrameDrawer, mpMapDrawer, mpAtlas,
@@ -161,6 +162,24 @@ bool System::initialize(bool initFr, const string &strSequence) {
 
   mptLocalMapping =
       std::make_unique<thread>(&ORB_SLAM3::LocalMapping::Run, mpLocalMapper);
+
+  // [VPR-BRIDGE] Initialize rclcpp before constructing LoopClosing.
+  // LoopClosing::InitVPRBridge() creates an rclcpp::Node internally, which
+  // requires rclcpp to already be initialized. We do it here — once, at the
+  // system level — so that any future code that also needs rclcpp (e.g. a
+  // ROS2-based viewer) can share the same context without double-init.
+  //
+  // Passing zero args is intentional: ORB-SLAM3 is a plain CMake binary,
+  // not launched via ros2 run, so there are no ROS2 CLI args to parse.
+  // If you later wrap this in a proper ROS2 node, move this call to main().
+  if (!rclcpp::ok()) {
+    int argc = 0;
+    rclcpp::init(argc, nullptr);
+    oslog::info("[VPR-BRIDGE] rclcpp initialized by System::initialize()");
+  } else {
+    oslog::info("[VPR-BRIDGE] rclcpp already initialized, skipping init.");
+  }
+  // [VPR-BRIDGE] end
 
   // Initialize the Loop Closing thread and launch
   mpLoopCloser = std::make_shared<LoopClosing>(
@@ -414,33 +433,39 @@ void System::Shutdown() {
 
   mpLocalMapper->RequestFinish();
   mpLoopCloser->RequestFinish();
-  /*if(mpViewer)
-  {
-      mpViewer->RequestFinish();
-      while(!mpViewer->isFinished())
-          usleep(5000);
-  }*/
 
-  // Wait until all thread have effectively stopped
+  if (mpViewer) {
+    mpViewer->RequestFinish();
+    while (!mpViewer->isFinished())
+      usleep(5000);
+  }
+
+  // Wait until all threads have effectively stopped
   while (!mpLocalMapper->isFinished() || !mpLoopCloser->isFinished() ||
          mpLoopCloser->isRunningGBA()) {
     if (!mpLocalMapper->isFinished()) {
       oslog::warn("mpLocalMapper is not finished");
     }
-
     if (!mpLoopCloser->isFinished()) {
       oslog::warn("mpLoopCloser is not finished");
     }
-
     if (mpLoopCloser->isRunningGBA()) {
       oslog::warn("mpLoopCloser is running GBA");
     }
-
     oslog::warn(" .... waiting");
     usleep(5000);
   }
 
   oslog::warn("All threads finished");
+
+  // [VPR-BRIDGE] Shut down rclcpp after all SLAM threads have stopped.
+  // This triggers the executor cancel inside LoopClosing::~LoopClosing(),
+  // which joins mVPRSpinThread cleanly before the node is destroyed.
+  if (rclcpp::ok()) {
+    rclcpp::shutdown();
+    oslog::info("[VPR-BRIDGE] rclcpp shutdown complete.");
+  }
+  // [VPR-BRIDGE] end
 
   const string mStrSaveAtlasToFile = settings_->atlasSaveFile();
   if (!mStrSaveAtlasToFile.empty()) {
@@ -488,8 +513,7 @@ bool System::isLost() {
   if (!mpAtlas->isImuInitialized()) {
     return false;
   } else {
-    if ((mpTracker->mState ==
-         Tracking::LOST))  // ||(mpTracker->mState==Tracking::RECENTLY_LOST))
+    if ((mpTracker->mState == Tracking::LOST))
       return true;
     else
       return false;
