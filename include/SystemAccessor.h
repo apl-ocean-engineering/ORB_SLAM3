@@ -41,6 +41,14 @@ class VPRImplementation;
 class Viewer;
 
 class SystemAccessor {
+  /// Defines a base class which holds a shared_ptr to System and can
+  /// call up the singleton instances (e.g. Settings, Atlas).
+  ///
+  /// Though not every class needs to access every singleton, there's
+  /// some merit to centralizing this interface.  Makes it easier to catch
+  /// bad accesses.
+  ///
+
  public:
   explicit SystemAccessor(const std::shared_ptr<System> &pSys = nullptr);
 
