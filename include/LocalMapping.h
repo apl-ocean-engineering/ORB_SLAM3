@@ -21,36 +21,32 @@
 
 #pragma once
 
+#include <Eigen/Eigen>
+#include <fstream>
 #include <list>
 #include <memory>
 #include <mutex>
 #include <string>
 #include <vector>
 
-#include "Atlas.h"
-#include "KeyFrame.h"
-#include "KeyFrameDatabase.h"
-#include "LoopClosing.h"
-#include "Settings.h"
-#include "Tracking.h"
+#include "SystemAccessor.h"
 
 namespace ORB_SLAM3 {
 
-class System;
-class Tracking;
-class LoopClosing;
-class Atlas;
+class KeyFrame;
+class Map;
+class MapPoint;
 
-class LocalMapping {
+using std::ofstream;
+using std::string;
+using std::unique_lock;
+using std::vector;
+
+class LocalMapping : public SystemAccessor {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   LocalMapping(const std::shared_ptr<System> &pSys,
-               const std::shared_ptr<Atlas> &pAtlas, const float bMonocular,
-               bool bInertial, const string &_strSeqName = std::string());
-
-  void SetLoopCloser(const std::shared_ptr<LoopClosing> &pLoopCloser);
-
-  void SetTracker(const std::shared_ptr<Tracking> &pTracker);
+               const string &_strSeqName = std::string());
 
   // Main function
   void Run();
@@ -142,8 +138,6 @@ class LocalMapping {
   void SearchInNeighbors();
   void KeyFrameCulling();
 
-  std::shared_ptr<System> mpSystem;
-
   bool mbMonocular;
   bool mbInertial;
 
@@ -158,11 +152,6 @@ class LocalMapping {
   bool mbFinishRequested;
   bool mbFinished;
   std::mutex mMutexFinish;
-
-  std::shared_ptr<Atlas> mpAtlas;
-
-  std::shared_ptr<LoopClosing> mpLoopCloser;
-  std::shared_ptr<Tracking> mpTracker;
 
   std::list<std::shared_ptr<KeyFrame>> mlNewKeyFrames;
 

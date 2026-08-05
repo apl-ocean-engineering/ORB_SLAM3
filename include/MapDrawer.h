@@ -27,21 +27,16 @@
 #include <mutex>
 
 #include "Atlas.h"
-#include "KeyFrame.h"
 #include "MapPoint.h"
-#include "Settings.h"
+#include "SystemAccessor.h"
 
 namespace ORB_SLAM3 {
 
-class Settings;
-
-class MapDrawer {
+class MapDrawer : public SystemAccessor {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  MapDrawer(const std::shared_ptr<Atlas> &pAtlas,
-            const std::shared_ptr<Settings> &settings);
 
-  std::shared_ptr<Atlas> mpAtlas;
+  explicit MapDrawer(const std::shared_ptr<System> &pSys);
 
   void DrawMapPoints();
   void DrawKeyFrames(const bool bDrawKF, const bool bDrawGraph,
@@ -53,8 +48,6 @@ class MapDrawer {
                                     pangolin::OpenGlMatrix &MOw);
 
  private:
-  void newParameterLoader(const std::shared_ptr<Settings> &ssettings);
-
   float mKeyFrameSize;
   float mKeyFrameLineWidth;
   float mGraphLineWidth;

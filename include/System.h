@@ -177,9 +177,6 @@ class System : public std::enable_shared_from_this<System> {
   std::vector<MapPoint *> GetTrackedMapPoints();
   std::vector<cv::KeyPoint> GetTrackedKeyPointsUn();
 
-  std::shared_ptr<FrameDrawer> frameDrawer() { return mpFrameDrawer; }
-  std::shared_ptr<MapDrawer> mapDrawer() { return mpMapDrawer; }
-
   const SensorType sensorType() const { return settings_->sensor_; }
 
   // For debugging
@@ -202,7 +199,12 @@ class System : public std::enable_shared_from_this<System> {
   // Member accessors
   std::shared_ptr<Atlas> getAtlas() { return mpAtlas; }
 
-  std::shared_ptr<VPRImplementation> getVprImplementation() {
+  // Assume this is called at startup, who knows what happens if you call it
+  // mid-stream
+  void setVPRImplementation(const std::shared_ptr<VPRImplementation> &vpr) {
+    mpVprImpl = vpr;
+  }
+  std::shared_ptr<VPRImplementation> getVPRImplementation() {
     return mpVprImpl;
   }
   std::shared_ptr<ORBVocabulary> getORBVocabulary() { return mpVocabulary; }
@@ -217,6 +219,9 @@ class System : public std::enable_shared_from_this<System> {
 
   std::shared_ptr<LocalMapping> getLocalMapping() { return mpLocalMapper; }
   std::shared_ptr<LoopClosing> getLoopClosing() { return mpLoopCloser; }
+
+  std::shared_ptr<GeometricCamera> getPrimaryCamera() { return mpPriCamera; }
+  std::shared_ptr<GeometricCamera> getSecondaryCamera() { return mpSecCamera; }
 
  protected:
   // Initialize the SLAM system. It launches the Local Mapping, Loop Closing and
@@ -278,6 +283,8 @@ class System : public std::enable_shared_from_this<System> {
   std::unique_ptr<std::thread> mptLocalMapping;
   std::unique_ptr<std::thread> mptLoopClosing;
   std::unique_ptr<std::thread> mptViewer;
+
+  std::shared_ptr<GeometricCamera> mpPriCamera, mpSecCamera;
 
   // Reset flag
   std::mutex mMutexReset;

@@ -24,16 +24,20 @@
 
 #include <memory>
 
+#include "Types.h"
+
 namespace ORB_SLAM3 {
 
 class Atlas;
 class FrameDrawer;
+class GeometricCamera;
 class LocalMapping;
 class LoopClosing;
 class MapDrawer;
 class Settings;
 class System;
 class Tracking;
+class VPRImplementation;
 class Viewer;
 
 class SystemAccessor {
@@ -47,10 +51,15 @@ class SystemAccessor {
   // System
   std::shared_ptr<System> system();
 
+  const std::shared_ptr<System> system() const;
+
+  const SensorType sensorType() const;
+
   std::shared_ptr<Settings> getSettings();
   std::shared_ptr<LocalMapping> getLocalMapper();
   std::shared_ptr<LoopClosing> getLoopClosing();
   std::shared_ptr<Tracking> getTracker();
+  std::shared_ptr<VPRImplementation> getVPRImplementation();
 
   // Drawers
   std::shared_ptr<Viewer> getViewer();
@@ -60,6 +69,9 @@ class SystemAccessor {
 
   // Atlas
   std::shared_ptr<Atlas> getAtlas();
+
+  std::shared_ptr<GeometricCamera> getPrimaryCamera();
+  std::shared_ptr<GeometricCamera> getSecondaryCamera();
 
  private:
   // System

@@ -176,12 +176,12 @@ bool System::initialize(bool initFr, const string &strSequence) {
 
   if (sensorType().isImu()) mpAtlas->SetInertialSensor();
 
-  // Only draw right image in stereo modes
-  const bool frame_drawer_both = sensorType().isStereo();
+  mpPriCamera = getSettings()->camera1();
 
   // Create Drawers. These are used by the Viewer
+  const bool frame_drawer_both = sensorType().isStereo();
   mpFrameDrawer = std::make_shared<FrameDrawer>(mpAtlas, frame_drawer_both);
-  mpMapDrawer = std::make_shared<MapDrawer>(mpAtlas, settings_);
+  mpMapDrawer = std::make_shared<MapDrawer>(shared_from_this());
 
   // Initialize the Tracking thread
   // (it will live in the main thread of execution, the one that called this
@@ -190,9 +190,8 @@ bool System::initialize(bool initFr, const string &strSequence) {
   mpTracker = std::make_shared<Tracking>(shared_from_this(), strSequence);
 
   // Initialize the Local Mapping thread and launch
-  mpLocalMapper = std::make_shared<LocalMapping>(
-      shared_from_this(), mpAtlas, sensorType().isMonocular(),
-      sensorType().isImu(), strSequence);
+  mpLocalMapper =
+      std::make_shared<LocalMapping>(shared_from_this(), strSequence);
   mpLocalMapper->mInitFr = initFr;
   mpLocalMapper->mThFarPoints = settings_->thFarPoints();
 
@@ -212,8 +211,7 @@ bool System::initialize(bool initFr, const string &strSequence) {
 
   // Initialize the Loop Closing thread and launch
   mpLoopCloser = std::make_shared<LoopClosing>(
-      mpAtlas, mpVprImpl, mpVocabulary, sensorType() != SensorType::MONOCULAR,
-      activeLC);
+      shared_from_this(), sensorType() != SensorType::MONOCULAR, activeLC);
   mptLoopClosing =
       std::make_unique<thread>(&ORB_SLAM3::LoopClosing::Run, mpLoopCloser);
 
@@ -221,11 +219,11 @@ bool System::initialize(bool initFr, const string &strSequence) {
   // mpTracker->SetLocalMapper(mpLocalMapper);
   // mpTracker->SetLoopClosing(mpLoopCloser);
 
-  mpLocalMapper->SetTracker(mpTracker);
-  mpLocalMapper->SetLoopCloser(mpLoopCloser);
+  // mpLocalMapper->SetTracker(mpTracker);
+  // mpLocalMapper->SetLoopCloser(mpLoopCloser);
 
-  mpLoopCloser->SetTracker(mpTracker);
-  mpLoopCloser->SetLocalMapper(mpLocalMapper);
+  // mpLoopCloser->SetTracker(mpTracker);
+  // mpLoopCloser->SetLocalMapper(mpLocalMapper);
 
   // Initialize the Viewer thread and launch
   oslog::info("Viewer enabled: {}", settings_->useViewer_ ? "YES" : "NO");
@@ -233,7 +231,7 @@ bool System::initialize(bool initFr, const string &strSequence) {
     mpViewer = std::make_shared<Viewer>(shared_from_this());
     mptViewer = std::make_unique<thread>(&Viewer::Run, mpViewer);
     // mpTracker->SetViewer(mpViewer);
-    mpLoopCloser->mpViewer = mpViewer;
+    // mpLoopCloser->mpViewer = mpViewer;
     mpViewer->both = mpFrameDrawer->both;
   }
 

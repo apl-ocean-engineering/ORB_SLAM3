@@ -74,19 +74,19 @@ Tracking::Tracking(const std::shared_ptr<System>& pSys, const string& _nameSeq)
   newParameterLoader(system()->getSettings());
 
   {
-    vector<std::shared_ptr<GeometricCamera>> vpCams =
-        getAtlas()->GetAllCameras();
-    oslog::debug("There are {} cameras in the atlas", vpCams.size());
+    // vector<std::shared_ptr<GeometricCamera>> vpCams =
+    //     getAtlas()->GetAllCameras();
+    // oslog::debug("There are {} cameras in the atlas", vpCams.size());
 
-    for (auto const& pCam : vpCams) {
-      if (pCam->GetType() == GeometricCamera::CAM_PINHOLE) {
-        oslog::debug("Camera {} is pinhole", pCam->GetId());
-      } else if (pCam->GetType() == GeometricCamera::CAM_FISHEYE) {
-        oslog::debug("Camera {} is fisheye", pCam->GetId());
-      } else {
-        oslog::debug("Camera {} is unknown", pCam->GetId());
-      }
-    }
+    // for (auto const& pCam : vpCams) {
+    //   if (pCam->GetType() == GeometricCamera::CAM_PINHOLE) {
+    //     oslog::debug("Camera {} is pinhole", pCam->GetId());
+    //   } else if (pCam->GetType() == GeometricCamera::CAM_FISHEYE) {
+    //     oslog::debug("Camera {} is fisheye", pCam->GetId());
+    //   } else {
+    //     oslog::debug("Camera {} is unknown", pCam->GetId());
+    //   }
+    // }
   }
 
 #ifdef REGISTER_TIMES
@@ -541,7 +541,7 @@ Tracking::~Tracking() {
 
 void Tracking::newParameterLoader(const std::shared_ptr<Settings>& settings) {
   mpCamera = settings->camera1();
-  mpCamera = getAtlas()->AddCamera(mpCamera);
+  // mpCamera = getAtlas()->AddCamera(mpCamera);
 
   if (settings->needToUndistort()) {
     mDistCoef = settings->camera1DistortionCoef();
@@ -570,7 +570,7 @@ void Tracking::newParameterLoader(const std::shared_ptr<Settings>& settings) {
        mSensor == SensorType::IMU_RGBD) &&
       settings->cameraType() == Settings::KannalaBrandt) {
     mpCamera2 = settings->camera2();
-    mpCamera2 = getAtlas()->AddCamera(mpCamera2);
+    // mpCamera2 = getAtlas()->AddCamera(mpCamera2);
 
     mTlr = settings->Tlr();
 
@@ -1555,7 +1555,7 @@ void Tracking::StereoInitialization() {
     // Create KeyFrame
     std::shared_ptr<KeyFrame> pKFini =
         std::make_shared<KeyFrame>(mCurrentFrame, getAtlas()->GetCurrentMap(),
-                                   system()->getVprImplementation());
+                                   system()->getVPRImplementation());
 
     // Insert KeyFrame in the map
     getAtlas()->AddKeyFrame(pKFini);
@@ -1714,10 +1714,10 @@ void Tracking::CreateInitialMapMonocular() {
   // Create KeyFrames
   std::shared_ptr<KeyFrame> pKFini =
       std::make_shared<KeyFrame>(mInitialFrame, getAtlas()->GetCurrentMap(),
-                                 system()->getVprImplementation());
+                                 system()->getVPRImplementation());
   std::shared_ptr<KeyFrame> pKFcur =
       std::make_shared<KeyFrame>(mCurrentFrame, getAtlas()->GetCurrentMap(),
-                                 system()->getVprImplementation());
+                                 system()->getVPRImplementation());
 
   if (mSensor == SensorType::IMU_MONOCULAR) pKFini->mpImuPreintegrated.reset();
 
@@ -2456,7 +2456,7 @@ void Tracking::CreateNewKeyFrame() {
 
   std::shared_ptr<KeyFrame> pKF =
       std::make_shared<KeyFrame>(mCurrentFrame, getAtlas()->GetCurrentMap(),
-                                 system()->getVprImplementation());
+                                 system()->getVPRImplementation());
 
   if (getAtlas()
           ->isImuInitialized())  //  || getLocalMapper()->IsInitializing())
@@ -2797,7 +2797,7 @@ bool Tracking::Relocalization() {
   // Track Lost: Query KeyFrame Database for keyframe candidates for
   // relocalisation
   auto vpCandidateKFs =
-      system()->getVprImplementation()->DetectRelocalizationCandidates(
+      system()->getVPRImplementation()->DetectRelocalizationCandidates(
           mCurrentFrame, getAtlas()->GetCurrentMap());
 
   if (vpCandidateKFs.empty()) {
@@ -2975,7 +2975,7 @@ void Tracking::Reset(bool bLocMap) {
 
   // Clear BoW Database
   oslog::debug("[Tracking::Reset] !! resetting Database...");
-  system()->getVprImplementation()->clear();
+  system()->getVPRImplementation()->clear();
 
   // Clear Map (this erase MapPoints and KeyFrames)
   getAtlas()->clearAtlas();
@@ -3026,7 +3026,7 @@ void Tracking::ResetActiveMap(bool bLocMap) {
 
   // Clear BoW Database
   oslog::info("[Tracking::ResetActiveMap] !! resetting Database");
-  system()->getVprImplementation()->clearMap(
+  system()->getVPRImplementation()->clearMap(
       pMap);  // Only clear the active map references
 
   // Clear Map (this erase MapPoints and KeyFrames)

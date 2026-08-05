@@ -46,14 +46,17 @@ class VPRImplementation {
   virtual void clearMap(const std::shared_ptr<Map> &pMap) = 0;
 
   // Loop and Merge Detection
-  virtual void DetectCandidates(
-      const std::shared_ptr<KeyFrame> &pKF, float minScore,
-      vector<std::shared_ptr<KeyFrame>> &vpLoopCand,
-      vector<std::shared_ptr<KeyFrame>> &vpMergeCand) = 0;
-  virtual void DetectBestCandidates(
-      const std::shared_ptr<KeyFrame> &pKF,
-      vector<std::shared_ptr<KeyFrame>> &vpLoopCand,
-      vector<std::shared_ptr<KeyFrame>> &vpMergeCand, int nMinWords) = 0;
+  // These aren't used?
+  //
+  //   virtual void DetectCandidates(
+  //       const std::shared_ptr<KeyFrame> &pKF, float minScore,
+  //       vector<std::shared_ptr<KeyFrame>> &vpLoopCand,
+  //       vector<std::shared_ptr<KeyFrame>> &vpMergeCand) = 0;
+  //   virtual void DetectBestCandidates(
+  //       const std::shared_ptr<KeyFrame> &pKF,
+  //       vector<std::shared_ptr<KeyFrame>> &vpLoopCand,
+  //       vector<std::shared_ptr<KeyFrame>> &vpMergeCand, int nMinWords) = 0;
+
   virtual void DetectNBestCandidates(
       const std::shared_ptr<KeyFrame> &pKF,
       vector<std::shared_ptr<KeyFrame>> &vpLoopCand,

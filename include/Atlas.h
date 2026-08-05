@@ -59,8 +59,8 @@ class Atlas : public SystemAccessor {
     // for ubuntu 16.04, a vector is serializated
     // ar & mspMaps;
     ar & mvpBackupMaps;
-    ar & mvpCameras;
-    // Need to save/load the static Id from Frame, KeyFrame, MapPoint and Map
+    // ar & mvpCameras;
+    //  Need to save/load the static Id from Frame, KeyFrame, MapPoint and Map
     ar &Map::nNextId;
     ar &Frame::nNextId;
     ar &KeyFrame::nNextId;
@@ -91,9 +91,9 @@ class Atlas : public SystemAccessor {
   // void EraseMapPoint(MapPoint* pMP);
   // void EraseKeyFrame(KeyFrame* pKF);
 
-  std::shared_ptr<GeometricCamera> AddCamera(
-      const std::shared_ptr<GeometricCamera> &pCam);
-  std::vector<std::shared_ptr<GeometricCamera>> GetAllCameras();
+  // std::shared_ptr<GeometricCamera> AddCamera(
+  //     const std::shared_ptr<GeometricCamera> &pCam);
+  // std::vector<std::shared_ptr<GeometricCamera>> GetAllCameras();
 
   /* All methods without Map pointer work on current map */
   void SetReferenceMapPoints(const std::vector<MapPoint *> &vpMPs);
@@ -145,7 +145,7 @@ class Atlas : public SystemAccessor {
 
   std::shared_ptr<Map> mpCurrentMap;
 
-  std::vector<std::shared_ptr<GeometricCamera>> mvpCameras;
+  // std::vector<std::shared_ptr<GeometricCamera>> mvpCameras;
 
   unsigned long int mnLastInitKFidMap;
 

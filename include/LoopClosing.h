@@ -48,7 +48,8 @@ class LocalMapping;
 class BoWKeyFrameDatabase;
 class Map;
 
-class LoopClosing : public enable_shared_from_this<LoopClosing> {
+class LoopClosing : public SystemAccessor,
+                    public enable_shared_from_this<LoopClosing> {
  public:
   typedef pair<set<std::shared_ptr<KeyFrame> >, int> ConsistentGroup;
   typedef map<std::shared_ptr<KeyFrame>, g2o::Sim3,
@@ -61,14 +62,8 @@ class LoopClosing : public enable_shared_from_this<LoopClosing> {
   LoopClosing() = delete;
   LoopClosing(const LoopClosing &) = delete;
 
-  LoopClosing(const std::shared_ptr<Atlas> &pAtlas,
-              const std::shared_ptr<VPRImplementation> &pDB,
-              const std::shared_ptr<ORBVocabulary> &pVoc, const bool bFixScale,
+  LoopClosing(const std::shared_ptr<System> &pSys, const bool bFixScale,
               const bool bActiveLC);
-
-  void SetTracker(const std::shared_ptr<Tracking> &pTracker);
-
-  void SetLocalMapper(const std::shared_ptr<LocalMapping> &pLocalMapper);
 
   // Main function
   void Run();
@@ -94,9 +89,6 @@ class LoopClosing : public enable_shared_from_this<LoopClosing> {
   void RequestFinish();
 
   bool isFinished();
-
-  // \amm Unused?
-  std::shared_ptr<Viewer> mpViewer;
 
 #ifdef REGISTER_TIMES
 
@@ -182,14 +174,6 @@ class LoopClosing : public enable_shared_from_this<LoopClosing> {
   bool mbFinishRequested;
   bool mbFinished;
   std::mutex mMutexFinish;
-
-  std::shared_ptr<Atlas> mpAtlas;
-  std::shared_ptr<Tracking> mpTracker;
-
-  std::shared_ptr<VPRImplementation> mpVprImplementation;
-  std::shared_ptr<ORBVocabulary> mpORBVocabulary;
-
-  std::shared_ptr<LocalMapping> mpLocalMapper;
 
   std::list<std::shared_ptr<KeyFrame> > mlpLoopKeyFrameQueue;
 

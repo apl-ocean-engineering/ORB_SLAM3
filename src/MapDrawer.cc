@@ -33,13 +33,10 @@
 
 namespace ORB_SLAM3 {
 
-MapDrawer::MapDrawer(const std::shared_ptr<Atlas> &pAtlas,
-                     const std::shared_ptr<Settings> &settings)
-    : mpAtlas(pAtlas) {
-  newParameterLoader(settings);
-}
+MapDrawer::MapDrawer(const std::shared_ptr<System> &pSys)
+    : SystemAccessor(pSys) {
+  auto const settings = getSettings();
 
-void MapDrawer::newParameterLoader(const std::shared_ptr<Settings> &settings) {
   mKeyFrameSize = settings->keyFrameSize();
   mKeyFrameLineWidth = settings->keyFrameLineWidth();
   mGraphLineWidth = settings->graphLineWidth();
@@ -49,7 +46,7 @@ void MapDrawer::newParameterLoader(const std::shared_ptr<Settings> &settings) {
 }
 
 void MapDrawer::DrawMapPoints() {
-  std::shared_ptr<Map> pActiveMap = mpAtlas->GetCurrentMap();
+  std::shared_ptr<Map> pActiveMap = getAtlas()->GetCurrentMap();
   if (!pActiveMap) return;
 
   const vector<MapPoint *> &vpMPs = pActiveMap->GetAllMapPoints();
@@ -91,7 +88,7 @@ void MapDrawer::DrawKeyFrames(const bool bDrawKF, const bool bDrawGraph,
   const float h = w * 0.75;
   const float z = w * 0.6;
 
-  std::shared_ptr<Map> pActiveMap = mpAtlas->GetCurrentMap();
+  std::shared_ptr<Map> pActiveMap = getAtlas()->GetCurrentMap();
   // DEBUG LBA
   std::set<long unsigned int> sOptKFs = pActiveMap->msOptKFs;
   std::set<long unsigned int> sFixedKFs = pActiveMap->msFixedKFs;
@@ -219,7 +216,7 @@ void MapDrawer::DrawKeyFrames(const bool bDrawKF, const bool bDrawGraph,
     glEnd();
   }
 
-  vector<std::shared_ptr<Map>> vpMaps = mpAtlas->GetAllMaps();
+  vector<std::shared_ptr<Map>> vpMaps = getAtlas()->GetAllMaps();
 
   if (bDrawKF) {
     for (auto pMap : vpMaps) {

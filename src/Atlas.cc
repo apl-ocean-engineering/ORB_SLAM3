@@ -94,20 +94,20 @@ void Atlas::AddMapPoint(MapPoint *pMP) {
   pMapMP->AddMapPoint(pMP);
 }
 
-std::shared_ptr<GeometricCamera> Atlas::AddCamera(
-    const std::shared_ptr<GeometricCamera> &pCam) {
-  auto const it = std::find(mvpCameras.begin(), mvpCameras.end(), pCam);
-  if (it != mvpCameras.end()) {
-    return *it;
-  }
+// std::shared_ptr<GeometricCamera> Atlas::AddCamera(
+//     const std::shared_ptr<GeometricCamera> &pCam) {
+//   auto const it = std::find(mvpCameras.begin(), mvpCameras.end(), pCam);
+//   if (it != mvpCameras.end()) {
+//     return *it;
+//   }
 
-  mvpCameras.push_back(pCam);
-  return pCam;
-}
+//   mvpCameras.push_back(pCam);
+//   return pCam;
+// }
 
-std::vector<std::shared_ptr<GeometricCamera>> Atlas::GetAllCameras() {
-  return mvpCameras;
-}
+// std::vector<std::shared_ptr<GeometricCamera>> Atlas::GetAllCameras() {
+//   return mvpCameras;
+// }
 
 void Atlas::SetReferenceMapPoints(const std::vector<MapPoint *> &vpMPs) {
   unique_lock<mutex> lock(mMutexAtlas);
@@ -238,8 +238,10 @@ void Atlas::PreSave() {
   std::copy(mspMaps.begin(), mspMaps.end(), std::back_inserter(mvpBackupMaps));
   sort(mvpBackupMaps.begin(), mvpBackupMaps.end(), compFunctor());
 
-  std::set<std::shared_ptr<GeometricCamera>> spCams(mvpCameras.begin(),
-                                                    mvpCameras.end());
+  // std::set<std::shared_ptr<GeometricCamera>> spCams(mvpCameras.begin(),
+  //                                                   mvpCameras.end());
+  std::set<std::shared_ptr<GeometricCamera>> spCams;
+
   for (auto pMi : mvpBackupMaps) {
     if (!pMi || pMi->IsBad()) continue;
 
@@ -255,15 +257,15 @@ void Atlas::PreSave() {
 
 void Atlas::PostLoad() {
   map<unsigned int, std::shared_ptr<GeometricCamera>> mpCams;
-  for (auto pCam : mvpCameras) {
-    mpCams[pCam->GetId()] = pCam;
-  }
+  // for (auto pCam : mvpCameras) {
+  //   mpCams[pCam->GetId()] = pCam;
+  // }
 
   mspMaps.clear();
   unsigned long int numKF = 0, numMP = 0;
   for (auto pMi : mvpBackupMaps) {
     mspMaps.insert(pMi);
-    pMi->PostLoad(system()->getVprImplementation(),
+    pMi->PostLoad(system()->getVPRImplementation(),
                   system()->getORBVocabulary(), mpCams);
     numKF += pMi->GetAllKeyFrames().size();
     numMP += pMi->GetAllMapPoints().size();

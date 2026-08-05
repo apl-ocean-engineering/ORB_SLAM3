@@ -68,14 +68,15 @@ class BoWKeyFrameDatabase : public VPRImplementation {
   //     const std::shared_ptr<KeyFrame> &pKF, float minScore);
 
   // Loop and Merge Detection
-  void DetectCandidates(
-      const std::shared_ptr<KeyFrame> &pKF, float minScore,
-      vector<std::shared_ptr<KeyFrame>> &vpLoopCand,
-      vector<std::shared_ptr<KeyFrame>> &vpMergeCand) override;
-  void DetectBestCandidates(const std::shared_ptr<KeyFrame> &pKF,
-                            vector<std::shared_ptr<KeyFrame>> &vpLoopCand,
-                            vector<std::shared_ptr<KeyFrame>> &vpMergeCand,
-                            int nMinWords) override;
+  // void DetectCandidates(
+  //     const std::shared_ptr<KeyFrame> &pKF, float minScore,
+  //     vector<std::shared_ptr<KeyFrame>> &vpLoopCand,
+  //     vector<std::shared_ptr<KeyFrame>> &vpMergeCand) override;
+  // void DetectBestCandidates(const std::shared_ptr<KeyFrame> &pKF,
+  //                           vector<std::shared_ptr<KeyFrame>> &vpLoopCand,
+  //                           vector<std::shared_ptr<KeyFrame>> &vpMergeCand,
+  //                           int nMinWords) override;
+
   void DetectNBestCandidates(const std::shared_ptr<KeyFrame> &pKF,
                              vector<std::shared_ptr<KeyFrame>> &vpLoopCand,
                              vector<std::shared_ptr<KeyFrame>> &vpMergeCand,
@@ -88,7 +89,7 @@ class BoWKeyFrameDatabase : public VPRImplementation {
 
   void PreSave();
   void PostLoad(map<long unsigned int, std::shared_ptr<KeyFrame>> mpKFid);
-  void SetORBVocabulary(const std::shared_ptr<ORBVocabulary> &pORBVoc);
+  // void SetORBVocabulary(const std::shared_ptr<ORBVocabulary> &pORBVoc);
 
  protected:
   // Associated vocabulary

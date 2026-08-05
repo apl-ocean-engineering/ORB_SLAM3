@@ -27,6 +27,7 @@
 
 #include "Atlas.h"
 #include "FrameDrawer.h"
+#include "GeometricCamera.h"
 #include "LocalMapping.h"
 #include "LoopClosing.h"
 #include "Settings.h"
@@ -46,6 +47,16 @@ std::shared_ptr<System> SystemAccessor::system() {
   assert(mpSystem);
   return mpSystem;
 }
+
+const std::shared_ptr<System> SystemAccessor::system() const {
+  assert(mpSystem);
+  return mpSystem;
+}
+
+const SensorType SystemAccessor::sensorType() const {
+  return system()->sensorType();
+}
+
 std::shared_ptr<Settings> SystemAccessor::getSettings() {
   return system()->getSettings();
 }
@@ -73,6 +84,18 @@ std::shared_ptr<LocalMapping> SystemAccessor::getLocalMapper() {
 }
 std::shared_ptr<LoopClosing> SystemAccessor::getLoopClosing() {
   return system()->getLoopClosing();
+}
+
+std::shared_ptr<VPRImplementation> SystemAccessor::getVPRImplementation() {
+  return system()->getVPRImplementation();
+}
+
+std::shared_ptr<GeometricCamera> SystemAccessor::getPrimaryCamera() {
+  return system()->getPrimaryCamera();
+}
+
+std::shared_ptr<GeometricCamera> SystemAccessor::getSecondaryCamera() {
+  return system()->getSecondaryCamera();
 }
 
 }  // namespace ORB_SLAM3

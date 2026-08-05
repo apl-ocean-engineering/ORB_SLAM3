@@ -40,17 +40,13 @@
 
 namespace ORB_SLAM3 {
 
-LoopClosing::LoopClosing(const std::shared_ptr<Atlas>& pAtlas,
-                         const std::shared_ptr<VPRImplementation>& pDB,
-                         const std::shared_ptr<ORBVocabulary>& pVoc,
+LoopClosing::LoopClosing(const std::shared_ptr<System>& pSys,
                          const bool bFixScale, const bool bActiveLC)
-    : mbResetRequested(false),
+    : SystemAccessor(pSys),
+      mbResetRequested(false),
       mbResetActiveMapRequested(false),
       mbFinishRequested(false),
       mbFinished(true),
-      mpAtlas(pAtlas),
-      mpVprImplementation(pDB),
-      mpORBVocabulary(pVoc),
       mpMatchedKF(NULL),
       mLastLoopKFid(0),
       mbRunningGBA(false),
@@ -104,15 +100,6 @@ LoopClosing::LoopClosing(const std::shared_ptr<Atlas>& pAtlas,
   mnCorrectionGBA = 0;
 }
 
-void LoopClosing::SetTracker(const std::shared_ptr<Tracking>& pTracker) {
-  mpTracker = pTracker;
-}
-
-void LoopClosing::SetLocalMapper(
-    const std::shared_ptr<LocalMapping>& pLocalMapper) {
-  mpLocalMapper = pLocalMapper;
-}
-
 void LoopClosing::Run() {
   mbFinished = false;
 
@@ -147,7 +134,7 @@ void LoopClosing::Run() {
 #endif
       if (bFindedRegion) {
         if (mbMergeDetected) {
-          if ((mpTracker->mSensor.isImu()) &&
+          if ((sensorType().isImu()) &&
               (!mpCurrentKF->GetMap()->isImuInitialized())) {
             cout << "IMU is not initilized, merge is aborted" << endl;
           } else {
@@ -176,7 +163,7 @@ void LoopClosing::Run() {
                 continue;
               }
               // If inertial, force only yaw
-              if ((mpTracker->mSensor.isImu()) &&
+              if ((sensorType().isImu()) &&
                   mpCurrentKF->GetMap()->GetInertialBA1()) {
                 Eigen::Vector3d phi =
                     LogSO3(mSold_new.rotation().toRotationMatrix());
@@ -191,7 +178,7 @@ void LoopClosing::Run() {
 
             mg2oMergeScw = mg2oMergeSlw;
 
-            // mpTracker->SetStepByStep(true);
+            // getTracker()->SetStepByStep(true);
 
             Verbose::PrintMess("*Merge detected", Verbose::VERBOSITY_QUIET);
 
@@ -202,7 +189,7 @@ void LoopClosing::Run() {
             nMerges += 1;
 #endif
             // TODO UNCOMMENT
-            if (mpTracker->mSensor.isImu())
+            if (sensorType().isImu())
               MergeLocal2();
             else
               MergeLocal();
@@ -268,7 +255,7 @@ void LoopClosing::Run() {
                 fabs(phi(2)) < 0.349f) {
               if (mpCurrentKF->GetMap()->IsInertial()) {
                 // If inertial, force only yaw
-                if ((mpTracker->mSensor.isImu()) &&
+                if ((sensorType().isImu()) &&
                     mpCurrentKF->GetMap()->GetInertialBA2()) {
                   phi(0) = 0;
                   phi(1) = 0;
@@ -369,18 +356,18 @@ bool LoopClosing::NewDetectCommonRegions() {
   }
 
   if (mpLastMap->IsInertial() && !mpLastMap->GetInertialBA2()) {
-    mpVprImplementation->add(mpCurrentKF);
+    getVPRImplementation()->add(mpCurrentKF);
     mpCurrentKF->SetErase();
     return false;
   }
 
-  if (mpTracker->mSensor == SensorType::STEREO &&
+  if (sensorType() == SensorType::STEREO &&
       mpLastMap->GetAllKeyFrames().size() < 5) {
     oslog::info(
         "[LoopClosing::NewDetectCommonRegions] Stereo KF inserted without "
         "check: {}",
         mpCurrentKF->mnId);
-    mpVprImplementation->add(mpCurrentKF);
+    getVPRImplementation()->add(mpCurrentKF);
     mpCurrentKF->SetErase();
     return false;
   }
@@ -390,7 +377,7 @@ bool LoopClosing::NewDetectCommonRegions() {
         "[LoopClosing::NewDetectCommonRegions] Stereo KF inserted without "
         "check, map is small: {}",
         mpCurrentKF->mnId);
-    mpVprImplementation->add(mpCurrentKF);
+    getVPRImplementation()->add(mpCurrentKF);
     mpCurrentKF->SetErase();
     return false;
   }
@@ -504,7 +491,7 @@ bool LoopClosing::NewDetectCommonRegions() {
 #ifdef REGISTER_TIMES
     vdEstSim3_ms.push_back(timeEstSim3);
 #endif
-    mpVprImplementation->add(mpCurrentKF);
+    getVPRImplementation()->add(mpCurrentKF);
     return true;
   }
 
@@ -523,8 +510,8 @@ bool LoopClosing::NewDetectCommonRegions() {
     std::chrono::steady_clock::time_point time_StartQuery =
         std::chrono::steady_clock::now();
 #endif
-    mpVprImplementation->DetectNBestCandidates(mpCurrentKF, vpLoopBowCand,
-                                               vpMergeBowCand, 3);
+    getVPRImplementation()->DetectNBestCandidates(mpCurrentKF, vpLoopBowCand,
+                                                  vpMergeBowCand, 3);
 #ifdef REGISTER_TIMES
     std::chrono::steady_clock::time_point time_EndQuery =
         std::chrono::steady_clock::now();
@@ -566,7 +553,7 @@ bool LoopClosing::NewDetectCommonRegions() {
   vdEstSim3_ms.push_back(timeEstSim3);
 #endif
 
-  mpVprImplementation->add(mpCurrentKF);
+  getVPRImplementation()->add(mpCurrentKF);
 
   if (mbMergeDetected || mbLoopDetected) {
     return true;
@@ -602,7 +589,7 @@ bool LoopClosing::DetectAndReffineSim3FromLastKF(
 
     bool bFixedScale =
         mbFixScale;  // TODO CHECK; Solo para el monocular inertial
-    if (mpTracker->mSensor == SensorType::IMU_MONOCULAR &&
+    if (sensorType() == SensorType::IMU_MONOCULAR &&
         !pCurrentKF->GetMap()->GetInertialBA2())
       bFixedScale = false;
     int numOptMatches =
@@ -745,7 +732,7 @@ bool LoopClosing::DetectCommonRegionsFromBoW(
     if (numBoWMatches >= nBoWMatches) {
       // Geometric validation
       bool bFixedScale = mbFixScale;
-      if (mpTracker->mSensor == SensorType::IMU_MONOCULAR &&
+      if (sensorType() == SensorType::IMU_MONOCULAR &&
           !mpCurrentKF->GetMap()->GetInertialBA2())
         bFixedScale = false;
 
@@ -827,7 +814,7 @@ bool LoopClosing::DetectCommonRegionsFromBoW(
           Eigen::Matrix<double, 7, 7> mHessian7x7;
 
           // bool bFixedScale = mbFixScale;
-          //  if (mpTracker->mSensor == SensorType::IMU_MONOCULAR &&
+          //  if (sensorType() == SensorType::IMU_MONOCULAR &&
           //      !mpCurrentKF->GetMap()->GetInertialBA2()) {
           // bFixedScale = false; }
 
@@ -1040,8 +1027,8 @@ void LoopClosing::CorrectLoop() {
 
   // Send a stop signal to Local Mapping
   // Avoid new keyframes are inserted while correcting the loop
-  mpLocalMapper->RequestStop();
-  mpLocalMapper->EmptyQueue();  // Proccess keyframes in the queue
+  getLocalMapper()->RequestStop();
+  getLocalMapper()->EmptyQueue();  // Proccess keyframes in the queue
 
   // If a Global Bundle Adjustment is running, abort it
   if (isRunningGBA()) {
@@ -1059,7 +1046,7 @@ void LoopClosing::CorrectLoop() {
   }
 
   // Wait until Local Mapping has effectively stopped
-  while (!mpLocalMapper->isStopped()) {
+  while (!getLocalMapper()->isStopped()) {
     usleep(1000);
   }
 
@@ -1179,7 +1166,7 @@ void LoopClosing::CorrectLoop() {
       pKFi->UpdateConnections();
     }
     // TODO Check this index increasement
-    mpAtlas->GetCurrentMap()->IncreaseChangeIndex();
+    getAtlas()->GetCurrentMap()->IncreaseChangeIndex();
 
     // Start Loop Fusion
     // Update matched map points and replace if duplicated
@@ -1226,7 +1213,7 @@ void LoopClosing::CorrectLoop() {
   // Optimize graph
   bool bFixedScale = mbFixScale;
   // TODO CHECK; Solo para el monocular inertial
-  if (mpTracker->mSensor == SensorType::IMU_MONOCULAR &&
+  if (sensorType() == SensorType::IMU_MONOCULAR &&
       !mpCurrentKF->GetMap()->GetInertialBA2())
     bFixedScale = false;
 
@@ -1262,7 +1249,7 @@ void LoopClosing::CorrectLoop() {
   vdLoopOptEss_ms.push_back(timeOptEss);
 #endif
 
-  mpAtlas->InformNewBigChange();
+  getAtlas()->InformNewBigChange();
 
   // Add loop edge
   mpLoopMatchedKF->AddLoopEdge(mpCurrentKF);
@@ -1271,7 +1258,7 @@ void LoopClosing::CorrectLoop() {
   // Launch a new thread to perform Global Bundle Adjustment (Only if few
   // keyframes, if not it would take too much time)
   if (!pLoopMap->isImuInitialized() ||
-      (pLoopMap->KeyFramesInMap() < 200 && mpAtlas->CountMaps() == 1)) {
+      (pLoopMap->KeyFramesInMap() < 200 && getAtlas()->CountMaps() == 1)) {
     mbRunningGBA = true;
     mbFinishedGBA = false;
     mbStopGBA = false;
@@ -1282,7 +1269,7 @@ void LoopClosing::CorrectLoop() {
   }
 
   // Loop closed. Release Local Mapping.
-  mpLocalMapper->Release();
+  getLocalMapper()->Release();
 
   mLastLoopKFid =
       mpCurrentKF
@@ -1323,14 +1310,14 @@ void LoopClosing::MergeLocal() {
 
   // Verbose::PrintMess("MERGE-VISUAL: Request Stop Local Mapping",
   // Verbose::VERBOSITY_DEBUG); cout << "Request Stop Local Mapping" << endl;
-  mpLocalMapper->RequestStop();
+  getLocalMapper()->RequestStop();
   // Wait until Local Mapping has effectively stopped
-  while (!mpLocalMapper->isStopped()) {
+  while (!getLocalMapper()->isStopped()) {
     usleep(1000);
   }
   // cout << "Local Map stopped" << endl;
 
-  mpLocalMapper->EmptyQueue();
+  getLocalMapper()->EmptyQueue();
 
   // Merge map will become in the new active map with the local window of KFs
   // and MPs from the current map. Later, the elements of the current map will
@@ -1616,8 +1603,8 @@ void LoopClosing::MergeLocal() {
       pCurrentMap->EraseMapPoint(pMPi);
     }
 
-    mpAtlas->ChangeMap(pMergeMap);
-    mpAtlas->SetMapBad(pCurrentMap);
+    getAtlas()->ChangeMap(pMergeMap);
+    getAtlas()->SetMapBad(pCurrentMap);
     pMergeMap->IncreaseChangeIndex();
     // TODO for debug
     pMergeMap->ChangeId(pCurrentMap->GetId());
@@ -1693,7 +1680,7 @@ void LoopClosing::MergeLocal() {
             std::back_inserter(vpLocalCurrentWindowKFs));
   std::copy(spMergeConnectedKFs.begin(), spMergeConnectedKFs.end(),
             std::back_inserter(vpMergeConnectedKFs));
-  if (mpTracker->mSensor.isImu()) {
+  if (sensorType().isImu()) {
     Optimizer::MergeInertialBA(mpCurrentKF, mpMergeMatchedKF, &bStop,
                                pCurrentMap, vCorrectedSim3);
   } else {
@@ -1714,7 +1701,7 @@ void LoopClosing::MergeLocal() {
   // std::cout << "[Merge]: Welding bundle adjustment finished" << std::endl;
 
   // Loop closed. Release Local Mapping.
-  mpLocalMapper->Release();
+  getLocalMapper()->Release();
 
   // Update the non critical area from the current map to the merged map
   auto vpCurrentMapKFs = pCurrentMap->GetAllKeyFrames();
@@ -1722,7 +1709,7 @@ void LoopClosing::MergeLocal() {
 
   if (vpCurrentMapKFs.size() == 0) {
   } else {
-    if (mpTracker->mSensor == SensorType::MONOCULAR) {
+    if (sensorType() == SensorType::MONOCULAR) {
       unique_lock<mutex> currentLock(
           pCurrentMap->mMutexMapUpdate);  // We update the current map with the
                                           // Merge information
@@ -1783,15 +1770,15 @@ void LoopClosing::MergeLocal() {
       }
     }
 
-    mpLocalMapper->RequestStop();
+    getLocalMapper()->RequestStop();
     // Wait until Local Mapping has effectively stopped
-    while (!mpLocalMapper->isStopped()) {
+    while (!getLocalMapper()->isStopped()) {
       usleep(1000);
     }
 
     // Optimize graph (and update the loop position for each element form the
     // begining to the end)
-    if (mpTracker->mSensor != SensorType::MONOCULAR) {
+    if (sensorType() != SensorType::MONOCULAR) {
       Optimizer::OptimizeEssentialGraph(mpCurrentKF, vpMergeConnectedKFs,
                                         vpLocalCurrentWindowKFs,
                                         vpCurrentMapKFs, vpCurrentMapMPs);
@@ -1841,11 +1828,11 @@ void LoopClosing::MergeLocal() {
   vdMergeOptEss_ms.push_back(timeOptEss);
 #endif
 
-  mpLocalMapper->Release();
+  getLocalMapper()->Release();
 
   if (bRelaunchBA &&
       (!pCurrentMap->isImuInitialized() ||
-       (pCurrentMap->KeyFramesInMap() < 200 && mpAtlas->CountMaps() == 1))) {
+       (pCurrentMap->KeyFramesInMap() < 200 && getAtlas()->CountMaps() == 1))) {
     // Launch a new thread to perform Global Bundle Adjustment
     mbRunningGBA = true;
     mbFinishedGBA = false;
@@ -1860,7 +1847,7 @@ void LoopClosing::MergeLocal() {
   pCurrentMap->IncreaseChangeIndex();
   pMergeMap->IncreaseChangeIndex();
 
-  mpAtlas->RemoveBadMaps();
+  getAtlas()->RemoveBadMaps();
 }
 
 void LoopClosing::MergeLocal2() {
@@ -1900,9 +1887,9 @@ void LoopClosing::MergeLocal2() {
   }
 
   // cout << "Request Stop Local Mapping" << endl;
-  mpLocalMapper->RequestStop();
+  getLocalMapper()->RequestStop();
   // Wait until Local Mapping has effectively stopped
-  while (!mpLocalMapper->isStopped()) {
+  while (!getLocalMapper()->isStopped()) {
     usleep(1000);
   }
   // cout << "Local Map stopped" << endl;
@@ -1915,39 +1902,40 @@ void LoopClosing::MergeLocal2() {
     Sophus::SE3f T_on(mSold_new.rotation().cast<float>(),
                       mSold_new.translation().cast<float>());
 
-    unique_lock<mutex> lock(mpAtlas->GetCurrentMap()->mMutexMapUpdate);
+    unique_lock<mutex> lock(getAtlas()->GetCurrentMap()->mMutexMapUpdate);
 
     // cout << "KFs before empty: " <<
-    // mpAtlas->GetCurrentMap()->KeyFramesInMap() << endl;
-    mpLocalMapper->EmptyQueue();
-    // cout << "KFs after empty: " << mpAtlas->GetCurrentMap()->KeyFramesInMap()
+    // getAtlas()->GetCurrentMap()->KeyFramesInMap() << endl;
+    getLocalMapper()->EmptyQueue();
+    // cout << "KFs after empty: " <<
+    // getAtlas()->GetCurrentMap()->KeyFramesInMap()
     // << endl;
 
     std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
     // cout << "updating active map to merge reference" << endl;
     // cout << "curr merge KF id: " << mpCurrentKF->mnId << endl;
-    // cout << "curr tracking KF id: " << mpTracker->GetLastKeyFrame()->mnId <<
-    // endl;
+    // cout << "curr tracking KF id: " << getTracker()->GetLastKeyFrame()->mnId
+    // << endl;
     bool bScaleVel = false;
     if (s_on != 1) bScaleVel = true;
-    mpAtlas->GetCurrentMap()->ApplyScaledRotation(T_on, s_on, bScaleVel);
-    mpTracker->UpdateFrameIMU(s_on, mpCurrentKF->GetImuBias(),
-                              mpTracker->GetLastKeyFrame());
+    getAtlas()->GetCurrentMap()->ApplyScaledRotation(T_on, s_on, bScaleVel);
+    getTracker()->UpdateFrameIMU(s_on, mpCurrentKF->GetImuBias(),
+                                 getTracker()->GetLastKeyFrame());
 
     std::chrono::steady_clock::time_point t3 = std::chrono::steady_clock::now();
   }
 
   const int numKFnew = pCurrentMap->KeyFramesInMap();
 
-  if ((mpTracker->mSensor.isImu()) && !pCurrentMap->GetInertialBA2()) {
+  if ((sensorType().isImu()) && !pCurrentMap->GetInertialBA2()) {
     // Map is not completly initialized
     Eigen::Vector3d bg, ba;
     bg << 0., 0., 0.;
     ba << 0., 0., 0.;
     Optimizer::InertialOptimization(pCurrentMap, bg, ba);
     IMU::Bias b(ba[0], ba[1], ba[2], bg[0], bg[1], bg[2]);
-    unique_lock<mutex> lock(mpAtlas->GetCurrentMap()->mMutexMapUpdate);
-    mpTracker->UpdateFrameIMU(1.0f, b, mpTracker->GetLastKeyFrame());
+    unique_lock<mutex> lock(getAtlas()->GetCurrentMap()->mMutexMapUpdate);
+    getTracker()->UpdateFrameIMU(1.0f, b, getTracker()->GetLastKeyFrame());
 
     // Set map initialized
     pCurrentMap->SetInertialBA2();
@@ -2125,7 +2113,7 @@ void LoopClosing::MergeLocal2() {
   // TODO Check: If new map is too small, we suppose that not informaiton can be
   // propagated from new to old map
   if (numKFnew < 10) {
-    mpLocalMapper->Release();
+    getLocalMapper()->Release();
     return;
   }
 
@@ -2135,7 +2123,7 @@ void LoopClosing::MergeLocal2() {
 
   // Perform BA
   bool bStopFlag = false;
-  auto pCurrKF = mpTracker->GetLastKeyFrame();
+  auto pCurrKF = getTracker()->GetLastKeyFrame();
   // cout << "start MergeInertialBA" << endl;
   Optimizer::MergeInertialBA(pCurrKF, mpMergeMatchedKF, &bStopFlag, pCurrentMap,
                              CorrectedSim3);
@@ -2146,7 +2134,7 @@ void LoopClosing::MergeLocal2() {
       cout << "BAD ESSENTIAL GRAPH 6!!" << endl;*/
 
   // Release Local Mapping.
-  mpLocalMapper->Release();
+  getLocalMapper()->Release();
 
   return;
 }
@@ -2324,8 +2312,9 @@ void LoopClosing::ResetIfRequested() {
       }
     }
 
-    mLastLoopKFid = mpAtlas->GetLastInitKFid();  // TODO old variable, it is not
-                                                 // use in the new algorithm
+    mLastLoopKFid =
+        getAtlas()->GetLastInitKFid();  // TODO old variable, it is not
+                                        // use in the new algorithm
     mbResetActiveMapRequested = false;
   }
 }
@@ -2387,10 +2376,11 @@ void LoopClosing::RunGlobalBundleAdjustment(
                          Verbose::VERBOSITY_NORMAL);
       Verbose::PrintMess("Updating map ...", Verbose::VERBOSITY_NORMAL);
 
-      mpLocalMapper->RequestStop();
+      getLocalMapper()->RequestStop();
       // Wait until Local Mapping has effectively stopped
 
-      while (!mpLocalMapper->isStopped() && !mpLocalMapper->isFinished()) {
+      while (!getLocalMapper()->isStopped() &&
+             !getLocalMapper()->isFinished()) {
         usleep(1000);
       }
 
@@ -2554,11 +2544,11 @@ void LoopClosing::RunGlobalBundleAdjustment(
       pActiveMap->IncreaseChangeIndex();
 
       // TODO Check this update
-      // mpTracker->UpdateFrameIMU(1.0f,
-      // mpTracker->GetLastKeyFrame()->GetImuBias(),
-      // mpTracker->GetLastKeyFrame());
+      // getTracker()->UpdateFrameIMU(1.0f,
+      // getTracker()->GetLastKeyFrame()->GetImuBias(),
+      // getTracker()->GetLastKeyFrame());
 
-      mpLocalMapper->Release();
+      getLocalMapper()->Release();
 
 #ifdef REGISTER_TIMES
       std::chrono::steady_clock::time_point time_EndUpdateMap =
