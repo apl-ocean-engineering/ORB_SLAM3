@@ -85,6 +85,10 @@ void BoWKeyFrameDatabase::clearMap(const std::shared_ptr<Map>& pMap) {
   }
 }
 
+//
+// These aren't even used?
+//
+
 // void BoWKeyFrameDatabase::DetectCandidates(
 //     const std::shared_ptr<KeyFrame>& pKF, float minScore,
 //     vector<std::shared_ptr<KeyFrame>>& vpLoopCand,
@@ -472,16 +476,10 @@ void BoWKeyFrameDatabase::DetectNBestCandidates(
 
     spConnectedKF = pKF->GetConnectedKeyFrames();
 
-    for (DBoW2::BowVector::const_iterator vit = pKF->mBowVec.begin(),
-                                          vend = pKF->mBowVec.end();
-         vit != vend; vit++) {
-      auto& lKFs = mvInvertedFile[vit->first];
+    for (const auto& [key, value] : pKF->mBowVec) {
+      auto& lKFs = mvInvertedFile[key];
 
-      for (list<std::shared_ptr<KeyFrame>>::iterator lit = lKFs.begin(),
-                                                     lend = lKFs.end();
-           lit != lend; lit++) {
-        std::shared_ptr<KeyFrame> pKFi = *lit;
-
+      for (auto pKFi : lKFs) {
         if (pKFi->mnPlaceRecognitionQuery != pKF->mnId) {
           pKFi->mnPlaceRecognitionWords = 0;
           if (!spConnectedKF.count(pKFi)) {
@@ -509,11 +507,7 @@ void BoWKeyFrameDatabase::DetectNBestCandidates(
   int nscores = 0;
 
   // Compute similarity score.
-  for (list<std::shared_ptr<KeyFrame>>::iterator lit = lKFsSharingWords.begin(),
-                                                 lend = lKFsSharingWords.end();
-       lit != lend; lit++) {
-    std::shared_ptr<KeyFrame> pKFi = *lit;
-
+  for (auto pKFi : lKFsSharingWords) {
     if (pKFi->mnPlaceRecognitionWords > minCommonWords) {
       nscores++;
       float si = mpVoc->score(pKF->mBowVec, pKFi->mBowVec);
@@ -590,15 +584,10 @@ BoWKeyFrameDatabase::DetectRelocalizationCandidates(
   {
     unique_lock<mutex> lock(mMutex);
 
-    for (DBoW2::BowVector::const_iterator vit = F->mBowVec.begin(),
-                                          vend = F->mBowVec.end();
-         vit != vend; vit++) {
-      list<std::shared_ptr<KeyFrame>>& lKFs = mvInvertedFile[vit->first];
+    for (auto const& [key, value] : F->mBowVec) {
+      list<std::shared_ptr<KeyFrame>>& lKFs = mvInvertedFile[key];
 
-      for (list<std::shared_ptr<KeyFrame>>::iterator lit = lKFs.begin(),
-                                                     lend = lKFs.end();
-           lit != lend; lit++) {
-        std::shared_ptr<KeyFrame> pKFi = *lit;
+      for (auto pKFi : lKFs) {
         if (pKFi->mnRelocQuery != F->mnId) {
           pKFi->mnRelocWords = 0;
           pKFi->mnRelocQuery = F->mnId;
@@ -608,15 +597,13 @@ BoWKeyFrameDatabase::DetectRelocalizationCandidates(
       }
     }
   }
+
   if (lKFsSharingWords.empty()) return vector<std::shared_ptr<KeyFrame>>();
 
   // Only compare against those keyframes that share enough words
   int maxCommonWords = 0;
-  for (list<std::shared_ptr<KeyFrame>>::iterator lit = lKFsSharingWords.begin(),
-                                                 lend = lKFsSharingWords.end();
-       lit != lend; lit++) {
-    if ((*lit)->mnRelocWords > maxCommonWords)
-      maxCommonWords = (*lit)->mnRelocWords;
+  for (auto lit : lKFsSharingWords) {
+    if (lit->mnRelocWords > maxCommonWords) maxCommonWords = lit->mnRelocWords;
   }
 
   int minCommonWords = maxCommonWords * 0.8f;
