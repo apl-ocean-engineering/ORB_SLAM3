@@ -84,8 +84,7 @@ Sim3Solver::Sim3Solver(const std::shared_ptr<KeyFrame> &pKF1,
 
       if (pMP1->isBad() || pMP2->isBad()) continue;
 
-      if (bDifferentKFs) pKFm = vpKeyFrameMatchedMP[i1];
-      //if (!bDifferentKFs) pKFm = vpKeyFrameMatchedMP[i1]; //recommended fix?
+      if (!bDifferentKFs) pKFm = vpKeyFrameMatchedMP[i1];
       //oslog::info("Sim3Solver ctor: vpKeyFrameMatchedMP.size()=" + to_string(vpKeyFrameMatchedMP.size()) + " bDifferentKFs=" + to_string(bDifferentKFs));
 
       int indexKF1 = get<0>(pMP1->GetIndexInKeyFrame(pKF1));
@@ -117,6 +116,9 @@ Sim3Solver::Sim3Solver(const std::shared_ptr<KeyFrame> &pKF1,
       idx++;
     }
   }
+
+  std::cout << "[VPR] Sim3Solver ctor: mN1=" << mN1
+             << " constructed N=" << mvpMapPoints1.size() << std::endl;
 
   FromCameraToImage(mvX3Dc1, mvP1im1, pCamera1);
   FromCameraToImage(mvX3Dc2, mvP2im2, pCamera2);
@@ -479,6 +481,8 @@ Eigen::Vector3f Sim3Solver::GetEstimatedTranslation() {
 }
 
 float Sim3Solver::GetEstimatedScale() { return mBestScale; }
+
+int Sim3Solver::GetBestInliers() { return mnBestInliers; }
 
 void Sim3Solver::Project(const vector<Eigen::Vector3f> &vP3Dw,
                          vector<Eigen::Vector2f> &vP2D, Eigen::Matrix4f Tcw,

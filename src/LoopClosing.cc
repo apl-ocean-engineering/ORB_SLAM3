@@ -794,6 +794,20 @@ bool LoopClosing::DetectCommonRegionsFromBoW(
           !mpCurrentKF->GetMap()->GetInertialBA2())
         bFixedScale = false;
 
+      std::cout << "[VPR] Sim3 attempting: currentKF=" << mpCurrentKF->mnId << " matchedKF=" << pMostBoWMatchesKF->mnId << std::endl;
+
+      {
+        int nValid = 0, nNull = 0, nBad = 0;
+        for (auto mp : vpMatchedPoints) {
+          if (!mp) { nNull++; continue; }
+          if (mp->isBad()) { nBad++; continue; }
+          nValid++;
+        }
+        std::cout << "[VPR] vpMatchedPoints: size=" << vpMatchedPoints.size()
+                   << " valid=" << nValid << " null=" << nNull
+                   << " bad=" << nBad << std::endl;
+      }
+
       Sim3Solver solver =
           Sim3Solver(mpCurrentKF, pMostBoWMatchesKF, vpMatchedPoints,
                      bFixedScale, vpKeyFrameMatchedMP);
@@ -817,7 +831,7 @@ bool LoopClosing::DetectCommonRegionsFromBoW(
       }
 
       oslog::info("Check 2 beginning, bconverge = " + to_string(bConverge));
-      std::cout << "[VPR] G2_Sim3: " << (bConverge ? "PASS" : "FAIL") << " inliers=" << nInliers << std::endl; if (bConverge) {
+      std::cout << "[VPR] G2_Sim3: " << (bConverge ? "PASS" : "FAIL") << " inliers=" << nInliers << " bestInliers=" << solver.GetBestInliers() << std::endl; if (bConverge) {
         oslog::info("[PR] Check 2: KF" + to_string(pKFi->mnId) +
                     " | G2_Sim3: PASS inliers=" + to_string(nInliers));
 
@@ -2269,12 +2283,11 @@ bool LoopClosing::FetchVPRCandidates(
     VPRCandidate c = mvVPRCandidateQueue.front();
     mvVPRCandidateQueue.pop();
 
-    // if (c.queryKFId != mpCurrentKF->mnId) {
-    //   remaining.push(c);
-    //   continue;
-    // }
-    // 8/3
-    (void)c.queryKFId;  // intentionally unused
+    long unsigned int dist = (mpCurrentKF->mnId > c.queryKFId) ? mpCurrentKF->mnId - c.queryKFId : c.queryKFId - mpCurrentKF->mnId;
+    if (dist > 5) {
+      remaining.push(c);
+      continue;
+    }
 
     // Resolve matched KF ID → shared_ptr by walking all maps.
     // O(n) over all KFs — acceptable for typical map sizes.
@@ -2290,38 +2303,12 @@ bool LoopClosing::FetchVPRCandidates(
       if (pMatchedKF) break;
     }
 
-    // if (!pMatchedKF) {
-    //   RCLCPP_WARN(mpVPRNode->get_logger(),
-    //               "[VPR-BRIDGE] Could not resolve matched KF ID %lu — "
-    //               "KF may have been culled. Skipping.",
-    //               c.matchedKFId);
-    //   continue;
-    // }
-
     if (!pMatchedKF) {
-    // [VPR-BRIDGE] KF was culled by LocalMapping. Find the nearest
-    // surviving KF by ID — culled KFs transfer their MapPoints to
-    // a nearby surviving KF so this is geometrically reasonable.
-    long unsigned int bestDist = ULONG_MAX;
-    for (auto& pMap : mpAtlas->GetAllMaps()) {
-        for (auto& pKF : pMap->GetAllKeyFrames()) {
-            if (pKF->isBad()) continue;
-            long unsigned int dist = (pKF->mnId > c.matchedKFId) ?
-                pKF->mnId - c.matchedKFId :
-                c.matchedKFId - pKF->mnId;
-            if (dist < bestDist) {
-                bestDist = dist;
-                pMatchedKF = pKF;
-            }
-        }
-    }
-    if (!pMatchedKF || bestDist > 30) {
-        // Too far — no reasonable substitute
-        continue;
-    }
-    RCLCPP_DEBUG(mpVPRNode->get_logger(),
-                 "[VPR-BRIDGE] KF %lu culled, using nearest survivor KF %lu (dist=%lu)",
-                 c.matchedKFId, pMatchedKF->mnId, bestDist);
+      RCLCPP_WARN(mpVPRNode->get_logger(),
+                  "[VPR-BRIDGE] Could not resolve matched KF ID %lu — "
+                  "KF may have been culled. Skipping.",
+                  c.matchedKFId);
+      continue;
     }
     
 

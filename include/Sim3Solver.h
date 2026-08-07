@@ -54,6 +54,7 @@ class Sim3Solver {
   Eigen::Matrix3f GetEstimatedRotation();
   Eigen::Vector3f GetEstimatedTranslation();
   float GetEstimatedScale();
+  int GetBestInliers();
 
  protected:
   void ComputeCentroid(Eigen::Matrix3f &P, Eigen::Matrix3f &Pr,
